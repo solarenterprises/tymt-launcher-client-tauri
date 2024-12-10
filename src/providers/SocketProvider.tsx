@@ -160,15 +160,15 @@ export const SocketProvider = () => {
           if (socket.current) {
             if (!socket.current.hasListeners("connect")) {
               socket.current.on("connect", () => {
-                console.log("socket.current.on > connect");
+                // console.log("socket.current.on > connect");
                 socket.current.emit("get-active-users");
-                console.log("socket.current.emit > get-active-users");
+                // console.log("socket.current.emit > get-active-users");
               });
             }
 
             if (!socket.current.hasListeners("message-posted")) {
               socket.current.on("message-posted", async (data: ISocketParamsPostMessage) => {
-                console.log("socket.current.on > message-posted", data);
+                // console.log("socket.current.on > message-posted", data);
 
                 const senderId = data.sender_id;
                 const senderInBlockList = blockListStoreRef.current.contacts.find((user) => user._id === senderId);
@@ -179,7 +179,7 @@ export const SocketProvider = () => {
 
                 // Block if the message is from someone in the block list
                 if (senderInBlockList || !roomInChatroomList) {
-                  console.log("Blocked the message from someone in the block list or from an unknown chat room!", data);
+                  // console.log("Blocked the message from someone in the block list or from an unknown chat room!", data);
                   return;
                 }
 
@@ -217,10 +217,10 @@ export const SocketProvider = () => {
 
             if (!socket.current.hasListeners("alert-posted")) {
               socket.current.on("alert-posted", async (alert: IAlert) => {
-                console.log("socket.current.on > alert-posted", alert);
+                // console.log("socket.current.on > alert-posted", alert);
                 // Alert wrong format
                 if (!alert || !alert.alertType) {
-                  console.error("Alert wrong format!", alert);
+                  // console.error("Alert wrong format!", alert);
                   return;
                 }
 
@@ -230,14 +230,14 @@ export const SocketProvider = () => {
 
                 // Block if the alert is from someone in the block list
                 if (senderInBlockList) {
-                  console.log("Blocked the alert from someone in the block list!", alert);
+                  // console.log("Blocked the alert from someone in the block list!", alert);
                   return;
                 }
 
                 // Friend request alert
                 if (alert.alertType === "friend-request") {
                   if (senderInFriendList) {
-                    console.log("Sender is already in my friend list!");
+                    // console.log("Sender is already in my friend list!");
                     return;
                   }
                   dispatch(addOneToUnreadList(alert));
@@ -265,7 +265,7 @@ export const SocketProvider = () => {
 
             if (!socket.current.hasListeners("alert-updated")) {
               socket.current.on("alert-udpated", async (alert: IAlert) => {
-                console.log("socket.current.on > alert-udpated", alert);
+                // console.log("socket.current.on > alert-udpated", alert);
                 // if (alert.alertType === "friend-request") {
                 //   // Update the friend lists of both him and me
                 //   dispatch(fetchFriendListAsync());
@@ -285,7 +285,7 @@ export const SocketProvider = () => {
 
             if (!socket.current.hasListeners("friend-request-accepted")) {
               socket.current.on("friend-request-accepted", async (alert: IAlert) => {
-                console.log("socket.current.on > friend-request-accepted", alert);
+                // console.log("socket.current.on > friend-request-accepted", alert);
                 dispatch(fetchAlertListAsync(myInfoStoreRef.current._id));
                 dispatch(fetchFriendListAsync());
               });
@@ -293,7 +293,7 @@ export const SocketProvider = () => {
 
             if (!socket.current.hasListeners("friend-request-rejected")) {
               socket.current.on("friend-request-rejected", async (alert: IAlert) => {
-                console.log("socket.current.on > friend-request-rejected", alert);
+                // console.log("socket.current.on > friend-request-rejected", alert);
                 dispatch(fetchAlertListAsync(myInfoStoreRef.current._id));
                 dispatch(fetchFriendListAsync());
               });
@@ -301,7 +301,7 @@ export const SocketProvider = () => {
 
             if (!socket.current.hasListeners("joined-message-group")) {
               socket.current.on("joined-message-group", async (data: ISocketParamsJoinedMessageGroup) => {
-                console.log("socket.current.on > joined-message-group", data);
+                // console.log("socket.current.on > joined-message-group", data);
                 try {
                   const { room_id, joined_user_id } = data;
 
@@ -336,14 +336,14 @@ export const SocketProvider = () => {
                     }
                   });
                 } catch (err) {
-                  console.error("Failed to socket.current.on > joined-message-group", data);
+                  // console.error("Failed to socket.current.on > joined-message-group", data);
                 }
               });
             }
 
             if (!socket.current.hasListeners("left-message-group")) {
               socket.current.on("left-message-group", async (data: ISocketParamsLeftMessageGroup) => {
-                console.log("socket.current.on > left-message-group", data);
+                // console.log("socket.current.on > left-message-group", data);
                 try {
                   const { room_id, left_user_id } = data;
                   if (left_user_id === myInfoStoreRef.current._id) {
@@ -367,7 +367,7 @@ export const SocketProvider = () => {
                     });
                   }
                 } catch (err) {
-                  console.error("Failed to socket.current.on > left-message-group", data);
+                  // console.error("Failed to socket.current.on > left-message-group", data);
                 }
               });
             }
@@ -375,20 +375,20 @@ export const SocketProvider = () => {
             if (!socket.current.hasListeners("sync-events-all")) {
               socket.current.on("sync-events-all", async (data: any) => {
                 try {
-                  console.log("socket.current.on > sync-events-all", data);
+                  // console.log("socket.current.on > sync-events-all", data);
 
                   if (data.event_identifier) {
                     if (data.event_identifier === "user-online") {
-                      console.log("socket.current.on > sync-events-all > user-online", data.userId);
+                      // console.log("socket.current.on > sync-events-all > user-online", data.userId);
                       dispatch(addOneActiveUserList(data.userId));
                     } else if (data.event_identifier === "user-offline") {
-                      console.log("socket.current.on > sync-events-all > user-offline", data.userId);
+                      // console.log("socket.current.on > sync-events-all > user-offline", data.userId);
                       dispatch(delOneActiveUserList(data.userId));
                     } else if (data.event_identifier === "alert-posted") {
-                      console.log("socket.current.on > sync-events-all > alert-posted", data.newAlert);
+                      // console.log("socket.current.on > sync-events-all > alert-posted", data.newAlert);
                       const alert = data.newAlert as IAlert;
                       if (!alert || !alert.alertType) {
-                        console.error("Alert wrong format!", alert);
+                        // console.error("Alert wrong format!", alert);
                         return;
                       }
 
@@ -398,14 +398,14 @@ export const SocketProvider = () => {
 
                       // Block if the alert is from someone in the block list
                       if (senderInBlockList) {
-                        console.log("Blocked the alert from someone in the block list!", alert);
+                        // console.log("Blocked the alert from someone in the block list!", alert);
                         return;
                       }
 
                       // Friend request alert
                       if (alert.alertType === "friend-request") {
                         if (senderInFriendList) {
-                          console.log("Sender is already in my friend list!");
+                          // console.log("Sender is already in my friend list!");
                           return;
                         }
                         dispatch(addOneToUnreadList(alert));
@@ -429,15 +429,15 @@ export const SocketProvider = () => {
                         dispatch(addOneToUnreadList(alert));
                       }
                     } else if (data.event_identifier === "alert-updated") {
-                      console.log("socket.current.on > sync-events-all > alert-udpated", data.updatedAlert);
+                      // console.log("socket.current.on > sync-events-all > alert-udpated", data.updatedAlert);
                     }
                   } else if (data.instructions && isArray(data.instructions)) {
                     data.instructions.map((instruction: string) => {
                       if (instruction === SyncEventNames.UPDATE_IMAGE_RENDER_TIME) {
-                        console.log(instruction);
+                        // console.log(instruction);
                         dispatch(setRenderTime({ renderTime: Date.now() }));
                       } else if (instruction === SyncEventNames.UPDATE_CHATROOM_LIST) {
-                        console.log(instruction);
+                        // console.log(instruction);
                         dispatch(fetchChatroomListAsync(myInfoStoreRef.current._id)).then((action) => {
                           try {
                             if (action.type.endsWith("/fulfilled")) {
@@ -464,21 +464,21 @@ export const SocketProvider = () => {
                               }
                             }
                           } catch (err) {
-                            console.error("Failed to newSKeyArray: ", err);
+                            // console.error("Failed to newSKeyArray: ", err);
                           }
                         });
                       }
                     });
                   }
                 } catch (err) {
-                  console.error("Failed to sync-events-all: ", err);
+                  // console.error("Failed to sync-events-all: ", err);
                 }
               });
             }
 
             if (!socket.current.hasListeners("active-users")) {
               socket.current.on("active-users", async (data: ISocketParamsActiveUsers) => {
-                console.log("socket.current.on > active-users", data);
+                // console.log("socket.current.on > active-users", data);
                 dispatch(setActiveUserList(data.users));
               });
             }
@@ -486,7 +486,7 @@ export const SocketProvider = () => {
             if (!socket.current.hasListeners("sync-event")) {
               socket.current.on("sync-event", async (data: string) => {
                 try {
-                  console.log("socket.current.on > sync-event", data);
+                  // console.log("socket.current.on > sync-event", data);
                   const { instructions } = JSON.parse(data) as ISocketParamsSyncEvent;
                   instructions.map(async (instruction) => {
                     if (instruction === SyncEventNames.UPDATE_CONTACT_LIST) {
@@ -521,7 +521,7 @@ export const SocketProvider = () => {
                             }
                           }
                         } catch (err) {
-                          console.error("Failed to newSKeyArray: ", err);
+                          // console.error("Failed to newSKeyArray: ", err);
                         }
                       });
                     } else if (instruction === SyncEventNames.UPDATE_IMAGE_RENDER_TIME) {
@@ -529,14 +529,14 @@ export const SocketProvider = () => {
                     }
                   });
                 } catch (err) {
-                  console.error("Failed to socket.current.on > sync-event: ", err);
+                  // console.error("Failed to socket.current.on > sync-event: ", err);
                 }
               });
             }
 
             if (!socket.current.hasListeners("user-online-status-updated")) {
               socket.current.on("user-online-status-updated", async (data) => {
-                console.log("socket.current.on > user-online-status-updated", data);
+                // console.log("socket.current.on > user-online-status-updated", data);
                 const handleUpdatedOnlineStatus = async () => {
                   const userId = data.userid;
                   const userInChatuserlist = contactListStoreRef.current.contacts.find((user) => user._id === userId);
@@ -550,7 +550,7 @@ export const SocketProvider = () => {
 
             if (!socket.current.hasListeners("user-notification-status-updated")) {
               socket.current.on("user-notification-status-updated", async (data) => {
-                console.log("socket.current.on > user-notification-status-updated", data);
+                // console.log("socket.current.on > user-notification-status-updated", data);
                 const handleUpdatedOnlineStatus = async () => {
                   const userId = data.userid;
                   const userInChatuserlist = contactListStoreRef.current.contacts.find((user) => user._id === userId);
@@ -576,7 +576,7 @@ export const SocketProvider = () => {
   const approveFriendRequest = useCallback(
     async (alert: IAlert) => {
       try {
-        console.log("approveFriendRequest");
+        // console.log("approveFriendRequest");
 
         if (socket.current && socket.current.connected) {
           const data = {
@@ -589,13 +589,13 @@ export const SocketProvider = () => {
             },
           };
           socket.current.emit("update-alert", JSON.stringify(data));
-          console.log("socket.current.emit > update-alert", data);
+          // console.log("socket.current.emit > update-alert", data);
 
           dispatch(updateFriendRequestInAlertList(data));
           dispatch(createContactAsync(alert.note.sender));
         }
       } catch (err) {
-        console.error("Failed to approveFriendRequest: ", err);
+        // console.error("Failed to approveFriendRequest: ", err);
       }
     },
     [myInfoStore, socket.current]
@@ -604,7 +604,7 @@ export const SocketProvider = () => {
   const declineFriendRequest = useCallback(
     (alert: IAlert) => {
       try {
-        console.log("declineFriendRequest");
+        // console.log("declineFriendRequest");
         if (socket.current && socket.current.connected) {
           const data = {
             id: alert._id,
@@ -616,14 +616,14 @@ export const SocketProvider = () => {
             },
           };
           socket.current.emit("update-alert", JSON.stringify(data));
-          console.log("socket.current.emit > update-alert", data);
+          // console.log("socket.current.emit > update-alert", data);
 
           dispatch(updateFriendRequestInAlertList(data));
           dispatch(createContactAsync(alert.note.sender));
           dispatch(fetchFriendListAsync());
         }
       } catch (err) {
-        console.error("Failed to declineFriendRequest: ", err);
+        // console.error("Failed to declineFriendRequest: ", err);
       }
     },
     [myInfoStore, socket.current]

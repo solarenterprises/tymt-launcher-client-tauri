@@ -6,7 +6,7 @@ import { IBalance, IParamsFetchChainBalance, IWallet } from "../../types/walletT
 
 export const fetchBalanceList = async (walletStore: IWallet) => {
   try {
-    console.log("fetchBalanceList");
+    // console.log("fetchBalanceList");
     const asyncFunctions = supportChains?.map((one) =>
       fetchChainBalance({
         walletStore: walletStore,
@@ -17,13 +17,13 @@ export const fetchBalanceList = async (walletStore: IWallet) => {
     const flattenedResult = result?.flat();
     return flattenedResult;
   } catch (err) {
-    console.log("Failed to fetchBalanceList: ", err);
+    // console.log("Failed to fetchBalanceList: ", err);
   }
 };
 
 export const fetchChainBalance = async ({ walletStore, chainName }: IParamsFetchChainBalance) => {
   try {
-    console.log("fetchChainBalance");
+    // console.log("fetchChainBalance");
     const walletAddress = getCurrentChainWalletAddress(walletStore, chainName);
     const supportTokens = getSupportTokensByChainName(chainName);
     let nativeBalance: IBalance;
@@ -93,6 +93,6 @@ export const fetchChainBalance = async ({ walletStore, chainName }: IParamsFetch
     const res = [...tokenBalances, nativeBalance];
     return res;
   } catch (err) {
-    console.log("Failed to fetchChainBalance: ", err);
+    // console.log("Failed to fetchChainBalance: ", err);
   }
 };

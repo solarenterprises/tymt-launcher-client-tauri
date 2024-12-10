@@ -16,7 +16,7 @@ export const FullscreenProvider: React.FC<FullscreenProviderProps> = ({ children
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
       if (e.key === "F11") {
-        console.log("F11 pressed");
+        // console.log("F11 pressed");
         e.preventDefault();
         const isFullscreen = await appWindow.isFullscreen();
         if (isFullscreen) {

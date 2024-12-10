@@ -39,7 +39,7 @@ export const contactListSlice = createSlice({
     updateOneInContactList: (state, action) => {
       const index = state.data.contacts.findIndex((element) => element._id === action.payload.id);
       if (index < 0) {
-        console.error("Failed to updateOneInContactList: can't find the contact in contactList");
+        // console.error("Failed to updateOneInContactList: can't find the contact in contactList");
         return;
       }
       state.data.contacts[index] = action.payload;
@@ -52,7 +52,7 @@ export const contactListSlice = createSlice({
       })
       .addCase(fetchContactListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchContactListAsync: ", action.payload);
+          // console.log("Failed to fetchContactListAsync: ", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };
@@ -64,7 +64,7 @@ export const contactListSlice = createSlice({
       })
       .addCase(createContactAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to createContactAsync: ", action.payload);
+          // console.log("Failed to createContactAsync: ", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };
@@ -76,7 +76,7 @@ export const contactListSlice = createSlice({
       })
       .addCase(deleteContactAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to deleteContactAsync: ", action.payload);
+          // console.log("Failed to deleteContactAsync: ", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };

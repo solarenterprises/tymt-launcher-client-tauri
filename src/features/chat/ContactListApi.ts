@@ -14,16 +14,16 @@ export const fetchContactList = async () => {
       },
     });
     if (res?.status === 200) {
-      console.log("fetchContactList");
+      // console.log("fetchContactList");
       return {
         contacts: res?.data?.contacts,
       };
     } else {
-      console.log("fetchContactList res.status !== 200");
+      // console.log("fetchContactList res.status !== 200");
       return null;
     }
   } catch (err) {
-    console.error("Failed to fetchContactList: ", err);
+    // console.error("Failed to fetchContactList: ", err);
     return null;
   }
 };
@@ -41,16 +41,16 @@ export const createContact = async (_id: string) => {
       },
     });
     if (res?.status === 200 && res?.data?.contacts) {
-      console.log("createContact");
+      // console.log("createContact");
       return {
         contacts: res?.data?.contacts,
       };
     } else {
-      console.log("createContact: ", res?.status);
+      // console.log("createContact: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to createContact: ", err);
+    // console.error("Failed to createContact: ", err);
     return null;
   }
 };
@@ -68,16 +68,16 @@ export const deleteContact = async (_id: string) => {
       },
     });
     if (res?.status === 200 && res?.data?.contacts) {
-      console.log("deleteContact");
+      // console.log("deleteContact");
       return {
         contacts: res?.data?.contacts,
       };
     } else {
-      console.log("deleteContact: ", res?.status);
+      // console.log("deleteContact: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to deleteContact: ", err);
+    // console.error("Failed to deleteContact: ", err);
     return null;
   }
 };
@@ -89,14 +89,14 @@ export const searchUsers = async (nameOrSxp: string) => {
     const res = await axios.get(isAddress ? `${tymt_backend_url}/users?sxp=${nameOrSxp}` : `${tymt_backend_url}/users?name=${nameOrSxp}`);
 
     if (res?.status === 200) {
-      console.log("searchUsers");
+      // console.log("searchUsers");
       return res?.data?.users;
     } else {
-      console.log("searchUsers res.status", res?.status);
+      // console.log("searchUsers res.status", res?.status);
       return [];
     }
   } catch (err) {
-    console.error("Failed to searchUsers: ", err);
+    // console.error("Failed to searchUsers: ", err);
     return [];
   }
 };
@@ -111,13 +111,13 @@ export const getsenderName = async (userid: string) => {
       },
     });
     if (res?.status === 200) {
-      console.log("getsenderName");
+      // console.log("getsenderName");
       return res?.data?.result?.data?.nickName;
     } else {
-      console.log("getsenderName", res?.status);
+      // console.log("getsenderName", res?.status);
     }
   } catch (err) {
-    console.error("Failed to getsenderName: ", err);
+    // console.error("Failed to getsenderName: ", err);
   }
 };
 
@@ -143,13 +143,13 @@ export const getUserAvatar = async (userid: string) => {
       },
     });
     if (res.status === 200) {
-      console.log("getUserAvatar");
+      // console.log("getUserAvatar");
       return res.data.avatarUrl;
     } else {
-      console.log("getUserAvatar res.status !== 200");
+      // console.log("getUserAvatar res.status !== 200");
     }
   } catch (err) {
-    console.error("Failed to getUserAvatar: ", err);
+    // console.error("Failed to getUserAvatar: ", err);
   }
 };
 
@@ -163,13 +163,13 @@ export const getUsernotificationStatus = async (userid: string) => {
       },
     });
     if (res.status === 200) {
-      console.log("getUsernotificationStatus");
+      // console.log("getUsernotificationStatus");
       return res.data.result.data.notificationStatus;
     } else {
-      console.log("getUsernotificationStatus res.status !== 200");
+      // console.log("getUsernotificationStatus res.status !== 200");
     }
   } catch (err) {
-    console.error("Failed to getUsernotificationStatus: ", err);
+    // console.error("Failed to getUsernotificationStatus: ", err);
   }
 };
 
@@ -189,12 +189,12 @@ export const updateUsernotificationStatus = async (userid: string, notificationS
       }
     );
     if (res.status === 200) {
-      console.log("updateUsernotificationStatus");
+      // console.log("updateUsernotificationStatus");
       return res.data.notificationStatus;
     } else {
-      console.log("updateUsernotificationStatus res.status !== 200");
+      // console.log("updateUsernotificationStatus res.status !== 200");
     }
   } catch (err) {
-    console.error("Failed to updateUsernotificationStatus: ", err);
+    // console.error("Failed to updateUsernotificationStatus: ", err);
   }
 };

@@ -33,7 +33,7 @@ const InstallProcessContextMenu = ({ view, setView, contextMenuPosition }: IProp
       emit(TauriEventNames.GAME_DOWNLOAD, data);
       setView(false);
     } catch (err) {
-      console.error("Failed to handleCancelClick: ", err);
+      // console.error("Failed to handleCancelClick: ", err);
       const data_2: INotificationParams = {
         status: "failed",
         title: "Error",

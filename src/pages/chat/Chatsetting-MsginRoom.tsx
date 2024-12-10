@@ -17,7 +17,7 @@ const ChatMsginRoom = ({ view, setView }: propsType) => {
     (item: string) => {
       let updateData = { ...data, message: item };
       dispatch(setChat(updateData));
-      console.log("receiving message option", data.message);
+      // console.log("receiving message option", data.message);
     },
     [data]
   );

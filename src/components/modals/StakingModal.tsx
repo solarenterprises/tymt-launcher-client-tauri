@@ -48,7 +48,7 @@ const StakingModal = () => {
       if (sxpBalance > 0 && votingDataLength === 0) setOpen(true);
       else setOpen(false);
     } catch (err) {
-      console.log("Failed to SolarGetMyVotingData: ", err);
+      // console.log("Failed to SolarGetMyVotingData: ", err);
     }
   }, [walletStore, balanceListStore]);
 

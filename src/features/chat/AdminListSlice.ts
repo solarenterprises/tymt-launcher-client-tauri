@@ -45,7 +45,7 @@ const adminListSlice = createSlice({
       })
       .addCase(fetchAdminListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to fetchAdminListAsync: undefined!", action.payload);
+          // console.error("Failed to fetchAdminListAsync: undefined!", action.payload);
           return;
         }
         state.data = action.payload;

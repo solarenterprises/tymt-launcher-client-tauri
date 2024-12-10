@@ -59,7 +59,7 @@ const BubbleAudio = ({ roomMode, message, decryptedMessage, isLastMessage, isSen
         const blob = await response.blob();
         setBlob(blob);
       } catch (err) {
-        console.error("Failed to fetchAudioFile: ", err);
+        // console.error("Failed to fetchAudioFile: ", err);
       }
     };
 

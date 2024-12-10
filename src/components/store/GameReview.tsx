@@ -49,7 +49,7 @@ const GameReview = ({ game }: IPropsGameReview) => {
       setReviewData(data?.data);
       setLoading(false);
     } catch (err) {
-      console.log("Failed to fetchReviewData: ", err);
+      // console.log("Failed to fetchReviewData: ", err);
       setLoading(false);
     }
   };
@@ -65,7 +65,7 @@ const GameReview = ({ game }: IPropsGameReview) => {
 
   useEffect(() => {
     const unlisten_fetch_review = listen(TauriEventNames.FETCH_REVIEW, (_event) => {
-      console.log("TauriEventNames.FETCH_REVIEW");
+      // console.log("TauriEventNames.FETCH_REVIEW");
       fetchReviewData(1);
       setPage(1);
     });

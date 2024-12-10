@@ -43,7 +43,7 @@ export const addChatHistory = (array1: ChatMessageType[], array2: ChatMessageTyp
   }
 
   const resultArray = [...array1, ...array2];
-  console.log("addChatHistory", array1, array2, pageSize, resultArray);
+  // console.log("addChatHistory", array1, array2, pageSize, resultArray);
   return resultArray;
 
   // const resultArray: ChatMessageType[] = [...array1];

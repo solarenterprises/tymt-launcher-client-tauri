@@ -16,7 +16,7 @@ export const fetchGameList = async (page: number) => {
   try {
     const res = await GameAPI.fetchGameList(page);
     if (!res?.data?.result?.data || !isArray(res?.data?.result?.data)) {
-      console.error("Failed to fetchGameList: response error!", res);
+      // console.error("Failed to fetchGameList: response error!", res);
       const noti: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -29,7 +29,7 @@ export const fetchGameList = async (page: number) => {
     }
     return { games: res.data.result.data };
   } catch (err) {
-    console.error("Failed to fetchGameList: ", err);
+    // console.error("Failed to fetchGameList: ", err);
     const noti: INotificationParams = {
       status: "failed",
       title: "Error",
@@ -44,7 +44,7 @@ export const fetchGameList = async (page: number) => {
 
 export const fetchAllGameList = async ({ socket, userId }: IParamfetchAllGameList) => {
   try {
-    console.log("fetchAllGameList");
+    // console.log("fetchAllGameList");
     const res1 = await GameAPI.fetchGameList(1);
     const totalPage: number = res1?.data?.result?.meta?.pagination?.pageCount;
 
@@ -62,14 +62,14 @@ export const fetchAllGameList = async ({ socket, userId }: IParamfetchAllGameLis
       privateStoreIds.map((privateStoreId): Promise<IStoreSecret | null> => {
         return new Promise((resolve) => {
           const timeoutId = setTimeout(() => {
-            console.log("Failed to fetch storeSecret: ", privateStoreId, userId);
+            // console.log("Failed to fetch storeSecret: ", privateStoreId, userId);
             resolve(null); // Resolve with null instead of rejecting
           }, TIMEOUT);
 
-          console.log("socket.current.emit > request-store-secretkey", privateStoreId, userId);
+          // console.log("socket.current.emit > request-store-secretkey", privateStoreId, userId);
           socket.current.emit(SocketEventNames.REQUEST_STORE_SECRET_KEY, { privateStoreId, userId }, (response) => {
             clearTimeout(timeoutId); // Clear the timeout on successful response
-            console.log("response", response); // Log the response status
+            // console.log("response", response); // Log the response status
 
             if (response.error) {
               resolve(null); // Resolve with null if there's an error in the response
@@ -102,7 +102,7 @@ export const fetchAllGameList = async ({ socket, userId }: IParamfetchAllGameLis
 
     return { games: res2 };
   } catch (err) {
-    console.log("Failed to fetchAllGameList: ", err);
+    // console.log("Failed to fetchAllGameList: ", err);
     return null;
   }
 };

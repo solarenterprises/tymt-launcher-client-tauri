@@ -75,17 +75,17 @@ const UserListItem = ({ user, index, roomMode, setView, page }: IPropsUserListIt
           contactListStore?.contacts.some((element) => element?._id === user._id) ||
           friendListStore?.contacts.some((element) => element?._id === user._id)
         ) {
-          console.log("handleUserListItemClick: Already in the block/contact/friend list!");
+          // console.log("handleUserListItemClick: Already in the block/contact/friend list!");
           const haveDMWithUser = chatroomListStore?.chatrooms
             .filter((chatroom) => !chatroom.room_name)
             .some((dm) => dm.participants.some((participant) => participant?.userId === user?._id));
           // If we already had DM in the past
-          console.log("haveDMWithUser: ", haveDMWithUser);
+          // console.log("haveDMWithUser: ", haveDMWithUser);
           if (haveDMWithUser) {
             const newCurrentChatroom = chatroomListStore?.chatrooms
               .filter((chatroom) => !chatroom.room_name)
               .find((dm) => dm.participants.some((participant) => participant?.userId === user._id));
-            console.log("newCurrentChatroom: ", newCurrentChatroom);
+            // console.log("newCurrentChatroom: ", newCurrentChatroom);
 
             if (roomMode) {
               navigate(`/chat/${newCurrentChatroom?._id}`);
@@ -127,8 +127,8 @@ const UserListItem = ({ user, index, roomMode, setView, page }: IPropsUserListIt
                 };
                 socket.current.emit("join-message-group", JSON.stringify(data_1));
                 socket.current.emit("join-message-group", JSON.stringify(data_2));
-                console.log("socket.current.emit > join-message-group", data_1);
-                console.log("socket.current.emit > join-message-group", data_2);
+                // console.log("socket.current.emit > join-message-group", data_1);
+                // console.log("socket.current.emit > join-message-group", data_2);
 
                 const myUserKey = newCurrentChatroom?.participants.find((participant) => participant.userId === myInfoStore?._id)?.userKey;
                 dispatch(
@@ -172,8 +172,8 @@ const UserListItem = ({ user, index, roomMode, setView, page }: IPropsUserListIt
                 };
                 socket.current.emit("join-message-group", JSON.stringify(data_1));
                 socket.current.emit("join-message-group", JSON.stringify(data_2));
-                console.log("socket.current.emit > join-message-group", data_1);
-                console.log("socket.current.emit > join-message-group", data_2);
+                // console.log("socket.current.emit > join-message-group", data_1);
+                // console.log("socket.current.emit > join-message-group", data_2);
 
                 const myUserKey = newCurrentChatroom?.participants.find((participant) => participant?.userId === myInfoStore?._id)?.userKey;
                 dispatch(
@@ -192,12 +192,12 @@ const UserListItem = ({ user, index, roomMode, setView, page }: IPropsUserListIt
             });
           });
         }
-        console.log("handleUserListItemClick");
+        // console.log("handleUserListItemClick");
       } catch (err) {
-        console.log("Failed to handleUserListItemClick: ", err);
+        // console.log("Failed to handleUserListItemClick: ", err);
       }
     } else {
-      console.log("Failed to handleUserListItemClick: socket not connected!");
+      // console.log("Failed to handleUserListItemClick: socket not connected!");
     }
   }, [user, contactListStore, blockListStore, friendListStore, chatroomListStore, myInfoStore, socket.current]);
 

@@ -64,7 +64,7 @@ class Arbitrum implements IWallet {
       }
       return result;
     } catch (err) {
-      console.log("Failed to ARBITRUM getTokenBalance: ", err);
+      // console.log("Failed to ARBITRUM getTokenBalance: ", err);
       return [];
     }
   }
@@ -99,10 +99,10 @@ class Arbitrum implements IWallet {
           const block = receipt.blockNumber;
           const status = receipt.status ? "Success" : "Failure";
           const gas = receipt.gasUsed.toString();
-          console.log(`Transaction: [${hash}](^5^${hash})`);
-          console.log(`Block: ${block}`);
-          console.log(`Status: ${status}`);
-          console.log(`Gas Used: ${gas}`);
+          // console.log(`Transaction: [${hash}](^5^${hash})`);
+          // console.log(`Block: ${block}`);
+          // console.log(`Status: ${status}`);
+          // console.log(`Gas Used: ${gas}`);
         });
         return true;
       } catch {

@@ -61,7 +61,7 @@ class Avalanche implements IWallet {
       }
       return result;
     } catch (err) {
-      console.log("Failed to AVALANCHE getTokenBalance: ", err);
+      // console.log("Failed to AVALANCHE getTokenBalance: ", err);
       return [];
     }
   }
@@ -81,7 +81,7 @@ class Avalanche implements IWallet {
         tymtStorage.set(`avaxNextToken`, nextToken);
         return res.items;
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        // console.error("Error fetching transactions:", error);
         return [];
       }
     } else {
@@ -93,7 +93,7 @@ class Avalanche implements IWallet {
         tymtStorage.set(`avaxNextToken`, nextToken);
         return res.items;
       } catch (error) {
-        console.error("Error fetching transactions:", error);
+        // console.error("Error fetching transactions:", error);
         return [];
       }
     }
@@ -115,10 +115,10 @@ class Avalanche implements IWallet {
           const block = receipt.blockNumber;
           const status = receipt.status ? "Success" : "Failure";
           const gas = receipt.gasUsed.toString();
-          console.log(`Transaction: [${hash}](^5^${hash})`);
-          console.log(`Block: ${block}`);
-          console.log(`Status: ${status}`);
-          console.log(`Gas Used: ${gas}`);
+          // console.log(`Transaction: [${hash}](^5^${hash})`);
+          // console.log(`Block: ${block}`);
+          // console.log(`Status: ${status}`);
+          // console.log(`Gas Used: ${gas}`);
         });
         return true;
       } catch {

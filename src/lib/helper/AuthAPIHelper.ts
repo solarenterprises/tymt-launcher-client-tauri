@@ -60,7 +60,7 @@ export const getReqBodyNonCustodySignUp = (account: IAccount, wallet: IWallet, m
     };
     return data;
   } catch (err) {
-    console.log("Failed to getBodyNonCustodySignUp: ", err);
+    // console.log("Failed to getBodyNonCustodySignUp: ", err);
   }
 };
 
@@ -74,7 +74,7 @@ export const getReqBodyNonCustodySignIn = (account: IAccount, machineId: IMachin
     };
     return data;
   } catch (err) {
-    console.log("Failed to getReqBodyNonCustodySignIn: ", err);
+    // console.log("Failed to getReqBodyNonCustodySignIn: ", err);
   }
 };
 
@@ -90,7 +90,7 @@ export const getReqBodyNonCustodyBeforeSignIn = (account: IAccount, mnemonic: st
     };
     return data;
   } catch (err) {
-    console.log("Failed to getReqBodyNonCustodyBeforeSignIn: ", err);
+    // console.log("Failed to getReqBodyNonCustodyBeforeSignIn: ", err);
   }
 };
 
@@ -104,6 +104,6 @@ export const getNonCustodySignInToken = (salt: string, saltTokenStore: ISaltToke
     }
     return token;
   } catch (err) {
-    console.log("Failed to getNonCustodySignInToken: ", err);
+    // console.log("Failed to getNonCustodySignInToken: ", err);
   }
 };

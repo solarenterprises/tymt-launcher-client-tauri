@@ -62,7 +62,7 @@ const InstallingProcess = () => {
               try {
                 await openDir();
               } catch (error) {
-                console.error("Failed to open the directory:", error);
+                // console.error("Failed to open the directory:", error);
               }
             }}
           >
@@ -136,7 +136,7 @@ const InstallingProcess = () => {
               try {
                 await openDir();
               } catch (error) {
-                console.error("Failed to open the directory:", error);
+                // console.error("Failed to open the directory:", error);
               }
             }}
           >

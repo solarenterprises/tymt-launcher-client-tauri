@@ -133,7 +133,7 @@ export default class TransactionProviderAPI {
         return false;
       }
     } catch (err) {
-      console.error("TransactionProviderAPI.validateTransaction failed: ", err);
+      // console.error("TransactionProviderAPI.validateTransaction failed: ", err);
       noti = {
         status: "failed",
         title: "Send SXP",
@@ -249,7 +249,7 @@ export default class TransactionProviderAPI {
     }
     let feeInToken: number = feeInUSD / price;
     let res = bal >= totalAmount + feeInToken;
-    console.log(bal, totalAmount, feeInToken, feeInUSD, price);
+    // console.log(bal, totalAmount, feeInToken, feeInUSD, price);
     return res;
   };
 
@@ -315,7 +315,7 @@ export default class TransactionProviderAPI {
   static sendTransaction = async (jsonData: ISendTransactionReq, password: string, fee: string) => {
     let res: any;
     const accountStore: IAccount = JSON.parse(tymtStorage.get(`account`));
-    console.log(accountStore?.mnemonic, password, fee);
+    // console.log(accountStore?.mnemonic, password, fee);
     const passphrase: string = await decrypt(accountStore?.mnemonic, password);
     const recipients: IRecipient[] = [];
     for (let i = 0; i < jsonData.transfers.length; i++) {
@@ -359,7 +359,7 @@ export default class TransactionProviderAPI {
         headers: headers,
         body: JSON.parse(body1)
       });
-      console.log("done", await res1.json());
+      // console.log("done", await res1.json());
     } else if (res?.status === "failed") {
       const apiURL = `${tymt_backend_url}/orders/update-order/${jsonData._id}`;
       const headers: Record<string, any> = {
@@ -377,7 +377,7 @@ export default class TransactionProviderAPI {
         headers: headers,
         body: JSON.parse(body1)
       });
-      console.log("error", await res1.json());
+      // console.log("error", await res1.json());
     }
     return res;
   };
@@ -409,7 +409,7 @@ export default class TransactionProviderAPI {
         body: JSON.parse(body1)
       });
     } catch (err) {
-      console.error("Failed to update tx status: ", err);
+      // console.error("Failed to update tx status: ", err);
     }
   };
 
@@ -418,7 +418,7 @@ export default class TransactionProviderAPI {
       const res = await ERC20.sendContract(jsonData);
       return res;
     } catch (err) {
-      console.error("Failed to sendContract: ", err);
+      // console.error("Failed to sendContract: ", err);
     }
   };
 
@@ -448,7 +448,7 @@ export default class TransactionProviderAPI {
       }
       return res;
     } catch (err) {
-      console.error("Failed to signMessage: ", err);
+      // console.error("Failed to signMessage: ", err);
       return "";
     }
   };
@@ -483,7 +483,7 @@ export default class TransactionProviderAPI {
       }
       return res;
     } catch (err) {
-      console.error("Failed to verifyMessage: ", err);
+      // console.error("Failed to verifyMessage: ", err);
       return false;
     }
   };

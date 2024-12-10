@@ -25,7 +25,7 @@ export async function isInstalled(game: IGame) {
     await readDir(`${await appDataDir()}/v${tymt_version}/games/${game.project_name}`);
     return true;
   } catch (err) {
-    console.log("Failed to isInstalled: ", err);
+    // console.log("Failed to isInstalled: ", err);
     return false;
   }
 }
@@ -69,7 +69,7 @@ export const runNewGame = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    console.error("Failed to runNewGame: ", err);
+    // console.error("Failed to runNewGame: ", err);
     return false;
   }
 };
@@ -84,7 +84,7 @@ export const runD53 = async (serverIp: string, autoMode: boolean) => {
     const launcherUrl = `http://localhost:${local_server_port}`;
 
     if (!fullExePath || !d53_server || !d53_port || !token || !launcherUrl) {
-      console.log(`Failed to runD53: fullExePath ${fullExePath}, d53_server ${d53_server}, d53_port ${d53_port}, token ${token}, launcherUrl ${launcherUrl}`);
+      // console.log(`Failed to runD53: fullExePath ${fullExePath}, d53_server ${d53_server}, d53_port ${d53_port}, token ${token}, launcherUrl ${launcherUrl}`);
       return false;
     }
 
@@ -118,7 +118,7 @@ export const runD53 = async (serverIp: string, autoMode: boolean) => {
 
     return true;
   } catch (err) {
-    console.log("Failed to runD53: ", err);
+    // console.log("Failed to runD53: ", err);
     return false;
   }
 };
@@ -133,7 +133,7 @@ export async function openLink(url: string) {
   try {
     await open(url);
   } catch (err) {
-    console.error("Failed to open link:", err);
+    // console.error("Failed to open link:", err);
   }
 }
 
@@ -150,14 +150,14 @@ export const checkOnline = async (): Promise<boolean> => {
 
 export const downloadFileToAppDir = async (game: IGame) => {
   try {
-    console.log("downloadFileToAppDir");
+    // console.log("downloadFileToAppDir");
 
     const url: string = await getDownloadLinkNewGame(game);
     const downloadPath: string = await getDownloadFileFullPath(game);
     if (!url || !downloadPath) return false;
 
-    console.log("url", url);
-    console.log("downloadPath", downloadPath);
+    // console.log("url", url);
+    // console.log("downloadPath", downloadPath);
 
     await invoke("download_to_app_dir", {
       url: url,
@@ -166,21 +166,21 @@ export const downloadFileToAppDir = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    console.error("Failed to downloadFileToAppDir: ", err);
+    // console.error("Failed to downloadFileToAppDir: ", err);
     return false;
   }
 };
 
 export const installGame = async (game: IGame) => {
   try {
-    console.log("installGame");
+    // console.log("installGame");
 
     const fileLocation: string = await getDownloadFileFullPath(game);
     const installDir: string = await getInstallDir(game);
     if (!fileLocation || !installDir) return false;
 
-    console.log("fileLocation", fileLocation);
-    console.log("installDir", installDir);
+    // console.log("fileLocation", fileLocation);
+    // console.log("installDir", installDir);
 
     const fullExecutablePath = await getFullExecutablePathNewGame(game);
     const sourceExtension = (await getDownloadFileExtension(game))?.toLocaleLowerCase();
@@ -240,14 +240,14 @@ export const installGame = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    console.log("Failed to installGame: ", err);
+    // console.log("Failed to installGame: ", err);
     return false;
   }
 };
 
 export const downloadAndInstallNewGame = async (game: IGame) => {
   try {
-    console.log("downloadAndInstallNewGame");
+    // console.log("downloadAndInstallNewGame");
 
     await downloadFileToAppDir(game);
     await installGame(game);
@@ -255,7 +255,7 @@ export const downloadAndInstallNewGame = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    console.error("Failed to downloadAndInstallNewGame: ", err);
+    // console.error("Failed to downloadAndInstallNewGame: ", err);
     return false;
   }
 };
@@ -306,7 +306,7 @@ export const getDownloadLinkNewGame = async (game: IGame) => {
     }
     return res;
   } catch (err) {
-    console.error("Failed to getDownloadLinkNewGame: ", err);
+    // console.error("Failed to getDownloadLinkNewGame: ", err);
     return "";
   }
 };
@@ -316,10 +316,10 @@ export const getFullExecutablePathNewGame = async (game: IGame) => {
     const prefix: string = await appDataDir();
     const exePath: string = await getExecutablePathNewGame(game);
     const fullPath = prefix + `/v${tymt_version}/games/${game.project_name}/` + exePath;
-    console.log("getFullExecutablePathNewGame", fullPath);
+    // console.log("getFullExecutablePathNewGame", fullPath);
     return fullPath;
   } catch (err) {
-    console.log("Failed to getFullExecutablePathNewGame: ", err);
+    // console.log("Failed to getFullExecutablePathNewGame: ", err);
     return "";
   }
 };
@@ -366,7 +366,7 @@ export const getExecutablePathNewGame = async (game: IGame) => {
     }
     return res;
   } catch (err) {
-    console.error("Failed to getExecutablePathNewGame: ", err);
+    // console.error("Failed to getExecutablePathNewGame: ", err);
     return "";
   }
 };
@@ -413,7 +413,7 @@ export const getDownloadFileNameNewGame = async (game: IGame) => {
     }
     return res;
   } catch (err) {
-    console.error("Failed to getDownloadFileNameNewGame: ", err);
+    // console.error("Failed to getDownloadFileNameNewGame: ", err);
     return "";
   }
 };
@@ -423,7 +423,7 @@ export const getGameType = (game: IGame) => {
     const res = game?.projectMeta?.type;
     return res;
   } catch (err) {
-    console.log("Failed to getGameType: ", err);
+    // console.log("Failed to getGameType: ", err);
   }
 };
 
@@ -435,7 +435,7 @@ export const getGameReleaseBrowser = (game: IGame) => {
     const res = game?.releaseMeta?.platforms?.web;
     return res;
   } catch (err) {
-    console.log("Failed to getGameReleaseBrowser: ", err);
+    // console.log("Failed to getGameReleaseBrowser: ", err);
     return null;
   }
 };
@@ -482,7 +482,7 @@ export const getGameReleaseNative = async (game: IGame) => {
     }
     return res;
   } catch (err) {
-    console.log("Failed to getGameOsCpu: ", err);
+    // console.log("Failed to getGameOsCpu: ", err);
     return null;
   }
 };
@@ -497,7 +497,7 @@ export const getDownloadSizeNewGame = async (game: IGame) => {
     res = gameReleaseNative?.downloadSize;
     return res;
   } catch (err) {
-    console.error("Failed to getDownloadSizeNewGame: ", err);
+    // console.error("Failed to getDownloadSizeNewGame: ", err);
     return "";
   }
 };
@@ -512,7 +512,7 @@ export const getInstallSizeNewGame = async (game: IGame) => {
     res = gameReleaseNative?.installSize;
     return res;
   } catch (err) {
-    console.error("Failed to getInstallSizeNewGame: ", err);
+    // console.error("Failed to getInstallSizeNewGame: ", err);
     return "";
   }
 };
@@ -531,7 +531,7 @@ export const getSupportOSList = (game: IGame) => {
     }
     return res;
   } catch (err) {
-    console.log("Failed to getSupportOSList: ", err);
+    // console.log("Failed to getSupportOSList: ", err);
     return [];
   }
 };
@@ -540,10 +540,10 @@ export const getDownloadFileFullPath = async (game: IGame) => {
   try {
     const fileName = await getDownloadFileNameNewGame(game);
     const res = `${await appDataDir()}/${fileName}`;
-    console.log("getDownloadFileFullPath", res);
+    // console.log("getDownloadFileFullPath", res);
     return res;
   } catch (err) {
-    console.log("Failed to getDownloadFileFullPath: ", err);
+    // console.log("Failed to getDownloadFileFullPath: ", err);
     return "";
   }
 };
@@ -551,10 +551,10 @@ export const getDownloadFileFullPath = async (game: IGame) => {
 export const getInstallDir = async (game: IGame) => {
   try {
     const res = `${await appDataDir()}/v${tymt_version}/games/${game?.project_name}`;
-    console.log("getInstallDir", res);
+    // console.log("getInstallDir", res);
     return res;
   } catch (err) {
-    console.log("Failed to getInstallDir: ", err);
+    // console.log("Failed to getInstallDir: ", err);
     return "";
   }
 };
@@ -565,7 +565,7 @@ export const getDownloadFileExtension = async (game: IGame) => {
     const parts = fileName.split(".");
     return parts.length > 1 ? parts.pop() || null : null;
   } catch (err) {
-    console.log("Failed to getDownloadFileExtension: ", err);
+    // console.log("Failed to getDownloadFileExtension: ", err);
     return "";
   }
 };
@@ -576,7 +576,7 @@ export const getExecutableFileExtension = async (game: IGame) => {
     const parts = url.split(".");
     return parts.length > 1 ? parts.pop() || "" : "";
   } catch (err) {
-    console.log("Failed to getExecutableFileExtension:", err);
+    // console.log("Failed to getExecutableFileExtension:", err);
     return "";
   }
 };
@@ -584,7 +584,7 @@ export const getExecutableFileExtension = async (game: IGame) => {
 export const deleteDownloadFile = async (game: IGame) => {
   try {
     const fullPath = await getDownloadFileFullPath(game);
-    console.log("deleteDownloadFile", fullPath);
+    // console.log("deleteDownloadFile", fullPath);
 
     await invoke("delete_file", {
       fileLocation: fullPath,
@@ -592,7 +592,7 @@ export const deleteDownloadFile = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    console.log("Failed to deleteDownloadFile: ", err);
+    // console.log("Failed to deleteDownloadFile: ", err);
     return false;
   }
 };
@@ -629,7 +629,7 @@ export const getOsCpu = async () => {
     const res = `${resPlatform}_${resCpu}`;
     return res;
   } catch (err) {
-    console.log("Failed to getOsCpu: ", err);
+    // console.log("Failed to getOsCpu: ", err);
   }
 };
 
@@ -643,7 +643,7 @@ export const fetchMetaUri = async (game) => {
     const res = await res1.json();
     return res;
   } catch (err) {
-    console.log("Failed to fetchMetaUri: ", err);
+    // console.log("Failed to fetchMetaUri: ", err);
   }
 };
 
@@ -654,6 +654,6 @@ export const getDownloadLinkFromMetaUri = async (game) => {
     const res: string = data?.platforms[osCpu]?.external_url;
     return res;
   } catch (err) {
-    console.log("Failed to getDownloadLinkFromMetaUri: ", err);
+    // console.log("Failed to getDownloadLinkFromMetaUri: ", err);
   }
 };

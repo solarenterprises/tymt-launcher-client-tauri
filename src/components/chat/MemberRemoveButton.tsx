@@ -48,14 +48,14 @@ const MemberRemoveButton = ({ member }: IPropsMemberRemoveButton) => {
                 joined_user_id: member._id,
               };
               socket.current.emit("leave-message-group", JSON.stringify(data));
-              console.log("socket.current.emit > leave-message-group", data);
+              // console.log("socket.current.emit > leave-message-group", data);
             }
           }
         });
 
-        console.log("handleMemberRemoveButtonClick");
+        // console.log("handleMemberRemoveButtonClick");
       } catch (err) {
-        console.error("Failed to handleMemberRemoveButtonClick: ", err);
+        // console.error("Failed to handleMemberRemoveButtonClick: ", err);
 
         setNotificationStatus("failed");
         setNotificationTitle(t("hom-23_error"));
@@ -64,7 +64,7 @@ const MemberRemoveButton = ({ member }: IPropsMemberRemoveButton) => {
         setNotificationLink(null);
       }
     } else {
-      console.error("Failed to handleMemberRemoveButtonClick: socket not connected!");
+      // console.error("Failed to handleMemberRemoveButtonClick: socket not connected!");
 
       setNotificationStatus("failed");
       setNotificationTitle(t("hom-23_error"));

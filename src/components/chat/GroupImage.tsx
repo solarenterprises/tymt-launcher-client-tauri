@@ -21,11 +21,11 @@ const GroupImage = ({ groupId, size }: IPropsGroupImage) => {
       setLoading(true);
       const data = await ChatroomAPI.fetchChatroomAvatar(groupId);
       const imageUrl = URL.createObjectURL(data?.data);
-      console.log("imageUrl", imageUrl);
+      // console.log("imageUrl", imageUrl);
       setAvatar(imageUrl);
       setLoading(false);
     } catch (err) {
-      console.log("Failed to fetchGroupImage: ", err);
+      // console.log("Failed to fetchGroupImage: ", err);
       setLoading(false);
     }
   };

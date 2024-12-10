@@ -72,8 +72,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     const init = async () => {
       let permissionGranted = await isPermissionGranted();
       const windowIsVisible = await invoke<boolean>("is_window_visible");
-      console.log("permissionGranted", permissionGranted);
-      console.log("windowIsVisible", windowIsVisible);
+      // console.log("permissionGranted", permissionGranted);
+      // console.log("windowIsVisible", windowIsVisible);
       if (!permissionGranted) {
         const permission = await requestPermission();
         permissionGranted = permission === "granted";
@@ -95,7 +95,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   useEffect(() => {
     const unlisten_notification = listen(TauriEventNames.NOTIFICATION, async (event) => {
       const data = event.payload as INotificationParams;
-      console.log("TauriEventNames.NOTIFICATION", data);
+      // console.log("TauriEventNames.NOTIFICATION", data);
       setNotificationStatus(data.status);
       setNotificationTitle(data.translate ? await translateString(data.title) : data.title);
       setNotificationDetail(data.translate ? await translateString(data.message) : data.message);
@@ -105,7 +105,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
     const unlisten_game_download = listen(TauriEventNames.GAME_DOWNLOAD, async (event) => {
       const data = event.payload as INotificationGameDownloadParams;
-      console.log("TauriEventNames.GAME_DOWNLOAD", data);
+      // console.log("TauriEventNames.GAME_DOWNLOAD", data);
       if (data.status === "started") {
         const noti: INotificationParams = {
           status: "success",
@@ -206,10 +206,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     const unlisten_fs_remove_dir = listen(TauriEventNames.FS_REMOVE_DIR, async (event) => {
       const game = event.payload as IGame;
       if (!game) {
-        console.log("Failed to unlisten_fs_remove_dir: event.payload is not IGame!");
+        // console.log("Failed to unlisten_fs_remove_dir: event.payload is not IGame!");
         return;
       }
-      console.log("unlisten_fs_remove_dir", game);
+      // console.log("unlisten_fs_remove_dir", game);
       dispatch(addRemoveStatus(game));
       try {
         const dirPath = (await appDataDir()) + `/v${tymt_version}/games/${game?.project_name}`;
@@ -217,7 +217,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
           recursive: true,
         });
       } catch (err) {
-        console.log("Failed to unlisten_fs_remove_dir: ", err);
+        // console.log("Failed to unlisten_fs_remove_dir: ", err);
       }
       dispatch(delRemoveStatus(game));
     });

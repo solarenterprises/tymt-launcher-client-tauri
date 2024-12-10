@@ -10,14 +10,14 @@ const UpdateProvider = () => {
       try {
         const update = await check();
         if (update?.available) {
-          console.log(`Update to ${update.version} available! Date: ${update.date}`);
-          console.log(`Release notes: ${update.body}`);
+          // console.log(`Update to ${update.version} available! Date: ${update.date}`);
+          // console.log(`Release notes: ${update.body}`);
           await update.downloadAndInstall();
           // requires the `process` plugin
           await relaunch();
         }
       } catch (error) {
-        console.error("Failed to check for updates:", error);
+        // console.error("Failed to check for updates:", error);
       }
     };
 

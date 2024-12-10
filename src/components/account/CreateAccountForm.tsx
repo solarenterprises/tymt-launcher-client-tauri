@@ -60,7 +60,7 @@ const CreateAccountForm = () => {
         dispatch(setTempAccount(newTempAccountStore));
         navigate("/non-custodial/signup/2");
       } catch (err) {
-        console.log("Failed at CreateAccountForm: ", err);
+        // console.log("Failed at CreateAccountForm: ", err);
       }
     },
   });

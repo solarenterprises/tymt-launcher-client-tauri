@@ -40,7 +40,7 @@ const BubbleFile = ({ roomMode, message, decryptedMessage, isLastMessage, isSend
         extension: isValidExtension ? extension : null,
       };
     } catch (err) {
-      console.error("Failed to getFileDetailsFromFileName: ", err);
+      // console.error("Failed to getFileDetailsFromFileName: ", err);
       return {
         filename: null,
         extension: null,

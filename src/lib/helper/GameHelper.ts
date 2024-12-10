@@ -135,6 +135,6 @@ export const decryptGameURL = async (_data: IGame, _secret: string) => {
 
     return data;
   } catch (err) {
-    console.log("Failed to decryptDataURL:", err);
+    // console.log("Failed to decryptDataURL:", err);
   }
 };

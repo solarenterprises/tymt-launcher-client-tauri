@@ -55,8 +55,8 @@ class ERC20 {
   }
 
   static async sendTransaction(passphrase: string, rpc_url: string, tx: { recipients: IRecipient[]; fee: string; vendorField?: string }) {
-    console.log("RPC_URL", rpc_url);
-    console.log("passphrase", passphrase);
+    // console.log("RPC_URL", rpc_url);
+    // console.log("passphrase", passphrase);
     if (tx.recipients.length < 1) {
       const noti: INotification = {
         status: "failed",
@@ -67,7 +67,7 @@ class ERC20 {
     }
     try {
       const privateKey = await ERC20.getPrivateKeyFromMnemonic(passphrase);
-      console.log("privateKey", privateKey);
+      // console.log("privateKey", privateKey);
       const response = await Promise.all(
         tx.recipients.map((recipient) => {
           return multichainWallet.transfer({
@@ -79,7 +79,7 @@ class ERC20 {
           });
         })
       );
-      console.log("Response of send EVM native token transaction: ", response);
+      // console.log("Response of send EVM native token transaction: ", response);
       const noti: INotification = {
         status: "success",
         title: await translateString("Success"),
@@ -88,7 +88,7 @@ class ERC20 {
       };
       return noti;
     } catch (err) {
-      console.error("Failed to send EVM native token transaction: ", err);
+      // console.error("Failed to send EVM native token transaction: ", err);
       const translated = await translateString(err.toString());
       const noti: INotification = {
         status: "failed",
@@ -100,8 +100,8 @@ class ERC20 {
   }
 
   static async sendTransactionAPI(passphrase: string, rpc_url: string, tx: { recipients: IRecipient[]; fee: string; vendorField?: string }) {
-    console.log("RPC_URL", rpc_url);
-    console.log("passphrase", passphrase);
+    // console.log("RPC_URL", rpc_url);
+    // console.log("passphrase", passphrase);
     if (tx.recipients.length < 1) {
       const noti: INotification = {
         status: "failed",
@@ -112,7 +112,7 @@ class ERC20 {
     }
     try {
       const privateKey = await ERC20.getPrivateKeyFromMnemonic(passphrase);
-      console.log("privateKey", privateKey);
+      // console.log("privateKey", privateKey);
       const response = await Promise.all(
         tx.recipients.map((recipient) => {
           return multichainWallet.transfer({
@@ -124,7 +124,7 @@ class ERC20 {
           });
         })
       );
-      console.log("Response of send EVM native token transaction: ", response);
+      // console.log("Response of send EVM native token transaction: ", response);
       const noti: INotification = {
         status: "success",
         title: "Send EVM",
@@ -133,7 +133,7 @@ class ERC20 {
       };
       return noti;
     } catch (err) {
-      console.error("Failed to send EVM native token transaction: ", err);
+      // console.error("Failed to send EVM native token transaction: ", err);
       const noti: INotification = {
         status: "failed",
         title: "Send EVM",
@@ -166,7 +166,7 @@ class ERC20 {
           });
         })
       );
-      console.log("Response of send EVM native token transaction: ", response);
+      // console.log("Response of send EVM native token transaction: ", response);
       const noti: INotification = {
         status: "success",
         title: await translateString("Success"),
@@ -174,7 +174,7 @@ class ERC20 {
       };
       return noti;
     } catch (err) {
-      console.error("Failed to send EVM native token transaction: ", err);
+      // console.error("Failed to send EVM native token transaction: ", err);
       const translated = await translateString(err.toString());
       const noti: INotification = {
         status: "failed",
@@ -208,7 +208,7 @@ class ERC20 {
           });
         })
       );
-      console.log("Response of send EVM native token transaction: ", response);
+      // console.log("Response of send EVM native token transaction: ", response);
       const noti: INotification = {
         status: "success",
         title: "Send EVM",
@@ -217,7 +217,7 @@ class ERC20 {
       };
       return noti;
     } catch (err) {
-      console.error("Failed to send EVM native token transaction: ", err);
+      // console.error("Failed to send EVM native token transaction: ", err);
       const noti: INotification = {
         status: "failed",
         title: "Send EVM",
@@ -240,10 +240,10 @@ class ERC20 {
         contractAbi: jsonData.abi,
       };
       const res = await multichainWallet.smartContractCall(payload);
-      console.log("sendContract", res);
+      // console.log("sendContract", res);
       return res;
     } catch (err) {
-      console.error("Failed to sendTransaction: ", err);
+      // console.error("Failed to sendTransaction: ", err);
     }
   }
 

@@ -71,7 +71,7 @@ class Ethereum implements IWallet {
       }
       return result;
     } catch (err) {
-      console.log("Failed to ETHEREUM getTokenBalance: ", err);
+      // console.log("Failed to ETHEREUM getTokenBalance: ", err);
       return [];
     }
   }
@@ -106,11 +106,11 @@ class Ethereum implements IWallet {
           const block = receipt.blockNumber;
           const status = receipt.status ? "Success" : "Failure";
           const gas = receipt.gasUsed.toString();
-          console.log(`Transaction: [${hash}](^5^${hash})`);
-          console.log(`Block: ${block}`);
-          console.log(`Status: ${status}`);
-          console.log(`Gas Used: ${gas}`);
-          console.log("----------");
+          // console.log(`Transaction: [${hash}](^5^${hash})`);
+          // console.log(`Block: ${block}`);
+          // console.log(`Status: ${status}`);
+          // console.log(`Gas Used: ${gas}`);
+          // console.log("----------");
         });
         return true;
       } catch {
@@ -125,7 +125,7 @@ class Ethereum implements IWallet {
       const signature = await wallet.signMessage(message);
       return signature;
     } catch (error) {
-      console.error("Error signing message:", error);
+      // console.error("Error signing message:", error);
       throw error;
     }
   }
@@ -133,10 +133,10 @@ class Ethereum implements IWallet {
   static async verifyMessage(message: string, signature: string, address: string): Promise<boolean> {
     try {
       const recoveredAddress = ethers.verifyMessage(message, signature);
-      console.log(recoveredAddress);
+      // console.log(recoveredAddress);
       return recoveredAddress === address;
     } catch (error) {
-      console.error("Error verifying message:", error);
+      // console.error("Error verifying message:", error);
       return false;
     }
   }

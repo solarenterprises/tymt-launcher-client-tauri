@@ -55,7 +55,7 @@ const NonCustodialSignUp3 = () => {
       navigate("/non-custodial/signup/4");
       setLoading(false);
     } catch (err) {
-      console.log("Failed to handleNextClick: ", err);
+      // console.log("Failed to handleNextClick: ", err);
       setLoading(false);
     }
   }, [tempAccountStore]);

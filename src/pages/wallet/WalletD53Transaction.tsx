@@ -170,7 +170,7 @@ const WalletD53Transaction = () => {
       setTimeLeft(120);
       setSwitchChainModalOpen(false);
     } catch (err) {
-      console.log("Failed to TransactionProviderAPI.sendTransaction: ", err);
+      // console.log("Failed to TransactionProviderAPI.sendTransaction: ", err);
       const res: INotification = {
         status: "failed",
         title: `Send ${currentSupportChain?.chain?.symbol}`,
@@ -195,7 +195,7 @@ const WalletD53Transaction = () => {
     try {
       await TransactionProviderAPI.updateTransactionStatus(jsonData, "rejected");
     } catch (err) {
-      console.error("Failed to update tx status as rejected: ", err);
+      // console.error("Failed to update tx status as rejected: ", err);
     }
     let res = {
       status: "failed",
@@ -251,7 +251,7 @@ const WalletD53Transaction = () => {
         try {
           await TransactionProviderAPI.updateTransactionStatus(json_data, "fail");
         } catch (err) {
-          console.log("Failed to update transaction status as fail: ", err);
+          // console.log("Failed to update transaction status as fail: ", err);
         }
         return;
       }

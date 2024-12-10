@@ -32,10 +32,10 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPa
       });
       if (filepath) {
         const content = passphrase;
-        console.log(filepath);
+        // console.log(filepath);
         try {
           await invoke("write_file", { content, filepath });
-          console.log("File saved at:", filepath);
+          // console.log("File saved at:", filepath);
           const noti_0: INotificationParams = {
             status: "success",
             title: `Success`,
@@ -45,7 +45,7 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPa
           };
           emit(TauriEventNames.NOTIFICATION, noti_0);
         } catch (error) {
-          console.error("Error saving file:", error);
+          // console.error("Error saving file:", error);
           const noti_0: INotificationParams = {
             status: "failed",
             title: `Error`,

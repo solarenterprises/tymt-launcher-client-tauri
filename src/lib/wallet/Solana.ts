@@ -29,7 +29,7 @@ class Solana implements IWallet {
       if (!wallet) return "";
       return wallet.address;
     } catch (err) {
-      console.error("Failed to SOLANA getAddress: ", err);
+      // console.error("Failed to SOLANA getAddress: ", err);
       return "";
     }
   }
@@ -67,7 +67,7 @@ class Solana implements IWallet {
       const sols = (await response.json()?.result?.value) / 1e9;
       return sols;
     } catch (err) {
-      console.log("Failed to SOLANA getBalance: ", err);
+      // console.log("Failed to SOLANA getBalance: ", err);
       return 0;
     }
   }
@@ -111,7 +111,7 @@ class Solana implements IWallet {
       });
       return Array.isArray(await response2.json()) ? await response2.json() : [];
     } catch (err) {
-      console.error("Failed to SOLANA getTransactions: ", err);
+      // console.error("Failed to SOLANA getTransactions: ", err);
       return [];
     }
   }
@@ -149,15 +149,15 @@ class Solana implements IWallet {
           connectTimeout: 30,
           body: JSON.parse(body1),
         });
-        console.log(await response1.json());
+        // console.log(await response1.json());
         const recentBlockhash = await response1.json()?.result?.value?.blockhash;
 
-        console.log("recentBlockhash: ", recentBlockhash);
+        // console.log("recentBlockhash: ", recentBlockhash);
         trx.recentBlockhash = recentBlockhash;
         trx.sign(keypair);
         const rawTx = trx.serialize();
         const rawTxString = bs58.encode(rawTx);
-        console.log("rawTx: ", rawTxString);
+        // console.log("rawTx: ", rawTxString);
 
         const bodyContent2 = {
           jsonrpc: "2.0",
@@ -171,7 +171,7 @@ class Solana implements IWallet {
           connectTimeout: 30,
           body: JSON.parse(body2),
         });
-        console.log(await response2.json());
+        // console.log(await response2.json());
 
         const noti: INotification = {
           status: "success",
@@ -180,7 +180,7 @@ class Solana implements IWallet {
         };
         return noti;
       } catch (err) {
-        console.error("Failed to send SOL transaction: ", err);
+        // console.error("Failed to send SOL transaction: ", err);
         const translated = await translateString(err.toString());
         const noti: INotification = {
           status: "failed",
@@ -225,15 +225,15 @@ class Solana implements IWallet {
           connectTimeout: 30,
           body: JSON.parse(body1),
         });
-        console.log(await response1.json());
+        // console.log(await response1.json());
         const recentBlockhash = await response1.json()?.result?.value?.blockhash;
 
-        console.log("recentBlockhash: ", recentBlockhash);
+        // console.log("recentBlockhash: ", recentBlockhash);
         trx.recentBlockhash = recentBlockhash;
         trx.sign(keypair);
         const rawTx = trx.serialize();
         const rawTxString = bs58.encode(rawTx);
-        console.log("rawTx: ", rawTxString);
+        // console.log("rawTx: ", rawTxString);
 
         const bodyContent2 = {
           jsonrpc: "2.0",
@@ -247,7 +247,7 @@ class Solana implements IWallet {
           connectTimeout: 30,
           body: JSON.parse(body2),
         });
-        console.log(await response2.json());
+        // console.log(await response2.json());
 
         const noti: INotification = {
           status: "success",
@@ -257,7 +257,7 @@ class Solana implements IWallet {
         };
         return noti;
       } catch (err) {
-        console.error("Failed to send SOL transaction: ", err);
+        // console.error("Failed to send SOL transaction: ", err);
         const noti: INotification = {
           status: "failed",
           title: "Send SOL",

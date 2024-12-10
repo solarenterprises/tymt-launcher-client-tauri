@@ -30,11 +30,11 @@ const UserAvatar = ({ userId, size }: IPropsUserAvatar) => {
       setLoading(true);
       const data = await UserAPI.fetchAvatar(userId);
       const imageUrl = URL.createObjectURL(data?.data);
-      console.log("imageUrl", imageUrl);
+      // console.log("imageUrl", imageUrl);
       setAvatar(imageUrl);
       setLoading(false);
     } catch (err) {
-      console.log("Failed to fetchUserAvatar: ", err);
+      // console.log("Failed to fetchUserAvatar: ", err);
       setLoading(false);
     }
   };

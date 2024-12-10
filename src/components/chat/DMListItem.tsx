@@ -57,7 +57,7 @@ const DMListItem = ({ DM, index, roomMode, setView }: IPropsDMListItem) => {
     try {
       return unreadMessageListStore.data.find((element) => element.chatroomId === DM._id).unreadMessageCount;
     } catch (err) {
-      console.error("Failed with unreadMessageCountForChatroom: ", err);
+      // console.error("Failed with unreadMessageCountForChatroom: ", err);
       return 0;
     }
   }, [unreadMessageListStore]);
@@ -105,12 +105,12 @@ const DMListItem = ({ DM, index, roomMode, setView }: IPropsDMListItem) => {
           is_to_self: true,
         };
         socket.current.emit("sync-event", JSON.stringify(data));
-        console.log("socket.current.emit > sync-event", data);
+        // console.log("socket.current.emit > sync-event", data);
       }
 
-      console.log("handleDMListItemClick");
+      // console.log("handleDMListItemClick");
     } catch (err) {
-      console.error("Failed to handleDMListItemClick: ", err);
+      // console.error("Failed to handleDMListItemClick: ", err);
     }
   }, [socket.current, myInfoStore]);
 

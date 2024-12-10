@@ -73,11 +73,11 @@ const GuestCompletePassword = () => {
           })
         );
 
-        console.log("GuestCompletePassword", newPassword, decryptedMnemonic);
+        // console.log("GuestCompletePassword", newPassword, decryptedMnemonic);
 
         navigate("/guest/complete/passphrase");
       } catch (err) {
-        console.log("Failed at GuestCompletePassword: ", err);
+        // console.log("Failed at GuestCompletePassword: ", err);
       }
     },
   });

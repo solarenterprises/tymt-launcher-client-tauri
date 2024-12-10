@@ -141,7 +141,7 @@ const WalletVote = () => {
       setNotificationOpen(true);
       setNotificationLink(null);
     } catch (err) {
-      console.error("Failed to refresh voting page: ", err);
+      // console.error("Failed to refresh voting page: ", err);
       const translated = await translateString(err.toString());
       setNotificationStatus("failed");
       setNotificationTitle(t("wal-53_refresh-vote-failed"));
@@ -200,7 +200,7 @@ const WalletVote = () => {
           const res = await SolarGetBlockchain();
           setLatestBlock(res.data.data.block.height);
         } catch (err) {
-          console.error("Failed to setInterval 4*1e3: ", err);
+          // console.error("Failed to setInterval 4*1e3: ", err);
           error = true;
         }
       }
@@ -225,7 +225,7 @@ const WalletVote = () => {
           setTotalVoted(newTotalVoted);
           setTotalRewards(newTotalRewards);
         } catch (err) {
-          console.error("Failed to setInterval 120*1e3: ", err);
+          // console.error("Failed to setInterval 120*1e3: ", err);
           error = true;
         }
       }

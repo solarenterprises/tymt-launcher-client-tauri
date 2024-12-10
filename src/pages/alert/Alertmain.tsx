@@ -52,9 +52,9 @@ const Alertmain = () => {
         };
         dispatch(fetchUnreadAlertListAsync(param));
       }
-      console.log("fetchMoreAlert: ", `page: ${page + 1}`, `hasMore: true`);
+      // console.log("fetchMoreAlert: ", `page: ${page + 1}`, `hasMore: true`);
     } catch (err) {
-      console.error("Failed to fetchMoreAlert: ", err);
+      // console.error("Failed to fetchMoreAlert: ", err);
     }
   }, [page, alertStatus, myInfoStore, alertListStore]);
 

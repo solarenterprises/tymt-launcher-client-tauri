@@ -30,7 +30,7 @@ export interface ISendCoin {
 
 export const sendCoin = async ({ currentTokenSymbol, data }: ISendCoin): Promise<any> => {
   try {
-    console.log("sendCoin");
+    // console.log("sendCoin");
     const tx = { recipients: data.recipients, fee: data.fee };
     const accountStore: IAccount = JSON.parse(await tymtStorage.get(`account`));
     const rpc_url = getRPCUrl(currentTokenSymbol);
@@ -59,7 +59,7 @@ export const sendCoin = async ({ currentTokenSymbol, data }: ISendCoin): Promise
       return res;
     }
   } catch (err) {
-    console.log("Failed to sendCoin: ", err);
+    // console.log("Failed to sendCoin: ", err);
   }
 };
 

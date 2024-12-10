@@ -25,14 +25,14 @@ const removeStatusSlice = createSlice({
     addRemoveStatus(state, action) {
       const data = action.payload as IGame;
       if (!data) {
-        console.log("Failed to addRemoveStatus: action.payload is not IGame!", data);
+        // console.log("Failed to addRemoveStatus: action.payload is not IGame!", data);
       }
       state.data.games = [...state.data.games, data];
     },
     delRemoveStatus(state, action) {
       const data = action.payload as IGame;
       if (!data) {
-        console.log("Failed to addRemoveStatus: action.payload is not IGame!", data);
+        // console.log("Failed to addRemoveStatus: action.payload is not IGame!", data);
       }
       const rest = state.data.games.filter((game) => game?._id !== data?._id);
       state.data.games = rest;

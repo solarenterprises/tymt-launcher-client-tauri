@@ -44,7 +44,7 @@ const blockListSlice = createSlice({
       })
       .addCase(fetchBlockListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchBlockListAsync:", action.payload);
+          // console.log("Failed to fetchBlockListAsync:", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };
@@ -56,7 +56,7 @@ const blockListSlice = createSlice({
       })
       .addCase(createBlockAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to createBlockAsync:", action.payload);
+          // console.log("Failed to createBlockAsync:", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };
@@ -68,7 +68,7 @@ const blockListSlice = createSlice({
       })
       .addCase(deleteBlockAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to deleteBlockAsync:", action.payload);
+          // console.log("Failed to deleteBlockAsync:", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };

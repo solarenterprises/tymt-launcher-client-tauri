@@ -47,7 +47,7 @@ const ExportChatModal = ({ view, setView, group }: IPropsExportChatModal) => {
       };
       const res = await ChatroomAPI.exportMessageHistoryStream(body);
       if (res?.status !== 200 || !res?.data) {
-        console.error("Failed to handleExportClick:", res);
+        // console.error("Failed to handleExportClick:", res);
         return;
       }
       const dataToFile = {
@@ -63,10 +63,10 @@ const ExportChatModal = ({ view, setView, group }: IPropsExportChatModal) => {
       const blob = new Blob([JSON.stringify(dataToFile)], { type: "application/octet-stream" });
       saveAs(blob, `export_${dayjs().format("YYYY-MM-DD")}.json`);
 
-      console.log("handleExportClick", res);
+      // console.log("handleExportClick", res);
       setView(false);
     } catch (err) {
-      console.error("Failed to handleExportClick: ", err);
+      // console.error("Failed to handleExportClick: ", err);
     }
   }, [myInfoStore, group, fromDate, toDate]);
 

@@ -38,9 +38,9 @@ const ChatSetting = ({ view, setView }: propsType) => {
           alert: !notificationStore.alert,
         })
       );
-      console.log("putUserStatus");
+      // console.log("putUserStatus");
     } catch (err) {
-      console.error("Failed to putUserStatus: ", err);
+      // console.error("Failed to putUserStatus: ", err);
     }
   }, [notificationStore, myInfoStore]);
 

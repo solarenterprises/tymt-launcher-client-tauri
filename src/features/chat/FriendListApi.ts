@@ -13,16 +13,16 @@ export const fetchFriendList = async () => {
       },
     });
     if (res?.status === 200 && res?.data?.friends) {
-      console.log("fetchFriendList");
+      // console.log("fetchFriendList");
       return {
         contacts: res?.data?.friends,
       };
     } else {
-      console.log("fetchFriendList res.status: ", res?.status);
+      // console.log("fetchFriendList res.status: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to fetchFriendList: ", err);
+    // console.error("Failed to fetchFriendList: ", err);
     return null;
   }
 };
@@ -40,16 +40,16 @@ export const createFriend = async (_id: string) => {
       },
     });
     if (res?.status === 200 && res?.data?.friends) {
-      console.log("createFriend");
+      // console.log("createFriend");
       return {
         contacts: res?.data?.friends,
       };
     } else {
-      console.log("createFriend: ", res?.status);
+      // console.log("createFriend: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to createFriend: ", err);
+    // console.error("Failed to createFriend: ", err);
     return null;
   }
 };
@@ -67,16 +67,16 @@ export const deleteFriend = async (_id: string) => {
       },
     });
     if (res?.status === 200 && res?.data?.friends) {
-      console.log("deleteFriend");
+      // console.log("deleteFriend");
       return {
         contacts: res?.data?.friends,
       };
     } else {
-      console.log("deleteFriend: ", res?.status);
+      // console.log("deleteFriend: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to deleteFriend: ", err);
+    // console.error("Failed to deleteFriend: ", err);
     return null;
   }
 };

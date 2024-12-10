@@ -77,9 +77,9 @@ const CompleteButton = ({ account }: IPropsCompleteButton) => {
         dispatch(setTempWallet(walletStore));
 
         navigate("/guest/complete/password");
-        console.log("handleCompleteButton");
+        // console.log("handleCompleteButton");
       } catch (err) {
-        console.log("Failed to handleCompleteButton: ", err);
+        // console.log("Failed to handleCompleteButton: ", err);
       }
     },
     [saltTokenStore, machineIdStore, walletStore]

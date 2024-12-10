@@ -62,7 +62,7 @@ const GroupListItem = ({ group, index, roomMode, setView, gray }: IPropsGroupLis
     try {
       return chatroomListStore?.chatrooms?.some((chatroom) => chatroom?._id === group?._id);
     } catch (err) {
-      console.error("Failed with isGroupInvited: ", err);
+      // console.error("Failed with isGroupInvited: ", err);
       return false;
     }
   }, [chatroomListStore]);
@@ -70,7 +70,7 @@ const GroupListItem = ({ group, index, roomMode, setView, gray }: IPropsGroupLis
     try {
       return alertListStore?.unread?.filter((alert) => alert?.alertType === "chat").filter((chatAlert) => chatAlert?.note?.room_id === group?._id);
     } catch (err) {
-      console.error("Failed with unreadAlertsForThisGroup: ", err);
+      // console.error("Failed with unreadAlertsForThisGroup: ", err);
       return [];
     }
   }, [alertListStore]);
@@ -102,7 +102,7 @@ const GroupListItem = ({ group, index, roomMode, setView, gray }: IPropsGroupLis
                 joined_user_id: myInfoStore?._id,
               };
               socket.current.emit("join-message-group", JSON.stringify(data));
-              console.log("socket.current.emit > join-message-group", data);
+              // console.log("socket.current.emit > join-message-group", data);
             }
 
             if (setView) setView("chatbox");
@@ -136,7 +136,7 @@ const GroupListItem = ({ group, index, roomMode, setView, gray }: IPropsGroupLis
             is_to_self: true,
           };
           socket.current.emit("sync-event", JSON.stringify(data_2));
-          console.log("socket.current.emit > sync-event", data_2);
+          // console.log("socket.current.emit > sync-event", data_2);
         }
 
         await AlertAPI.readAllUnreadAlertsForChatroom({ userId: myInfoStore?._id, roomId: group?._id });
@@ -144,9 +144,9 @@ const GroupListItem = ({ group, index, roomMode, setView, gray }: IPropsGroupLis
         await dispatch(fetchAlertListAsync(myInfoStore?._id));
       }
 
-      console.log("handleGroupListItemClick");
+      // console.log("handleGroupListItemClick");
     } catch (err) {
-      console.error("Failed to handleGroupListItemClick: ", err);
+      // console.error("Failed to handleGroupListItemClick: ", err);
 
       setNotificationStatus("failed");
       setNotificationTitle(t("hom-23_error"));

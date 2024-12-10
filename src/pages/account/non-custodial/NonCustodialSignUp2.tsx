@@ -58,7 +58,7 @@ const NonCustodialSignUp2 = () => {
       );
       setOpen(true);
     } catch (err) {
-      console.log("Failed to handleNextClick: ", err);
+      // console.log("Failed to handleNextClick: ", err);
     }
   }, [passphrase, tempAccountStore]);
 

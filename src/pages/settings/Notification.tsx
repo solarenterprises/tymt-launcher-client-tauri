@@ -28,7 +28,7 @@ const Notification = ({ view, setView }: propsType) => {
     try {
       await updateUsernotificationStatus(myInfoStore?._id, notificationStore.alert);
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }, [myInfoStore, notificationStore]);
 

@@ -13,16 +13,16 @@ export const fetchBlockList = async () => {
       },
     });
     if (res?.status === 200 && res?.data?.blocks) {
-      console.log("fetchBlockList");
+      // console.log("fetchBlockList");
       return {
         contacts: res?.data?.blocks,
       };
     } else {
-      console.log("fetchBlockList: ", res?.status);
+      // console.log("fetchBlockList: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to fetchBlockList: ", err);
+    // console.error("Failed to fetchBlockList: ", err);
     return null;
   }
 };
@@ -40,16 +40,16 @@ export const createBlock = async (_id: string) => {
       },
     });
     if (res?.status === 200 && res?.data?.blocks) {
-      console.log("createBlock");
+      // console.log("createBlock");
       return {
         contacts: res?.data?.blocks,
       };
     } else {
-      console.log("createBlock: ", res?.status);
+      // console.log("createBlock: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to createBlock: ", err);
+    // console.error("Failed to createBlock: ", err);
     return null;
   }
 };
@@ -67,16 +67,16 @@ export const deleteBlock = async (_id: string) => {
       },
     });
     if (res?.status === 200 && res?.data?.blocks) {
-      console.log("deleteBlock");
+      // console.log("deleteBlock");
       return {
         contacts: res?.data?.blocks,
       };
     } else {
-      console.log("deleteBlock: ", res?.status);
+      // console.log("deleteBlock: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to deleteBlock: ", err);
+    // console.error("Failed to deleteBlock: ", err);
     return null;
   }
 };

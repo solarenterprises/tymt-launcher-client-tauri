@@ -9,7 +9,7 @@ export const fetchComingGameList = async (page: number) => {
   try {
     const res = await GameAPI.fetchComingGameList(page);
     if (!res?.data?.result?.data || !isArray(res?.data?.result?.data)) {
-      console.error("Failed to fetchComingGameList: response error!", res);
+      // console.error("Failed to fetchComingGameList: response error!", res);
       const noti: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -22,7 +22,7 @@ export const fetchComingGameList = async (page: number) => {
     }
     return { games: res.data.result.data };
   } catch (err) {
-    console.error("Failed to fetchComingGameList: ", err);
+    // console.error("Failed to fetchComingGameList: ", err);
     const noti: INotificationParams = {
       status: "failed",
       title: "Error",
@@ -51,7 +51,7 @@ export const fetchAllComingGameList = async () => {
 
     return { games: res };
   } catch (err) {
-    console.log("Failed to fetchAllGameList: ", err);
+    // console.log("Failed to fetchAllGameList: ", err);
     return null;
   }
 };

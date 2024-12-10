@@ -95,7 +95,7 @@ const ReviewModal = ({ open, setOpen, game }: IPropsReviewModal) => {
 
         emit(TauriEventNames.FETCH_REVIEW);
       } catch (err) {
-        console.log("Failed at ReviewModal: ", err);
+        // console.log("Failed at ReviewModal: ", err);
         setLoading(false);
 
         const noti: INotificationParams = {

@@ -84,7 +84,7 @@ const TransCard = () => {
       }
       setLoading(false);
     } catch (err) {
-      console.log("Failed to loadMore: ", err);
+      // console.log("Failed to loadMore: ", err);
       setLoading(false);
     }
   }, [walletStore, currentChainStore]);

@@ -48,9 +48,9 @@ const GroupListItemContextMenu = ({ view, setView, group, contextMenuPosition }:
       dispatch(createMutedListAsync(body)).then(() => {
         setView(false);
       });
-      console.log("handleMuteClick", group);
+      // console.log("handleMuteClick", group);
     } catch (err) {
-      console.error("Failed to handleMuteClick: ", err);
+      // console.error("Failed to handleMuteClick: ", err);
     }
   };
 
@@ -62,9 +62,9 @@ const GroupListItemContextMenu = ({ view, setView, group, contextMenuPosition }:
       dispatch(deleteMutedListAsync(body)).then(() => {
         setView(false);
       });
-      console.log("handleUnmuteClick", group);
+      // console.log("handleUnmuteClick", group);
     } catch (err) {
-      console.error("Failed to handleUnmuteClick: ", err);
+      // console.error("Failed to handleUnmuteClick: ", err);
     }
   };
 
@@ -83,20 +83,20 @@ const GroupListItemContextMenu = ({ view, setView, group, contextMenuPosition }:
             joined_user_id: myInfoStore?._id,
           };
           socket.current.emit("leave-message-group", JSON.stringify(data));
-          console.log("socket.current.emit > leave-message-group", data);
+          // console.log("socket.current.emit > leave-message-group", data);
         }
       });
 
-      console.log("handleLeaveGroupClick", group);
+      // console.log("handleLeaveGroupClick", group);
       setView(false);
     } catch (err) {
-      console.error("Failed to handleLeaveGroupClick: ", err);
+      // console.error("Failed to handleLeaveGroupClick: ", err);
     }
   }, [myInfoStore, socket.current]);
 
   const handleRemoveGroupClick = useCallback(async () => {
     try {
-      console.log("handleRemoveGroupClick");
+      // console.log("handleRemoveGroupClick");
 
       await dispatch(removeChatroomAsync(group._id));
 
@@ -109,10 +109,10 @@ const GroupListItemContextMenu = ({ view, setView, group, contextMenuPosition }:
           is_to_self: true,
         };
         socket.current.emit("sync-events", JSON.stringify(data_1));
-        console.log("socket.current.emit > sync-events", data_1);
+        // console.log("socket.current.emit > sync-events", data_1);
       }
     } catch (err) {
-      console.error("Failed to handleRemoveGroupClick: ", err);
+      // console.error("Failed to handleRemoveGroupClick: ", err);
     }
   }, [socket.current, myInfoStore]);
 

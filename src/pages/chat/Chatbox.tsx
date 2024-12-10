@@ -94,11 +94,11 @@ const Chatbox = ({ view, setView }: propsType) => {
           pagination: { page: Math.floor(chatHistoryStoreRef.current.messages.length / 20) + 1, pageSize: 20 },
         };
         socket.current.emit("get-messages-by-room", JSON.stringify(query));
-        console.log("Chatbox > socket.current.emit > get-messages-by-room", query);
+        // console.log("Chatbox > socket.current.emit > get-messages-by-room", query);
       }
-      console.log("fetchMessages");
+      // console.log("fetchMessages");
     } catch (err) {
-      console.error("Failed to fetchMessages: ", err);
+      // console.error("Failed to fetchMessages: ", err);
     }
   };
 
@@ -113,7 +113,7 @@ const Chatbox = ({ view, setView }: propsType) => {
     if (socket.current && view === "chatbox") {
       if (!socket.current.hasListeners("messages-by-room")) {
         socket.current.on("messages-by-room", async (result) => {
-          console.log("Chatbox > socket.current.on > messages-by-room", result);
+          // console.log("Chatbox > socket.current.on > messages-by-room", result);
           if (result && result.data.length > 0) {
             if (chatStoreRef.current.message === "anyone" || chatStoreRef.current.message === "friend") {
               dispatch(
@@ -159,7 +159,7 @@ const Chatbox = ({ view, setView }: propsType) => {
 
   useEffect(() => {
     const unlisten_scroll_to_end = listen("scroll_to_end", (_event) => {
-      console.log("scroll_to_end");
+      // console.log("scroll_to_end");
       const { scrollHeight } = scrollref.current as HTMLDivElement;
       scrollref.current?.scrollTo(0, scrollHeight);
     });

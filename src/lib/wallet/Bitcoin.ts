@@ -101,11 +101,11 @@ class Bitcoin implements IWallet_2 {
         response = await response.json();
         if (!response) return [];
         if (response.status === 429) {
-          console.error("Failed to get BTC transactions: 429 error");
+          // console.error("Failed to get BTC transactions: 429 error");
           return [];
         }
         if (response?.data?.txs) return response?.data?.txs;
-        console.error("Failed to get BTC transactions: unknown error");
+        // console.error("Failed to get BTC transactions: unknown error");
         return [];
       } else {
         const txs = await (await fetch(`${btc_api_url}/address/${addr}/txs?limit=10`)).json();
@@ -185,7 +185,7 @@ class Bitcoin implements IWallet_2 {
         const rawHexTransaction = psbt.extractTransaction().toHex();
 
         const response = await Bitcoin.broadcastTransaction(rawHexTransaction);
-        console.log("response", response);
+        // console.log("response", response);
 
         const noti: INotification = {
           status: "success",
@@ -194,7 +194,7 @@ class Bitcoin implements IWallet_2 {
         };
         return noti;
       } catch (err) {
-        console.error("Failed to send BTC transaction", err);
+        // console.error("Failed to send BTC transaction", err);
         const translated = await translateString(err.toString());
         const noti: INotification = {
           status: "failed",
@@ -270,7 +270,7 @@ class Bitcoin implements IWallet_2 {
         const rawHexTransaction = psbt.extractTransaction().toHex();
 
         const response = await Bitcoin.broadcastTransaction(rawHexTransaction);
-        console.log("response", response);
+        // console.log("response", response);
 
         const noti: INotification = {
           status: "success",
@@ -280,7 +280,7 @@ class Bitcoin implements IWallet_2 {
         };
         return noti;
       } catch (err) {
-        console.error("Failed to send BTC transaction", err);
+        // console.error("Failed to send BTC transaction", err);
         const noti: INotification = {
           status: "failed",
           title: "Send BTC",
@@ -299,7 +299,7 @@ class Bitcoin implements IWallet_2 {
       });
       return data;
     } catch (error) {
-      console.error("Failed to broadcast BTC transaction:", error);
+      // console.error("Failed to broadcast BTC transaction:", error);
       return null;
     }
   }
@@ -312,7 +312,7 @@ class Bitcoin implements IWallet_2 {
         connectTimeout: 30
       });
       const data = await response.json()?.result;
-      console.log(data);
+      // console.log(data);
       return data?.map((utxo: any) => ({
         txid: utxo.txId,
         vout: utxo.outputIndex,
@@ -320,7 +320,7 @@ class Bitcoin implements IWallet_2 {
         hex: utxo.scriptPk,
       }));
     } catch (error) {
-      console.error("Failed to fetch BTC UTXOs: ", error);
+      // console.error("Failed to fetch BTC UTXOs: ", error);
       return [];
     }
   }

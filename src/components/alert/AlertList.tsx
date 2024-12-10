@@ -56,7 +56,7 @@ const AlertList = ({ status, title, detail, read }: propsAlertListType) => {
         const sKey = sKeyListStore.sKeys.find((element) => element.roomId === detail?.note?.room_id)?.sKey;
         setDecryptedMessage(Chatdecrypt(detail?.note?.message, sKey));
       } catch (err) {
-        console.error("Failed to useEffect AlertList.tsx: ", err);
+        // console.error("Failed to useEffect AlertList.tsx: ", err);
       }
     }
   }, [sKeyListStore, title]);
@@ -99,7 +99,7 @@ const AlertList = ({ status, title, detail, read }: propsAlertListType) => {
         );
       }
     } catch (err) {
-      console.error("Failed to click on alertList: ", err);
+      // console.error("Failed to click on alertList: ", err);
     }
   }, [title, detail, senderUser, myInfoStore]);
 

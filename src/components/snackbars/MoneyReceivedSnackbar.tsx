@@ -77,7 +77,7 @@ const MoneyReceivedSnackbar = () => {
       const response = JSON.parse(JSON.stringify(data));
       const transferArray: Array<{ amount: string; recipientId: string }> = response?.data?.asset?.transfers;
       const isGuest: boolean = accountStoreRef?.current?.nickName === "Guest" && accountStoreRef?.current?.password === getKeccak256Hash("");
-      console.log("isisGuest", isGuest, accountStoreRef.current?.nickName);
+      // console.log("isisGuest", isGuest, accountStoreRef.current?.nickName);
 
       if (!transferArray || !isArray(transferArray)) return;
 
@@ -104,8 +104,8 @@ const MoneyReceivedSnackbar = () => {
 
         let permissionGranted = await isPermissionGranted();
         const windowIsVisible = await invoke<boolean>("is_window_visible");
-        console.log("permissionGranted", permissionGranted);
-        console.log("windowIsVisible", windowIsVisible);
+        // console.log("permissionGranted", permissionGranted);
+        // console.log("windowIsVisible", windowIsVisible);
         if (!permissionGranted) {
           const permission = await requestPermission();
           permissionGranted = permission === "granted";
@@ -121,7 +121,7 @@ const MoneyReceivedSnackbar = () => {
         }
       }
     } catch (err) {
-      console.log("Failed at client.subscribe: ", err);
+      // console.log("Failed at client.subscribe: ", err);
       handleClose();
     }
   };
@@ -130,9 +130,9 @@ const MoneyReceivedSnackbar = () => {
     try {
       await client.connect();
       client.subscribe(`transaction.applied`, handleTransactionApplied);
-      console.log("client subscribeForTransactions");
+      // console.log("client subscribeForTransactions");
     } catch (err) {
-      console.log("Failed to client subscribeForTransactions: ", err);
+      // console.log("Failed to client subscribeForTransactions: ", err);
     }
   };
 
@@ -141,9 +141,9 @@ const MoneyReceivedSnackbar = () => {
     return () => {
       try {
         client.unsubscribe(`transaction.applied`);
-        console.log("client disconnected");
+        // console.log("client disconnected");
       } catch (err) {
-        console.log("Failed to client disconnect: ", err);
+        // console.log("Failed to client disconnect: ", err);
       }
     };
   }, []);

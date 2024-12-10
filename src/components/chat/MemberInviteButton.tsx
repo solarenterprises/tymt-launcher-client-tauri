@@ -47,13 +47,13 @@ const MemberInviteButton = ({ member }: IPropsMemberInviteButton) => {
               joined_user_id: member._id,
             };
             socket.current.emit("join-message-group", JSON.stringify(data));
-            console.log("socket.current.emit > join-message-group", data);
+            // console.log("socket.current.emit > join-message-group", data);
           }
         }
       });
-      console.log("handleMemberInviteButtonClick");
+      // console.log("handleMemberInviteButtonClick");
     } catch (err) {
-      console.error("Failed to handleMemberInviteButtonClick: ", err);
+      // console.error("Failed to handleMemberInviteButtonClick: ", err);
 
       setNotificationStatus("failed");
       setNotificationTitle(t("hom-23_error"));

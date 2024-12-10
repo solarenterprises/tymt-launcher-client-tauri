@@ -70,10 +70,10 @@ export const currentChatroomMembersSlice = createSlice({
       })
       .addCase(fetchCurrentChatroomMembersAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchCurrentChatroomMembersAsync: ", action.payload);
+          // console.log("Failed to fetchCurrentChatroomMembersAsync: ", action.payload);
           return;
         }
-        console.log("fetchCurrentChatroomMembersAsync");
+        // console.log("fetchCurrentChatroomMembersAsync");
         state.data.members = action.payload;
         sessionStorage.setItem("currentChatroomMembers", JSON.stringify(state.data));
         state.status = "currentChatroomMembers";

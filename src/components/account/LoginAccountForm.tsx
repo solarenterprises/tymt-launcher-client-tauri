@@ -84,7 +84,7 @@ const LoginAccountForm = () => {
       dispatch(setLogin(true));
       navigate("/home");
     } catch (err) {
-      console.log("Failed at handleGuestLogin: ", err);
+      // console.log("Failed at handleGuestLogin: ", err);
     }
   }, [accountStore, saltTokenStore, machineIdStore]);
 
@@ -143,7 +143,7 @@ const LoginAccountForm = () => {
         dispatch(setLogin(true));
         navigate("/home");
       } catch (err) {
-        console.log("Failed at LoginAccountForm: ", err);
+        // console.log("Failed at LoginAccountForm: ", err);
       }
     },
   });

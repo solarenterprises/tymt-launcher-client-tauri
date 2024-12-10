@@ -14,8 +14,8 @@ const BubbleDownloadButton = ({ url, name }: IPropsBubbleDownloadButton) => {
       .then((blob) => {
         saveAs(blob, name); // Use saveAs to trigger the download
       })
-      .catch((error) => {
-        console.error("Failed to handleDownloadClick: ", error);
+      .catch(() => {
+        // console.error("Failed to handleDownloadClick: ", error);
       });
   };
 

@@ -44,7 +44,7 @@ const friendListSlice = createSlice({
       })
       .addCase(fetchFriendListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchFriendListAsync: ", action.payload);
+          // console.log("Failed to fetchFriendListAsync: ", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };
@@ -56,7 +56,7 @@ const friendListSlice = createSlice({
       })
       .addCase(createFriendAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to createFriendAsync: ", action.payload);
+          // console.log("Failed to createFriendAsync: ", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };
@@ -68,7 +68,7 @@ const friendListSlice = createSlice({
       })
       .addCase(deleteFriendAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to deleteFriendAsync: ", action.payload);
+          // console.log("Failed to deleteFriendAsync: ", action.payload);
           return;
         }
         state.data = { ...state.data, ...action.payload };

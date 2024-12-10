@@ -60,11 +60,11 @@ const UserListItemContextMenu = ({ user, view, setView, contextMenuPosition, pag
         socket.current.emit("sync-event", JSON.stringify(data_1));
         socket.current.emit("sync-event", JSON.stringify(data_2));
 
-        console.log("socket.current.emit > sync-event", data_1);
-        console.log("socket.current.emit > sync-event", data_2);
+        // console.log("socket.current.emit > sync-event", data_1);
+        // console.log("socket.current.emit > sync-event", data_2);
       }
     } catch (err) {
-      console.error("Failed to handleRemoveFriendClick: ", err);
+      // console.error("Failed to handleRemoveFriendClick: ", err);
     }
   }, [socket.current, myInfoStore]);
 
@@ -83,10 +83,10 @@ const UserListItemContextMenu = ({ user, view, setView, contextMenuPosition, pag
         };
 
         socket.current.emit("sync-event", JSON.stringify(data));
-        console.log("socket.current.emit > sync-event", data);
+        // console.log("socket.current.emit > sync-event", data);
       }
     } catch (err) {
-      console.error("Failed to handleBlockClick: ", err);
+      // console.error("Failed to handleBlockClick: ", err);
     }
   }, [socket.current, myInfoStore]);
 
@@ -104,10 +104,10 @@ const UserListItemContextMenu = ({ user, view, setView, contextMenuPosition, pag
         };
 
         socket.current.emit("sync-event", JSON.stringify(data));
-        console.log("socket.current.emit > sync-event", data);
+        // console.log("socket.current.emit > sync-event", data);
       }
     } catch (err) {
-      console.error("Failed to handleUnblockClick: ", err);
+      // console.error("Failed to handleUnblockClick: ", err);
     }
   }, [socket.current, myInfoStore]);
 

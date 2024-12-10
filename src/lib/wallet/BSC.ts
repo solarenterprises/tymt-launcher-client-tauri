@@ -77,7 +77,7 @@ class BSC implements IWallet {
       }
       return result;
     } catch (err) {
-      console.log("Failed to BSC getTokenBalance: ", err);
+      // console.log("Failed to BSC getTokenBalance: ", err);
       return [];
     }
   }
@@ -103,14 +103,14 @@ class BSC implements IWallet {
         const block = receipt.blockNumber;
         const status = receipt.status ? "Success" : "Failure";
         const gas = receipt.gasUsed.toString();
-        console.log(`Transaction: [${hash}](^5^${hash})`);
-        console.log(`Block: ${block}`);
-        console.log(`Status: ${status}`);
-        console.log(`Gas Used: ${gas}`);
-        console.log("----------");
+        // console.log(`Transaction: [${hash}](^5^${hash})`);
+        // console.log(`Block: ${block}`);
+        // console.log(`Status: ${status}`);
+        // console.log(`Gas Used: ${gas}`);
+        // console.log("----------");
       });
     } catch (e) {
-      console.error(e);
+      // console.error(e);
       return false;
     }
   }
@@ -130,15 +130,15 @@ class BSC implements IWallet {
           const block = receipt.blockNumber;
           const status = receipt.status ? "Success" : "Failure";
           const gas = receipt.gasUsed.toString();
-          console.log(`Transaction: [${hash}](^5^${hash})`);
-          console.log(`Block: ${block}`);
-          console.log(`Status: ${status}`);
-          console.log(`Gas Used: ${gas}`);
-          console.log("----------");
+          // console.log(`Transaction: [${hash}](^5^${hash})`);
+          // console.log(`Block: ${block}`);
+          // console.log(`Status: ${status}`);
+          // console.log(`Gas Used: ${gas}`);
+          // console.log("----------");
         });
         return true;
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         return false;
       }
     }

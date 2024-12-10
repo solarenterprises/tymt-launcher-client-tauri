@@ -43,10 +43,10 @@ const NewGroupModal = ({ open, setOpen, roomMode }: IPropsNewGroupModal) => {
     if (socket.current && socket.current.connected) {
       try {
         if (!newGroupName) {
-          console.log("handleCreateClick: !newGroupName");
+          // console.log("handleCreateClick: !newGroupName");
           return;
         }
-        console.log("handleCreateClick", newGroupMode, newGroupName);
+        // console.log("handleCreateClick", newGroupMode, newGroupName);
         dispatch(
           createGroupAsync({
             room_name: newGroupName,
@@ -62,7 +62,7 @@ const NewGroupModal = ({ open, setOpen, roomMode }: IPropsNewGroupModal) => {
               joined_user_id: myInfoStore?._id,
             };
             socket.current.emit("join-message-group", JSON.stringify(data_1));
-            console.log("socket.current.emit > join-message-group", data_1);
+            // console.log("socket.current.emit > join-message-group", data_1);
 
             dispatch(
               addOneSKeyList({
@@ -74,10 +74,10 @@ const NewGroupModal = ({ open, setOpen, roomMode }: IPropsNewGroupModal) => {
         });
         setOpen(false);
       } catch (err) {
-        console.error("Failed to handleCreateClick: ", err);
+        // console.error("Failed to handleCreateClick: ", err);
       }
     } else {
-      console.error("Failed to handleCreateClick: socket not connected!");
+      // console.error("Failed to handleCreateClick: socket not connected!");
     }
   }, [myInfoStore, newGroupName, newGroupMode, rsaStore, socket.current]);
 

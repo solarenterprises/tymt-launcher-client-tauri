@@ -97,7 +97,7 @@ const PasswordModal = ({ open, setOpen, voteAsset }: props) => {
       setPassword("");
       setLoading(false);
     } catch (err) {
-      console.error("Failed to Vote: ", err);
+      // console.error("Failed to Vote: ", err);
       setOpen(false);
       setPassword("");
       setLoading(false);

@@ -12,7 +12,7 @@ export const Chatencrypt = (_mnemonic: string, _password: string) => {
 export const Chatdecrypt = (_encryptedMnemonic: string, _password: string) => {
   try {
     if (!_password) {
-      console.error("Failed to Chatdecrypt: key undefined");
+      // console.error("Failed to Chatdecrypt: key undefined");
       return undefined;
     }
     const key = crypto.createHash("sha512").update(_password.normalize("NFD")).digest("hex").substring(0, 32);
@@ -21,7 +21,7 @@ export const Chatdecrypt = (_encryptedMnemonic: string, _password: string) => {
     const decipher = crypto.createDecipheriv("aes-256-cbc", key, encryptionIV);
     return decipher.update(buff.toString("utf8"), "hex", "utf8") + decipher.final("utf8");
   } catch (err) {
-    console.error("Failed to Chatdecrypt: ", err);
+    // console.error("Failed to Chatdecrypt: ", err);
     return undefined;
   }
 };

@@ -45,9 +45,9 @@ const ChatGroupEdit = ({ view, setView }: propsType) => {
       if (fileInput) {
         fileInput.click();
       }
-      console.log("handleBrowseClick");
+      // console.log("handleBrowseClick");
     } catch (err) {
-      console.error("Failed to handleBrowseClick: ", err);
+      // console.error("Failed to handleBrowseClick: ", err);
     }
   };
 
@@ -90,13 +90,13 @@ const ChatGroupEdit = ({ view, setView }: propsType) => {
               is_to_self: true,
             };
             socket.current.emit("sync-events-all", JSON.stringify(data));
-            console.log("socket.current.emit > sync-events-all", data);
+            // console.log("socket.current.emit > sync-events-all", data);
           }
         }
       });
-      console.log("uploadGroupAvatar", file, currentChatroomStore?._id);
+      // console.log("uploadGroupAvatar", file, currentChatroomStore?._id);
     } catch (err) {
-      console.error("Failed to uploadGroupAvatar: ", err);
+      // console.error("Failed to uploadGroupAvatar: ", err);
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -129,7 +129,7 @@ const ChatGroupEdit = ({ view, setView }: propsType) => {
         if (action.type.endsWith("/fulfilled")) {
           const newCurrentChatroom: IChatroom = action.payload as IChatroom;
           if (!newCurrentChatroom) {
-            console.error("Failed to updateGroupNameAsync: newCurrentChatroom undefined!");
+            // console.error("Failed to updateGroupNameAsync: newCurrentChatroom undefined!");
             return;
           }
           dispatch(setCurrentChatroom(newCurrentChatroom));
@@ -150,14 +150,14 @@ const ChatGroupEdit = ({ view, setView }: propsType) => {
               is_to_self: true,
             };
             socket.current.emit("sync-events-all", JSON.stringify(data));
-            console.log("socket.current.emit > sync-events-all", data);
+            // console.log("socket.current.emit > sync-events-all", data);
           }
         }
       });
 
-      console.log("handleSaveClick", groupName, currentChatroomStore?._id);
+      // console.log("handleSaveClick", groupName, currentChatroomStore?._id);
     } catch (err) {
-      console.error("Failed to handleSaveClick:", err);
+      // console.error("Failed to handleSaveClick:", err);
       const data: INotificationParams = {
         status: "failed",
         title: "Error",

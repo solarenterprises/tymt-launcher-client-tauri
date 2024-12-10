@@ -11,7 +11,7 @@ interface ICurrencyRes {
 
 export const fetchCurrencyList = async () => {
   try {
-    console.log("fetchCurrencyList");
+    // console.log("fetchCurrencyList");
 
     const res = await axios.get(`${tymt_backend_url}/currencies`);
 
@@ -25,6 +25,6 @@ export const fetchCurrencyList = async () => {
 
     return data;
   } catch (err) {
-    console.log("Failed to fetchCurrencyList: ", err);
+    // console.log("Failed to fetchCurrencyList: ", err);
   }
 };

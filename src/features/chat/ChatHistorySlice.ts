@@ -51,7 +51,7 @@ const chatHistorySlice = createSlice({
         state.status = "loading";
       })
       .addCase(setChatHistoryAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        console.log(action.payload, "action.payload");
+        // console.log(action.payload, "action.payload");
         state.data.messages = action.payload.messages;
         tymtStorage.set(`chatHistory`, JSON.stringify(state.data));
         state.status = "succeeded";

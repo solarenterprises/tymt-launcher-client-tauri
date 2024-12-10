@@ -32,7 +32,7 @@ export const globalChatroomListSlice = createSlice({
     setGlobalChatroomList: (state, action) => {
       state.data = action.payload;
       sessionStorage.setItem(`globalChatroomList`, JSON.stringify(state.data));
-      console.log("globalChatroomList", state.data);
+      // console.log("globalChatroomList", state.data);
     },
   },
   extraReducers(builder) {
@@ -42,7 +42,7 @@ export const globalChatroomListSlice = createSlice({
       })
       .addCase(fetchGlobalChatroomListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to fetchGlobalChatroomListAsync: ", action.payload);
+          // console.error("Failed to fetchGlobalChatroomListAsync: ", action.payload);
           return;
         }
         state.data.chatrooms = action.payload;

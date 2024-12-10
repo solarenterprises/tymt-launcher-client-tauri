@@ -116,7 +116,7 @@ const Wallet = () => {
       };
       emit(TauriEventNames.NOTIFICATION, noti);
     } catch (err) {
-      console.log("Failed to handleRefreshClick: ", err);
+      // console.log("Failed to handleRefreshClick: ", err);
       const noti: INotificationParams = {
         status: "failed",
         title: t("wal-56_failed"),

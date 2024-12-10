@@ -55,13 +55,13 @@ export const chatroomListSlice = createSlice({
     setChatroomList: (state, action) => {
       state.data = action.payload;
       tymtStorage.set(`chatroomList`, JSON.stringify(state.data));
-      console.log("setChatroomList", state.data);
+      // console.log("setChatroomList", state.data);
     },
     delOneFromChatroomList: (state, action) => {
       const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload);
       state.data.chatrooms = [...restOfChatrooms];
       tymtStorage.set(`chatroomList`, JSON.stringify(state.data));
-      console.log("delOneFromChatroomList", action.payload, state.data);
+      // console.log("delOneFromChatroomList", action.payload, state.data);
     },
   },
   extraReducers(builder) {
@@ -71,7 +71,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(fetchChatroomListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to fetchGroupListAsync: ", action.payload);
+          // console.error("Failed to fetchGroupListAsync: ", action.payload);
           return;
         }
         state.data.chatrooms = action.payload;
@@ -83,7 +83,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(addOneToChatroomListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to addOneToChatroomListAsync: ", action.payload);
+          // console.error("Failed to addOneToChatroomListAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -96,7 +96,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(createGroupAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to createGroupAsync: ", action.payload);
+          // console.error("Failed to createGroupAsync: ", action.payload);
           return;
         }
         state.data.chatrooms = [...state.data.chatrooms, action.payload];
@@ -108,7 +108,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(createDMAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to createDMAsync: ", action.payload);
+          // console.error("Failed to createDMAsync: ", action.payload);
           return;
         }
         state.data.chatrooms = [...state.data.chatrooms, action.payload];
@@ -120,7 +120,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(addParticipantAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to addParticipantAsync: ", action.payload);
+          // console.error("Failed to addParticipantAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -133,7 +133,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(removeParticipantAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to removeParticipantAsync: ", action.payload);
+          // console.error("Failed to removeParticipantAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -146,7 +146,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(joinPublicGroupAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to joinPublicGroupAsync: ", action.payload);
+          // console.error("Failed to joinPublicGroupAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -159,7 +159,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(leaveGroupAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to leaveGroupAsync: ", action.payload);
+          // console.error("Failed to leaveGroupAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -172,7 +172,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(updateGroupAvatarAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to updateGroupAvatarAsync: ", action.payload);
+          // console.error("Failed to updateGroupAvatarAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -185,7 +185,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(updateGroupNameAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to updateGroupNameAsync: ", action.payload);
+          // console.error("Failed to updateGroupNameAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);
@@ -198,7 +198,7 @@ export const chatroomListSlice = createSlice({
       })
       .addCase(removeChatroomAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to removeChatroomAsync: ", action.payload);
+          // console.error("Failed to removeChatroomAsync: ", action.payload);
           return;
         }
         const restOfChatrooms = state.data.chatrooms.filter((element) => element._id !== action.payload?._id);

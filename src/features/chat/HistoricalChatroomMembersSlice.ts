@@ -43,10 +43,10 @@ export const historicalChatroomMembersSlice = createSlice({
       })
       .addCase(fetchHistoricalChatroomMembersAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchHistoricalChatroomMembersAsync: ", action.payload);
+          // console.log("Failed to fetchHistoricalChatroomMembersAsync: ", action.payload);
           return;
         }
-        console.log("fetchHistoricalChatroomMembersAsync");
+        // console.log("fetchHistoricalChatroomMembersAsync");
         state.data.members = action.payload;
         sessionStorage.setItem("historicalChatroomMembers", JSON.stringify(state.data));
         state.status = "historicalChatroomMembers";

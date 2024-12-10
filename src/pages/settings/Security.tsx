@@ -35,7 +35,7 @@ const Security = ({ view, setView }: propsType) => {
       }
       setView("backup");
     } catch (err) {
-      console.log("Failed to handleBackupClick: ", err);
+      // console.log("Failed to handleBackupClick: ", err);
     }
   };
 

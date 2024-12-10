@@ -32,7 +32,7 @@ export const publicChatroomListSlice = createSlice({
     setPublicChatroomList: (state, action) => {
       state.data = action.payload;
       sessionStorage.setItem(`publicChatroomList`, JSON.stringify(state.data));
-      console.log("publicChatroomList", state.data);
+      // console.log("publicChatroomList", state.data);
     },
   },
   extraReducers(builder) {
@@ -42,7 +42,7 @@ export const publicChatroomListSlice = createSlice({
       })
       .addCase(fetchPublicChatroomListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to fetchPublicChatroomListAsync: ", action.payload);
+          // console.error("Failed to fetchPublicChatroomListAsync: ", action.payload);
           return;
         }
         state.data.chatrooms = action.payload;

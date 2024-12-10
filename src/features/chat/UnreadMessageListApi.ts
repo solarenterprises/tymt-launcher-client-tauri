@@ -3,11 +3,11 @@ import { IUnreadMessage, IUnreadMessageList } from "./UnreadMessageListSlice";
 
 export const fetchUnreadMessageList = async (userId: string) => {
   try {
-    console.log("fetchUnreadMessageList");
+    // console.log("fetchUnreadMessageList");
 
     const res = await AlertAPI.unreadAlertsCountForChatroom({ userId, roomId: "0" });
     if (!res || res.status !== 200 || !res?.data?.count) {
-      console.log("Failed to fetchUnreadMessageList: response undefined!", res);
+      // console.log("Failed to fetchUnreadMessageList: response undefined!", res);
       return null;
     }
 
@@ -22,7 +22,7 @@ export const fetchUnreadMessageList = async (userId: string) => {
 
     return newUnreadMessageList;
   } catch (err) {
-    console.log("Failed to fetchUnreadMessageList: ", err);
+    // console.log("Failed to fetchUnreadMessageList: ", err);
     return null;
   }
 };

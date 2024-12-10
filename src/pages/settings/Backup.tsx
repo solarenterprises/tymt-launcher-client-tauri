@@ -48,7 +48,7 @@ const Backup = ({ view, setView }: propsType) => {
         };
         emit(TauriEventNames.NOTIFICATION, noti_0);
       } catch (err) {
-        console.error("Failed to handleSubmit: ", err);
+        // console.error("Failed to handleSubmit: ", err);
         const noti_0: INotificationParams = {
           status: "failed",
           title: `Error`,

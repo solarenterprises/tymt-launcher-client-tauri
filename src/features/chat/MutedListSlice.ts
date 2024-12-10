@@ -37,10 +37,10 @@ const mutedListSlice = createSlice({
       })
       .addCase(fetchMutedListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchMutedListAsync: ", action.payload);
+          // console.log("Failed to fetchMutedListAsync: ", action.payload);
           return;
         }
-        console.log("fetchMutedListAsync");
+        // console.log("fetchMutedListAsync");
         state.data.chatrooms = action.payload;
         sessionStorage.setItem("mutedList", JSON.stringify(state.data));
         state.status = "mutedList";
@@ -50,10 +50,10 @@ const mutedListSlice = createSlice({
       })
       .addCase(createMutedListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to createMutedListAsync: ", action.payload);
+          // console.log("Failed to createMutedListAsync: ", action.payload);
           return;
         }
-        console.log("createMutedListAsync");
+        // console.log("createMutedListAsync");
         state.data.chatrooms = action.payload;
         sessionStorage.setItem("mutedList", JSON.stringify(state.data));
         state.status = "mutedList";
@@ -63,10 +63,10 @@ const mutedListSlice = createSlice({
       })
       .addCase(deleteMutedListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to deleteMutedListAsync: ", action.payload);
+          // console.log("Failed to deleteMutedListAsync: ", action.payload);
           return;
         }
-        console.log("deleteMutedListAsync");
+        // console.log("deleteMutedListAsync");
         state.data.chatrooms = action.payload;
         sessionStorage.setItem("mutedList", JSON.stringify(state.data));
         state.status = "mutedList";

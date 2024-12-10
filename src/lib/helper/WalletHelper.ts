@@ -30,10 +30,10 @@ export const getWalletAddressFromPassphrase = async (passphrase: string) => {
       solar: solarAddr,
     };
 
-    console.log("getWalletAddressFromPassphrase", res);
+    // console.log("getWalletAddressFromPassphrase", res);
     return res;
   } catch (err) {
-    console.log("Failed to getWalletAddressFromPassphrase: ", err);
+    // console.log("Failed to getWalletAddressFromPassphrase: ", err);
   }
 };
 
@@ -72,7 +72,7 @@ export const getTokenPriceByCmc = (priceListStore: IPriceList, cmc: string) => {
     const res = priceListStore?.list?.find((one) => one?.cmc === cmc)?.price;
     return res;
   } catch (err) {
-    console.log("Failed to getCurrentChainNativeTokenPrice: ", err);
+    // console.log("Failed to getCurrentChainNativeTokenPrice: ", err);
   }
 };
 
@@ -81,7 +81,7 @@ export const getTokenBalanceBySymbol = (balanceListStore: IBalanceList, symbol: 
     const res = balanceListStore?.list?.find((one) => one?.symbol === symbol)?.balance;
     return res;
   } catch (err) {
-    console.log("Failed to getTokenBalanceBySymbol: ", err);
+    // console.log("Failed to getTokenBalanceBySymbol: ", err);
   }
 };
 
@@ -96,7 +96,7 @@ export const getSupportNativeOrTokenBySymbol = (tokenSymbol: string) => {
       }
     }
   } catch (err) {
-    console.log("Failed to getSupportNativeOrTokenBySymbol: ", err);
+    // console.log("Failed to getSupportNativeOrTokenBySymbol: ", err);
   }
 };
 
@@ -109,7 +109,7 @@ export const getSupportTokenByAddress = (address: string) => {
       }
     }
   } catch (err) {
-    console.log("Failed to getSupportTokenByAddress: ", err);
+    // console.log("Failed to getSupportTokenByAddress: ", err);
   }
 };
 
@@ -118,7 +118,7 @@ export const getSupportChainByName = (chainName: string) => {
     const res = supportChains?.find((one) => one?.chain?.name === chainName);
     return res;
   } catch (err) {
-    console.log("Failed to getSupportChainByName: ", err);
+    // console.log("Failed to getSupportChainByName: ", err);
   }
 };
 
@@ -127,7 +127,7 @@ export const getSupportTokensByChainName = (chainName: string) => {
     const res = getSupportChainByName(chainName)?.tokens;
     return res;
   } catch (err) {
-    console.log("Failed to getSupportTokensByChainName: ", err);
+    // console.log("Failed to getSupportTokensByChainName: ", err);
   }
 };
 
@@ -137,7 +137,7 @@ export const getNativeCmcByChainName = (chainName: string) => {
     const res = supportChain?.chain?.cmc;
     return res;
   } catch (err) {
-    console.log("Failed to getNativeCmcByChainName: ", err);
+    // console.log("Failed to getNativeCmcByChainName: ", err);
   }
 };
 
@@ -147,7 +147,7 @@ export const getNativeSymbolByChainName = (chainName: string) => {
     const res = supportChain?.chain?.symbol;
     return res;
   } catch (err) {
-    console.log("Failed to getNativeSymbolByChainName: ", err);
+    // console.log("Failed to getNativeSymbolByChainName: ", err);
   }
 };
 
@@ -158,7 +158,7 @@ export const getNativeTokenPriceByChainName = (priceListStore: IPriceList, chain
     const res = getTokenPriceByCmc(priceListStore, cmc);
     return res;
   } catch (err) {
-    console.log("Failed to getNativeSymbolByChainName: ", err);
+    // console.log("Failed to getNativeSymbolByChainName: ", err);
   }
 };
 
@@ -169,7 +169,7 @@ export const getNativeTokenBalanceByChainName = (balanceListStore: IBalanceList,
     const res = getTokenBalanceBySymbol(balanceListStore, symbol);
     return res;
   } catch (err) {
-    console.log("Failed to getNativeSymbolByChainName: ", err);
+    // console.log("Failed to getNativeSymbolByChainName: ", err);
   }
 };
 
@@ -178,7 +178,7 @@ export const checkNativeToken = (tokenSymbol: string) => {
     const res = supportChains?.some((one) => one?.chain?.symbol === tokenSymbol);
     return res;
   } catch (err) {
-    console.log("Failed to checkNativeToken: ", err);
+    // console.log("Failed to checkNativeToken: ", err);
   }
 };
 
@@ -216,7 +216,7 @@ export const getCurrentChainWalletAddress = (walletStore: IWallet, chainName: st
     }
     return res;
   } catch (err) {
-    console.log("Failed to getCurrentChainWalletAddress: ", err);
+    // console.log("Failed to getCurrentChainWalletAddress: ", err);
   }
 };
 
@@ -243,7 +243,7 @@ export const resetBalanceList = () => {
     const res: IBalance[] = [...nativeTokens, ...altTokens];
     return res;
   } catch (err) {
-    console.log("Failed to resetBalanceList: ", err);
+    // console.log("Failed to resetBalanceList: ", err);
   }
 };
 
@@ -277,7 +277,7 @@ export const resetPriceList = () => {
     const res = [...nativeTokens, ...altTokens];
     return res;
   } catch (err) {
-    console.log("Failed to resetPriceList: ", err);
+    // console.log("Failed to resetPriceList: ", err);
   }
 };
 

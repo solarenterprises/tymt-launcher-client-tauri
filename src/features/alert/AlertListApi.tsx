@@ -16,20 +16,20 @@ export const fetchUnreadAlertList = async ({ userId, page, limit }: IFetchAlertL
       },
     });
     if (res?.status === 200) {
-      console.log("fetchUnreadAlertList");
+      // console.log("fetchUnreadAlertList");
       return {
         unread: res?.data?.unreadAlerts ?? [],
         unreadCount: res?.data?.unreadCount ?? 0,
       };
     } else {
-      console.log("fetchUnreadAlertList", res?.status);
+      // console.log("fetchUnreadAlertList", res?.status);
       return {
         unread: [],
         unreadCount: 0,
       };
     }
   } catch (err) {
-    console.log("Failed to fetchUnreadAlertList: ", err);
+    // console.log("Failed to fetchUnreadAlertList: ", err);
     return {
       unread: [],
       unreadCount: 0,
@@ -47,20 +47,20 @@ export const fetchReadAlertList = async ({ userId, page, limit }: IFetchAlertLis
       },
     });
     if (res?.status === 200) {
-      console.log("fetchReadAlertList");
+      // console.log("fetchReadAlertList");
       return {
         read: res?.data?.readAlerts ?? [],
         readCount: res?.data?.readCount ?? 0,
       };
     } else {
-      console.log("fetchReadAlertList res.status !== 200");
+      // console.log("fetchReadAlertList res.status !== 200");
       return {
         read: [],
         readCount: 0,
       };
     }
   } catch (err) {
-    console.error("Failed to fetchReadAlertList: ", err);
+    // console.error("Failed to fetchReadAlertList: ", err);
     return {
       read: [],
       readCount: 0,
@@ -82,10 +82,10 @@ export const fetchAlertList = async (userId: string) => {
       read: res[1]?.read,
       readCount: res[1]?.readCount,
     };
-    console.log("fetchAlertList");
+    // console.log("fetchAlertList");
     return res1;
   } catch (err) {
-    console.error("Failed to getAlertList: ", err);
+    // console.error("Failed to getAlertList: ", err);
     return {
       read: [],
       readCount: 0,
@@ -105,14 +105,14 @@ export const fetchCountUnreadAlertList = async (userid: string) => {
       },
     });
     if (res?.status === 200) {
-      console.log("fetchCountUnreadAlertList");
+      // console.log("fetchCountUnreadAlertList");
       return res?.data?.count;
     } else {
-      console.log("fetchCountUnreadAlertList res.status !== 200");
+      // console.log("fetchCountUnreadAlertList res.status !== 200");
       return 0;
     }
   } catch (err) {
-    console.error("Failed to fetchCountUnreadAlertList: ", err);
+    // console.error("Failed to fetchCountUnreadAlertList: ", err);
     return 0;
   }
 };
@@ -138,14 +138,14 @@ export const updateAlertReadStatus = async (payload: updateAlertReadStatusPayloa
       }
     );
     if (res?.status === 200) {
-      console.log("updateAlertReadstatus");
+      // console.log("updateAlertReadstatus");
       return res?.data?.result;
     } else {
-      console.log("updateAlertReadstatus res.status !== 200");
+      // console.log("updateAlertReadstatus res.status !== 200");
       return null;
     }
   } catch (err) {
-    console.error("Failed to updateAlertReadstatus: ", err);
+    // console.error("Failed to updateAlertReadstatus: ", err);
     return null;
   }
 };
@@ -164,14 +164,14 @@ export const updateAllAlertReadStatus = async () => {
       }
     );
     if (res?.status === 200 && res?.data?.msg === "All unread alerts are successfully read") {
-      console.log("updateAllAlertReadStatus");
+      // console.log("updateAllAlertReadStatus");
       return true;
     } else {
-      console.log("updateAllAlertReadStatus res.status !== 200");
+      // console.log("updateAllAlertReadStatus res.status !== 200");
       return false;
     }
   } catch (err) {
-    console.error("Failed to updateAllAlertReadStatus: ", err);
+    // console.error("Failed to updateAllAlertReadStatus: ", err);
     return false;
   }
 };
@@ -192,14 +192,14 @@ export const updateFriendRequest = async ({ alertId, status }: IUpdateFriendRequ
       }
     );
     if (res?.status === 200) {
-      console.log("updateFriendRequest");
+      // console.log("updateFriendRequest");
       return res?.data?.result;
     } else {
-      console.log("updateFriendRequest: ", res?.status);
+      // console.log("updateFriendRequest: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to updateFriendRequest: ", err);
+    // console.error("Failed to updateFriendRequest: ", err);
     return null;
   }
 };
@@ -208,13 +208,13 @@ export const readMultipleAlerts = async (body: IReqReadMultipleAlerts) => {
   try {
     const res = await AlertAPI.readMultipleAlerts(body);
     if (!res || res.status !== 200) {
-      console.error("Failed to readMultipleAlerts: response undefined! ", res);
+      // console.error("Failed to readMultipleAlerts: response undefined! ", res);
       return null;
     }
-    console.log("readMultipleAlerts", res);
+    // console.log("readMultipleAlerts", res);
     return null;
   } catch (err) {
-    console.error("Failed to readMultipleAlerts: ", err);
+    // console.error("Failed to readMultipleAlerts: ", err);
     return null;
   }
 };

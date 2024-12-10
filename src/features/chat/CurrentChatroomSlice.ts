@@ -45,7 +45,7 @@ export const currentChatroomSlice = createSlice({
       })
       .addCase(fetchCurrentChatroomAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.log("Failed to fetchCurrentChatroomAsync: ", action.payload);
+          // console.log("Failed to fetchCurrentChatroomAsync: ", action.payload);
           return;
         }
         state.data = action.payload;

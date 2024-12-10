@@ -17,7 +17,7 @@ export const decrypt = async (_encryptedMnemonic: string, _password: string) => 
     const decipher = crypto.createDecipheriv("aes-256-cbc", key, encryptionIV);
     return decipher.update(buff.toString("utf8"), "hex", "utf8") + decipher.final("utf8");
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     return undefined;
   }
 };
@@ -39,7 +39,7 @@ export const getKeccak256Hash = (plain: string) => {
     const res = createKeccakHash("keccak256").update(plain).digest("hex");
     return res;
   } catch (err) {
-    console.log("Failed to getKeccak256Hash: ", err);
+    // console.log("Failed to getKeccak256Hash: ", err);
   }
 };
 

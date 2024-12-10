@@ -22,12 +22,12 @@ class PriceAPI {
     try {
       const result = await axios.get(`${tymt_backend_url}/token-prices/latest-token-prices-cmc`);
       if (!result?.data?.result?.data && !isArray(result?.data?.result?.data)) {
-        console.error("getAllTokenPrices: response undefined or not an array");
+        // console.error("getAllTokenPrices: response undefined or not an array");
         return [] as ITokenPriceRes[];
       }
       return result?.data?.result?.data as ITokenPriceRes[];
     } catch (err) {
-      console.error("Failed to getAllTokenPrices: ", err);
+      // console.error("Failed to getAllTokenPrices: ", err);
     }
   }
 
@@ -41,7 +41,7 @@ class PriceAPI {
       });
       return result.data.result.data;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 
@@ -55,7 +55,7 @@ class PriceAPI {
       });
       return result.data.result.data[0].price;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
     }
   }
 }

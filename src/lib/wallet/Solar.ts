@@ -193,9 +193,9 @@ export class Solar implements IWallet {
         }
 
         let iTxJson = txJson.build().toJson();
-        console.log("sending start");
+        // console.log("sending start");
         let res = await SolarAPI.addTxToQueue(JSON.stringify({ transactions: [iTxJson] }), solar_api_url ?? "");
-        console.log("sending res", res);
+        // console.log("sending res", res);
         if (res.status !== 200) {
           return {
             status: "failed",
@@ -316,9 +316,9 @@ export class Solar implements IWallet {
         }
 
         let iTxJson = txJson.build().toJson();
-        console.log("sending start");
+        // console.log("sending start");
         let res = await SolarAPI.addTxToQueue(JSON.stringify({ transactions: [iTxJson] }), solar_api_url ?? "");
-        console.log("sending res", res);
+        // console.log("sending res", res);
         if (res.status !== 200) {
           return {
             status: "failed",

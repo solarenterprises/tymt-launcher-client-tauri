@@ -71,7 +71,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
 
   useEffect(() => {
     const unlisten_focus_chat_input_field = listen("focus_chat_input_field", (_event) => {
-      console.log("focus_chat_input_field");
+      // console.log("focus_chat_input_field");
       inputRef.current.focus();
     });
 
@@ -124,7 +124,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
               type: type,
             };
             socket.current.emit("post-message", JSON.stringify(message));
-            console.log("socket.current.emit > post-message", message);
+            // console.log("socket.current.emit > post-message", message);
 
             const fullName = currentSKey ? await encrypt(`${file.name}`, currentSKey) : `${file.name}`;
             const data = {
@@ -138,7 +138,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
               receivers: currentChatroomStore?.participants?.filter((element) => element.userId !== myInfoStore?._id)?.map((element_2) => element_2.userId),
             };
             socket.current.emit("post-alert", JSON.stringify(data));
-            console.log("socket.current.emit > post-alert");
+            // console.log("socket.current.emit > post-alert");
 
             const updatedHistory = [message, ...chatHistoryStore.messages];
             dispatch(
@@ -147,12 +147,12 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
               })
             );
 
-            console.log("handleFileInputChange", type, myInfoStore?._id, currentChatroomStore?._id, message, file);
+            // console.log("handleFileInputChange", type, myInfoStore?._id, currentChatroomStore?._id, message, file);
 
             setLoading(false);
           }
         } catch (err) {
-          console.error("Failed to handleFileInputChange: ", err);
+          // console.error("Failed to handleFileInputChange: ", err);
           setLoading(false);
         }
       }
@@ -210,7 +210,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
               type: type,
             };
             socket.current.emit("post-message", JSON.stringify(message));
-            console.log("socket.current.emit > post-message", message);
+            // console.log("socket.current.emit > post-message", message);
 
             const fullName = currentSKey ? await encrypt(`${file.name}`, currentSKey) : `${file.name}`;
             const data = {
@@ -224,7 +224,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
               receivers: currentChatroomStore?.participants?.filter((element) => element.userId !== myInfoStore?._id)?.map((element_2) => element_2.userId),
             };
             socket.current.emit("post-alert", JSON.stringify(data));
-            console.log("socket.current.emit > post-alert");
+            // console.log("socket.current.emit > post-alert");
 
             const updatedHistory = [message, ...chatHistoryStore.messages];
             dispatch(
@@ -233,12 +233,12 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
               })
             );
 
-            console.log("handleFileInputChange", type, myInfoStore?._id, currentChatroomStore?._id, message, file);
+            // console.log("handleFileInputChange", type, myInfoStore?._id, currentChatroomStore?._id, message, file);
 
             setLoading(false);
           }
         } catch (err) {
-          console.error("Failed to handleFileInputChange: ", err);
+          // console.error("Failed to handleFileInputChange: ", err);
           setLoading(false);
         }
       }
@@ -272,7 +272,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
             createdAt: Date.now(),
           };
           socket.current.emit("post-message", JSON.stringify(message));
-          console.log("socket.current.emit > post-message", message);
+          // console.log("socket.current.emit > post-message", message);
 
           // Trigger the alert
           const data = {
@@ -286,7 +286,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
             receivers: currentChatroomStore?.participants?.filter((element) => element.userId !== myInfoStore?._id)?.map((element_2) => element_2.userId),
           };
           socket.current.emit("post-alert", JSON.stringify(data));
-          console.log("socket.current.emit > post-alert");
+          // console.log("socket.current.emit > post-alert");
 
           // Update the chatHistoryStore
           const updatedHistory = [message, ...chatHistoryStore.messages];
@@ -300,7 +300,7 @@ const ChatInputField = ({ value, setValue }: propsChatInputFieldType) => {
           setValue("");
         }
       } catch (err) {
-        console.error("Failed to sendMessage: ", err);
+        // console.error("Failed to sendMessage: ", err);
       }
     }
   }, [socket.current, myInfoStore, currentChatroomStore, sKeyListStore, myInfoStore, value]);

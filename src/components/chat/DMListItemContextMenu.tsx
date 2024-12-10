@@ -42,10 +42,10 @@ const DMListItemContextMenu = ({ view, setView, DM, contextMenuPosition }: IProp
     try {
       const partner = DM.participants.find((participant) => participant.userId !== myInfoStore?._id);
 
-      console.log("handleFriendRequestClick", partner.userId);
+      // console.log("handleFriendRequestClick", partner.userId);
 
       if (!partner) {
-        console.error("Failed to handleSendFriendRequestClick: partner already left DM!");
+        // console.error("Failed to handleSendFriendRequestClick: partner already left DM!");
         return;
       }
 
@@ -63,7 +63,7 @@ const DMListItemContextMenu = ({ view, setView, DM, contextMenuPosition }: IProp
           receivers: [partner.userId],
         };
         socket.current.emit("post-alert", JSON.stringify(data));
-        console.log("socket.current.emit > post-alert", data);
+        // console.log("socket.current.emit > post-alert", data);
 
         const data_2: ISocketParamsSyncEvent = {
           sender_id: myInfoStore?._id,
@@ -72,12 +72,12 @@ const DMListItemContextMenu = ({ view, setView, DM, contextMenuPosition }: IProp
           is_to_self: true,
         };
         socket.current.emit("sync-event", JSON.stringify(data_2));
-        console.log("socket.current.emit > sync-event", data_2);
+        // console.log("socket.current.emit > sync-event", data_2);
       }
 
       setView(false);
     } catch (err) {
-      console.error("Failed to handleFriendRequestClick: ", err);
+      // console.error("Failed to handleFriendRequestClick: ", err);
     }
   }, [myInfoStore, DM, socket.current]);
 
@@ -85,7 +85,7 @@ const DMListItemContextMenu = ({ view, setView, DM, contextMenuPosition }: IProp
     try {
       const partner = DM.participants.find((participant) => participant.userId !== myInfoStore?._id);
       if (!partner) {
-        console.error("Failed to handleSendFriendRequestClick: partner already left DM!");
+        // console.error("Failed to handleSendFriendRequestClick: partner already left DM!");
         return;
       }
 
@@ -102,10 +102,10 @@ const DMListItemContextMenu = ({ view, setView, DM, contextMenuPosition }: IProp
         };
 
         socket.current.emit("sync-event", JSON.stringify(data));
-        console.log("socket.current.emit > sync-event", data);
+        // console.log("socket.current.emit > sync-event", data);
       }
     } catch (err) {
-      console.error("Failed to handleBlockClick: ", err);
+      // console.error("Failed to handleBlockClick: ", err);
     }
   }, [socket.current, myInfoStore]);
 
@@ -130,10 +130,10 @@ const DMListItemContextMenu = ({ view, setView, DM, contextMenuPosition }: IProp
         socket.current.emit("leave-message-group", JSON.stringify(data_2));
       });
 
-      console.log("handleLeaveDMClick", DM);
+      // console.log("handleLeaveDMClick", DM);
       setView(false);
     } catch (err) {
-      console.error("Failed to handleLeaveDMClick: ", err);
+      // console.error("Failed to handleLeaveDMClick: ", err);
     }
   }, [myInfoStore, socket.current]);
 

@@ -68,7 +68,7 @@ const NonCustodialImport1 = () => {
         dispatch(setWallet(tempWalletStore));
         dispatch(addWalletList(tempWalletStore));
       } catch (err) {
-        console.log("Failed to handleSignUp: ", err);
+        // console.log("Failed to handleSignUp: ", err);
       }
     },
     [tempAccountStore, tempWalletStore]
@@ -102,7 +102,7 @@ const NonCustodialImport1 = () => {
       dispatch(setLogin(true));
       navigate("/home");
     } catch (err) {
-      console.log("Failed to handleLogin: ", err);
+      // console.log("Failed to handleLogin: ", err);
     }
   }, [tempAccountStore, saltTokenStore]);
 
@@ -158,7 +158,7 @@ const NonCustodialImport1 = () => {
           await handleLogin();
         }
       } catch (err) {
-        console.log("Failed at NonCustodialImport1: ", err);
+        // console.log("Failed at NonCustodialImport1: ", err);
       }
     },
   });

@@ -108,7 +108,7 @@ const ConfirmInformation = () => {
       dispatch(setWallet(tempWalletStoreRef.current));
       dispatch(addWalletList(tempWalletStoreRef.current));
     } catch (err) {
-      console.log("Failed to handleSignUp: ", err);
+      // console.log("Failed to handleSignUp: ", err);
     }
   };
 
@@ -128,7 +128,7 @@ const ConfirmInformation = () => {
       dispatch(setAccount(newAccount));
       dispatch(addAccountList(newAccount));
     } catch (err) {
-      console.log("Failed to handleGuestComplete: ", err);
+      // console.log("Failed to handleGuestComplete: ", err);
     }
   };
 
@@ -160,7 +160,7 @@ const ConfirmInformation = () => {
       dispatch(setLogin(true));
       navigate("/home");
     } catch (err) {
-      console.log("Failed to handleLogin: ", err);
+      // console.log("Failed to handleLogin: ", err);
     }
   };
 

@@ -58,7 +58,7 @@ const TransactionProvider = () => {
   }, [accountStore, walletListStore]);
 
   useEffect(() => {
-    console.log("currentChainStore has been changed!");
+    // console.log("currentChainStore has been changed!");
     dispatch(setCurrentToken(getNativeSymbolByChainName(currentChainStore?.chain)));
     dispatch(fetchBalanceListAsync(walletStore));
     dispatch(fetchPriceListAsync());
@@ -74,7 +74,7 @@ const TransactionProvider = () => {
   }, [currentChainStore]);
 
   useEffect(() => {
-    console.log("currentTokenStore has been changed!");
+    // console.log("currentTokenStore has been changed!");
     dispatch(
       fetchTransactionListAsync({
         walletStore: walletStore,
@@ -87,11 +87,11 @@ const TransactionProvider = () => {
 
   const refreshAccountListAvatar = useCallback(async () => {
     try {
-      console.log("refreshAccountListAvatar");
+      // console.log("refreshAccountListAvatar");
       const newAccountList = await fetchAccountListAvatar(accountListStore);
       dispatch(setAccountList(newAccountList));
     } catch (err) {
-      console.log("Failed to refreshAccountListAvatar: ", err);
+      // console.log("Failed to refreshAccountListAvatar: ", err);
     }
   }, [accountListStore]);
 

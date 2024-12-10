@@ -40,7 +40,7 @@ const comingGameListSlice = createSlice({
       })
       .addCase(fetchComingGameListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to fetchComingGameListAsync: action.payload undefined!");
+          // console.error("Failed to fetchComingGameListAsync: action.payload undefined!");
           return;
         }
         state.data = action.payload;
@@ -52,7 +52,7 @@ const comingGameListSlice = createSlice({
       })
       .addCase(fetchAllComingGameListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload) {
-          console.error("Failed to fetchAllComingGameListAsync: action.payload undefined!");
+          // console.error("Failed to fetchAllComingGameListAsync: action.payload undefined!");
           return;
         }
         state.data = action.payload;

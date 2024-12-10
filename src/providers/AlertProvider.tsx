@@ -110,12 +110,12 @@ const AlertProvider = () => {
             dispatch(setSKeyList(newSKeyArray));
           }
         } catch (err) {
-          console.error("Failed to newSKeyArray: ", err);
+          // console.error("Failed to newSKeyArray: ", err);
         }
       });
       // ~ Chat
     } catch (err) {
-      console.log("Failed to timerAction: ", err);
+      // console.log("Failed to timerAction: ", err);
     }
   }, [walletStore, currentChainStore, myInfoStore]);
 

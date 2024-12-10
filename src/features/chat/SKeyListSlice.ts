@@ -35,7 +35,7 @@ export const sKeyListSlice = createSlice({
     },
     addOneSKeyList: (state, action) => {
       if (!action.payload || !action.payload.roomId || !action.payload.sKey) {
-        console.error("Failed to addOneSkeyList: action.payload undefined!", action.payload);
+        // console.error("Failed to addOneSkeyList: action.payload undefined!", action.payload);
         return;
       }
       const restOfSkeys = state.data.sKeys.filter((element) => element.roomId !== action.payload.roomId);

@@ -124,7 +124,7 @@ const Bubble = ({ roomMode, screenExpanded, message, index, isDM }: IParamsBubbl
       }
       return res;
     } catch (err) {
-      console.error("Failed with decryptedMessage: ", err);
+      // console.error("Failed with decryptedMessage: ", err);
       return "";
     }
   }, [sKey, sKeyListStore, currentChatroomStore, Chatdecrypt, decryptMessage, message]);

@@ -88,7 +88,7 @@ export const alertListSlice = createSlice({
       })
       .addCase(fetchReadAlertListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload && !action.payload.read) {
-          console.error("Failed to fetchReadAlertListSync: action.payload.read undefined");
+          // console.error("Failed to fetchReadAlertListSync: action.payload.read undefined");
         }
 
         state.data = { ...state.data, read: addAlertHistory([...action.payload.read], [...state.data.read]), readCount: action.payload.readCount };
@@ -100,7 +100,7 @@ export const alertListSlice = createSlice({
       })
       .addCase(fetchUnreadAlertListAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action.payload && !action.payload.read) {
-          console.log("Failed to fetchUnreadAlertListSync: action.payload.read undefined");
+          // console.log("Failed to fetchUnreadAlertListSync: action.payload.read undefined");
         }
         state.data = { ...state.data, unread: addAlertHistory([...action.payload.unread], [...state.data.unread]), unreadCount: action.payload.unreadCount };
         tymtStorage.set(`alertList`, JSON.stringify(state.data));
@@ -111,7 +111,7 @@ export const alertListSlice = createSlice({
       })
       .addCase(updateAlertReadStatusAsync.fulfilled, (state, action: PayloadAction<any>) => {
         if (!action?.payload || !action?.payload?._id) {
-          console.error("Failed to updateAlertReadStatusAsync: action.payload undefined");
+          // console.error("Failed to updateAlertReadStatusAsync: action.payload undefined");
           return;
         }
         const target = state.data.unread.find((element) => element._id === action.payload._id);

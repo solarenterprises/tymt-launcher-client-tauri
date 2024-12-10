@@ -57,7 +57,7 @@ const Profile = ({ view, setView }: propsType) => {
       dispatch(setAccount({ ...accountStore, nickName: nickname }));
 
       const res = await updateUserNickname(myInfoStore?._id, nickname);
-      console.log(res.data, "updateUserNickName");
+      // console.log(res.data, "updateUserNickName");
 
       setNotificationStatus("success");
       setNotificationTitle(t("alt-1_nickname-saved"));
@@ -68,7 +68,7 @@ const Profile = ({ view, setView }: propsType) => {
       if (err instanceof Yup.ValidationError) {
         setError(err.message);
       }
-      console.log(err);
+      // console.log(err);
 
       setNotificationStatus("failed");
       setNotificationTitle(t("alt-3_nickname-notsaved"));
@@ -106,7 +106,7 @@ const Profile = ({ view, setView }: propsType) => {
             is_to_self: true,
           };
           socket.current.emit("sync-events-all", JSON.stringify(data));
-          console.log("socket.current.emit > sync-events-all", data);
+          // console.log("socket.current.emit > sync-events-all", data);
         }
 
         setNotificationStatus("success");
@@ -116,7 +116,7 @@ const Profile = ({ view, setView }: propsType) => {
         setNotificationLink(null);
       })
       .catch((err) => {
-        console.log(err);
+        // console.log(err);
         setNotificationStatus("failed");
         setNotificationTitle(t("alt-34_avatar-notsaved"));
         setNotificationDetail(t("alt-35_avatar-notsaved-intro"));

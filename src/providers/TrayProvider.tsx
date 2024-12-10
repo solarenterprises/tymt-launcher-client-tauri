@@ -38,7 +38,7 @@ export const TrayProvider: React.FC<TrayProviderProps> = ({ children }) => {
     try {
       await invoke("set_tray_items_enabled", { itemIds, enabled });
     } catch (error) {
-      console.error("Failed to callSetTrayItemsEnabled:", error);
+      // console.error("Failed to callSetTrayItemsEnabled:", error);
     }
   };
 
@@ -55,36 +55,36 @@ export const TrayProvider: React.FC<TrayProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const unlisten_wallet = listen("wallet", (event) => {
+    const unlisten_wallet = listen("wallet", () => {
       navigate("/wallet");
       appWindow.setFocus();
-      console.log(event.payload as string);
+      // console.log(event.payload as string);
     });
 
-    const unlisten_games = listen("games", (event) => {
+    const unlisten_games = listen("games", () => {
       navigate("/library");
       appWindow.setFocus();
-      console.log(event.payload as string);
+      // console.log(event.payload as string);
     });
 
-    const unlisten_about = listen("about-tymt", (event) => {
+    const unlisten_about = listen("about-tymt", () => {
       try {
         open("https://tymt.com");
-        console.log(event.payload as string);
+        // console.log(event.payload as string);
       } catch (err) {
-        console.error("Failed to open link:", err);
+        // console.error("Failed to open link:", err);
       }
     });
 
-    const unlisten_signout = listen("signout", (event) => {
+    const unlisten_signout = listen("signout", () => {
       navigate("/start");
       appWindow.setFocus();
-      console.log(event.payload as string);
+      // console.log(event.payload as string);
     });
 
-    const unlisten_disable_notifications = listen("disable_notifications", (event) => {
+    const unlisten_disable_notifications = listen("disable_notifications", () => {
       dispatch(setNotification({ ...notificationStoreRef.current, alert: false }));
-      console.log(event.payload as string);
+      // console.log(event.payload as string);
     });
 
     const unlisten_install_dependencies = listen("install_dependencies_for_d53_on_mac", (event) => {
@@ -95,7 +95,7 @@ export const TrayProvider: React.FC<TrayProviderProps> = ({ children }) => {
           id: (event.payload as boolean) ? "district53" : "",
         })
       );
-      console.log(event.payload as string);
+      // console.log(event.payload as string);
     });
 
     return () => {

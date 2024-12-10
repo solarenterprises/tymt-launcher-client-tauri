@@ -11,7 +11,7 @@ import { getCurrentChainWalletAddress, getSupportChainByName, getSupportNativeOr
 
 export async function fetchTransactionList(data: { walletStore: IWallet; chainName: string; tokenSymbol: string; page: number }) {
   try {
-    console.log("fetchTransactionList");
+    // console.log("fetchTransactionList");
     tymtStorage.set(`loadMoreAvailable`, true);
     const currentSupportChain = getSupportChainByName(data?.chainName);
     const currentWalletAddress = getCurrentChainWalletAddress(data?.walletStore, data?.chainName);
@@ -35,7 +35,7 @@ export async function fetchTransactionList(data: { walletStore: IWallet; chainNa
       }
     }
   } catch (err) {
-    console.log("Failed to fetchTransactionList: ", err);
+    // console.log("Failed to fetchTransactionList: ", err);
   }
 }
 

@@ -140,7 +140,7 @@ const Welcome = () => {
       navigate("/home");
       setLoading(false);
     } catch (err) {
-      console.log("Failed to handlePlayGuest: ", err);
+      // console.log("Failed to handlePlayGuest: ", err);
       setLoading(false);
     }
   }, [saltTokenStore, machineIdStore, hasGuest]);
@@ -148,7 +148,7 @@ const Welcome = () => {
   useEffect(() => {
     invoke("get_machine_id")
       .then((hwid) => {
-        console.log("Unique Machine ID:", hwid);
+        // console.log("Unique Machine ID:", hwid);
         dispatch(
           setMachineId({
             machineId: hwid,
@@ -156,7 +156,7 @@ const Welcome = () => {
         );
       })
       .catch((err) => {
-        console.log("Error getting Machine ID:", err);
+        // console.log("Error getting Machine ID:", err);
       });
   }, []);
 

@@ -3,7 +3,7 @@ import { IPrice } from "../../types/walletTypes";
 
 export const fetchPriceList = async () => {
   try {
-    console.log("fetchPriceList");
+    // console.log("fetchPriceList");
 
     const data = await PriceAPI.getAllTokenPrices();
     if (!data) return;
@@ -15,6 +15,6 @@ export const fetchPriceList = async () => {
     });
     return res;
   } catch (err) {
-    console.log("Failed to fetchPriceList: ", err);
+    // console.log("Failed to fetchPriceList: ", err);
   }
 };

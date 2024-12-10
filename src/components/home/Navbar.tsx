@@ -182,7 +182,7 @@ const Navbar = () => {
               }}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
-                  console.log("Enter key pressed");
+                  // console.log("Enter key pressed");
                   navigate(`/store?key=${value}`);
                 }
               }}

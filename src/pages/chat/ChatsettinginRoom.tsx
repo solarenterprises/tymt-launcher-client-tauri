@@ -40,7 +40,7 @@ const ChatSettinginRoom = ({ view, setView }: propsType) => {
         })
       );
     } catch (err) {
-      console.error("Failed to putUserStatus: ", err);
+      // console.error("Failed to putUserStatus: ", err);
     }
   }, [myInfoStore, notificationStore]);
 

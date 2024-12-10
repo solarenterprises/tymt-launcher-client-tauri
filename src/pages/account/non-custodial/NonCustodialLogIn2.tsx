@@ -97,7 +97,7 @@ const NonCustodialLogIn2 = () => {
         navigate("/non-custodial/import/1");
         setLoading(false);
       } catch (err) {
-        console.log("Failed at NonCustodialLogin2: ", err);
+        // console.log("Failed at NonCustodialLogin2: ", err);
         setLoading(false);
       }
     },

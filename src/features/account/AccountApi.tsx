@@ -41,11 +41,11 @@ export const updateUserNickname = async (uid, nickName) => {
 export const fetchAccountAvatar = async (account: IAccount) => {
   try {
     const sxpAddress = account?.sxpAddress;
-    console.log("fetchAccountAvatar: ", sxpAddress);
+    // console.log("fetchAccountAvatar: ", sxpAddress);
 
     const data = await AuthAPI.getUserBySolarAddress(sxpAddress);
     if (!data) {
-      console.log("Failed to fetchAccountAvatar: user undefined!", data);
+      // console.log("Failed to fetchAccountAvatar: user undefined!", data);
       return;
     }
 
@@ -57,7 +57,7 @@ export const fetchAccountAvatar = async (account: IAccount) => {
 
     return newAccount;
   } catch (err) {
-    console.log("Failed to fetchAccountAvatar: ", err);
+    // console.log("Failed to fetchAccountAvatar: ", err);
   }
 };
 
@@ -70,7 +70,7 @@ export const fetchAccountListAvatar = async (accountList: IAccountList) => {
     }
     return newAccountList;
   } catch (err) {
-    console.log("Failed to fetchAccountListAvatar: ", err);
+    // console.log("Failed to fetchAccountListAvatar: ", err);
     return [];
   }
 };

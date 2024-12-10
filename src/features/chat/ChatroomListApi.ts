@@ -22,13 +22,13 @@ export const fetchChatroomList = async (_id: string) => {
   try {
     const res = await ChatroomAPI.fetchAllChatroomsFor(_id);
     if (res?.status !== 200 || !res?.data) {
-      console.error("Failed to fetchChatroomList: ", res);
+      // console.error("Failed to fetchChatroomList: ", res);
       return null;
     }
-    console.log("fetchChatroomList");
+    // console.log("fetchChatroomList");
     return res?.data ?? [];
   } catch (err) {
-    console.error("Failed to fetchChatroomList: ", err);
+    // console.error("Failed to fetchChatroomList: ", err);
     return null;
   }
 };
@@ -37,14 +37,14 @@ export const addOneToChatroomList = async (room_id: string) => {
   try {
     const res = await ChatroomAPI.fetchChatroom(room_id);
     if (res?.status !== 200 || !res?.data || !res?.data?.result) {
-      console.error("Failed to addOneToChatroomList: ", res);
+      // console.error("Failed to addOneToChatroomList: ", res);
       return null;
     }
 
-    console.log("addOneToChatroomList", room_id);
+    // console.log("addOneToChatroomList", room_id);
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to addOneToChatroomList: ", err);
+    // console.error("Failed to addOneToChatroomList: ", err);
     return null;
   }
 };
@@ -53,14 +53,14 @@ export const createGroup = async (payload: IReqChatroomCreateChatroom) => {
   try {
     const res = await ChatroomAPI.createChatroom(payload);
     if (res?.status === 200 && res?.data?.result) {
-      console.log("createGroup");
+      // console.log("createGroup");
       return res?.data?.result;
     } else {
-      console.log("createGroup: ", res?.status);
+      // console.log("createGroup: ", res?.status);
       return null;
     }
   } catch (err) {
-    console.error("Failed to createGroup: ", err);
+    // console.error("Failed to createGroup: ", err);
     return null;
   }
 };
@@ -75,14 +75,14 @@ export const createDM = async (_id: string) => {
     };
     const res0 = await ChatroomAPI.createChatroom(body0);
     if (res0?.status !== 200 || !res0?.data?.result) {
-      console.error("Failed to createDM at createChatroom: ", res0);
+      // console.error("Failed to createDM at createChatroom: ", res0);
       return null;
     }
 
     // Get user by id
     const res1 = await UserAPI.getUserById(_id);
     if (res1?.status !== 200 || !res1?.data?.result) {
-      console.error("Failed to createDM at getUserById: ", res1);
+      // console.error("Failed to createDM at getUserById: ", res1);
       return null;
     }
 
@@ -96,13 +96,13 @@ export const createDM = async (_id: string) => {
     };
     const res2 = await ChatroomAPI.addParticipant(body2);
     if (res2?.status !== 200 || !res2?.data?.result) {
-      console.error("Failed to createDM at addParticipant: ", res2);
+      // console.error("Failed to createDM at addParticipant: ", res2);
       return null;
     }
-    console.log("createDM");
+    // console.log("createDM");
     return res2?.data?.result;
   } catch (err) {
-    console.error("Failed to createDM: ", err);
+    // console.error("Failed to createDM: ", err);
     return null;
   }
 };
@@ -111,7 +111,7 @@ export const addParticipant = async (_member: ICurrentChatroomMember) => {
   try {
     const currentChatroomStore: IChatroom = JSON.parse(sessionStorage.getItem(`currentChatroom`));
     if (!currentChatroomStore) {
-      console.error("Failed to addOneCurrentChatroomMembers: currentChatroomStore undefined!");
+      // console.error("Failed to addOneCurrentChatroomMembers: currentChatroomStore undefined!");
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -125,7 +125,7 @@ export const addParticipant = async (_member: ICurrentChatroomMember) => {
 
     const sKeyListStore: ISKeyList = JSON.parse(sessionStorage.getItem(`sKeyList`));
     if (!sKeyListStore || !sKeyListStore.sKeys || !isArray(sKeyListStore.sKeys)) {
-      console.error("Failed to addOneCurrentChatroomMembers: sKeyListStore undefined!");
+      // console.error("Failed to addOneCurrentChatroomMembers: sKeyListStore undefined!");
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -139,7 +139,7 @@ export const addParticipant = async (_member: ICurrentChatroomMember) => {
 
     const currentSKey = sKeyListStore?.sKeys?.find((element) => element?.roomId === currentChatroomStore?._id)?.sKey;
     if (!currentSKey && currentChatroomStore?.isPrivate) {
-      console.error("Failed to addOneCurrentChatroomMembers: currentSKey undefined!");
+      // console.error("Failed to addOneCurrentChatroomMembers: currentSKey undefined!");
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -158,7 +158,7 @@ export const addParticipant = async (_member: ICurrentChatroomMember) => {
     };
     const res = await ChatroomAPI.addParticipant(body);
     if (res?.status !== 200 || !res?.data) {
-      console.error("Failed to addParticipant: ", res);
+      // console.error("Failed to addParticipant: ", res);
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -170,10 +170,10 @@ export const addParticipant = async (_member: ICurrentChatroomMember) => {
       return null;
     }
 
-    console.log("addParticipant");
+    // console.log("addParticipant");
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to addParticipant: ", err);
+    // console.error("Failed to addParticipant: ", err);
     const data: INotificationParams = {
       status: "failed",
       title: "Error",
@@ -189,7 +189,7 @@ export const removeParticipant = async (_member: ICurrentChatroomMember) => {
   try {
     const currentChatroomStore: IChatroom = JSON.parse(sessionStorage.getItem(`currentChatroom`));
     if (!currentChatroomStore) {
-      console.error("Failed to addOneCurrentChatroomMembers: currentChatroomStore undefined");
+      // console.error("Failed to addOneCurrentChatroomMembers: currentChatroomStore undefined");
       return null;
     }
 
@@ -199,14 +199,14 @@ export const removeParticipant = async (_member: ICurrentChatroomMember) => {
     };
     const res = await ChatroomAPI.leaveChatroom(body);
     if (res?.status !== 200 || !res?.data) {
-      console.error("Failed to addParticipant: ", res);
+      // console.error("Failed to addParticipant: ", res);
       return null;
     }
 
-    console.log("removeParticipant");
+    // console.log("removeParticipant");
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to removeParticipant: ", err);
+    // console.error("Failed to removeParticipant: ", err);
   }
 };
 
@@ -219,14 +219,14 @@ export const joinPublicGroup = async ({ _userId, _groupId }: IParamsJoinPublicGr
     };
     const res = await ChatroomAPI.addParticipant(body);
     if (res?.status !== 200 || !res?.data) {
-      console.error("Failed to joinPublicGroup: ", res);
+      // console.error("Failed to joinPublicGroup: ", res);
       return null;
     }
 
-    console.log("joinPublicGroup");
+    // console.log("joinPublicGroup");
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to joinPublicGroup: ", err);
+    // console.error("Failed to joinPublicGroup: ", err);
   }
 };
 
@@ -238,14 +238,14 @@ export const leaveGroup = async ({ _userId, _groupId }: IParamsLeaveGroup) => {
     };
     const res = await ChatroomAPI.leaveChatroom(body);
     if (res?.status !== 200 || !res?.data) {
-      console.error("Failed to leaveGroup: ", res);
+      // console.error("Failed to leaveGroup: ", res);
       return null;
     }
 
-    console.log("leaveGroup");
+    // console.log("leaveGroup");
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to leaveGroup: ", err);
+    // console.error("Failed to leaveGroup: ", err);
   }
 };
 
@@ -253,13 +253,13 @@ export const searchGroups = async (name: string) => {
   try {
     const res = await ChatroomAPI.searchPublicChatrooms(name);
     if (res?.status !== 200 || !res?.data) {
-      console.error("Failed to searchGroups: ", res);
+      // console.error("Failed to searchGroups: ", res);
       return [];
     }
-    console.log("searchGroups");
+    // console.log("searchGroups");
     return res?.data;
   } catch (err) {
-    console.error("Failed to searchGroups: ", err);
+    // console.error("Failed to searchGroups: ", err);
     return [];
   }
 };
@@ -268,7 +268,7 @@ export const updateGroupAvatar = async (formData: FormData) => {
   try {
     const res = await ChatroomAPI.uploadChatroomAvatar(formData);
     if (res?.status !== 200 || !res?.data || !res?.data?.result) {
-      console.error("Failed to updateGroupAvatar: ", res);
+      // console.error("Failed to updateGroupAvatar: ", res);
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -280,11 +280,11 @@ export const updateGroupAvatar = async (formData: FormData) => {
       return null;
     }
 
-    console.log("updateGroupAvatar");
+    // console.log("updateGroupAvatar");
     // emit("success", { message: "Group image has been updated." });
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to updateGroupAvatar: ", err);
+    // console.error("Failed to updateGroupAvatar: ", err);
     const data: INotificationParams = {
       status: "failed",
       title: "Error",
@@ -301,7 +301,7 @@ export const updateGroupName = async (body: IReqChatroomUpdateGroupName) => {
   try {
     const res = await ChatroomAPI.updateChatroomName(body);
     if (res?.status !== 200 || !res?.data || !res?.data?.result) {
-      console.error("Failed to updateGroupName: response error", res);
+      // console.error("Failed to updateGroupName: response error", res);
       const data: INotificationParams = {
         status: "failed",
         title: "Error",
@@ -313,10 +313,10 @@ export const updateGroupName = async (body: IReqChatroomUpdateGroupName) => {
       return null;
     }
 
-    console.log("updateGroupName");
+    // console.log("updateGroupName");
     return res?.data?.result;
   } catch (err) {
-    console.error("Failed to updateGroupName: ", err);
+    // console.error("Failed to updateGroupName: ", err);
     const data: INotificationParams = {
       status: "failed",
       title: "Error",
@@ -336,10 +336,10 @@ export const removeChatroom = async (chatroom_id: string) => {
       throw new Error("response undefined!");
     }
 
-    console.log("removeChatroom", res);
+    // console.log("removeChatroom", res);
     return null;
   } catch (err) {
-    console.error("removeChatroom: ", err);
+    // console.error("removeChatroom: ", err);
     return null;
   }
 };
