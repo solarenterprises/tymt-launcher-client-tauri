@@ -5,12 +5,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-shell";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 
-import tymtStorage from "../Storage";
-import { District53 } from "../game/district 53/District53";
+import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 
-import { local_server_port, tymt_version } from "../../configs";
-
-import { ISaltToken } from "../../types/accountTypes";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
 
 export async function runUrlArgs(url: string, args: string[]) {
@@ -22,7 +18,7 @@ export async function runUrlArgs(url: string, args: string[]) {
 
 export async function isInstalled(game: IGame) {
   try {
-    await readDir(`${await appDataDir()}/v${tymt_version}/games/${game.project_name}`);
+    await readDir(`${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game.project_name}`);
     return true;
   } catch (err) {
     // console.log("Failed to isInstalled: ", err);
@@ -74,54 +70,54 @@ export const runNewGame = async (game: IGame) => {
   }
 };
 
-export const runD53 = async (serverIp: string, autoMode: boolean) => {
-  try {
-    const fullExePath: string = await getFullExecutablePathNewGame(District53);
-    const d53_server = serverIp.split(":")[0];
-    const d53_port = serverIp.split(":")[1];
-    const saltTokenStore: ISaltToken = JSON.parse(tymtStorage.get(`saltToken`));
-    const token = saltTokenStore.token;
-    const launcherUrl = `http://localhost:${local_server_port}`;
+// export const runD53 = async (serverIp: string, autoMode: boolean) => {
+//   try {
+//     const fullExePath: string = await getFullExecutablePathNewGame(District53);
+//     const d53_server = serverIp.split(":")[0];
+//     const d53_port = serverIp.split(":")[1];
+//     const saltTokenStore: ISaltToken = JSON.parse(tymtStorage.get(`saltToken`));
+//     const token = saltTokenStore.token;
+//     const launcherUrl = `http://localhost:${local_server_port}`;
 
-    if (!fullExePath || !d53_server || !d53_port || !token || !launcherUrl) {
-      // console.log(`Failed to runD53: fullExePath ${fullExePath}, d53_server ${d53_server}, d53_port ${d53_port}, token ${token}, launcherUrl ${launcherUrl}`);
-      return false;
-    }
+//     if (!fullExePath || !d53_server || !d53_port || !token || !launcherUrl) {
+//       // console.log(`Failed to runD53: fullExePath ${fullExePath}, d53_server ${d53_server}, d53_port ${d53_port}, token ${token}, launcherUrl ${launcherUrl}`);
+//       return false;
+//     }
 
-    const platform = await type();
-    let args: string[] = [];
+//     const platform = await type();
+//     let args: string[] = [];
 
-    switch (platform) {
-      case "linux":
-        args = [`--appimage-extract-and-run`, `--launcher_url`, launcherUrl, `--token`, token];
-        break;
-      case "windows":
-        args = [`--launcher_url`, launcherUrl, `--token`, token];
-        break;
-      case "macos":
-        args = [`--launcher_url`, launcherUrl, `--token`, token];
-        break;
-    }
-    if (autoMode) args.push(`--address`, d53_server, `--port`, d53_port, `--go`);
+//     switch (platform) {
+//       case "linux":
+//         args = [`--appimage-extract-and-run`, `--launcher_url`, launcherUrl, `--token`, token];
+//         break;
+//       case "windows":
+//         args = [`--launcher_url`, launcherUrl, `--token`, token];
+//         break;
+//       case "macos":
+//         args = [`--launcher_url`, launcherUrl, `--token`, token];
+//         break;
+//     }
+//     if (autoMode) args.push(`--address`, d53_server, `--port`, d53_port, `--go`);
 
-    switch (platform) {
-      case "linux":
-        await runUrlArgs(fullExePath, args);
-        break;
-      case "windows":
-        await runUrlArgs(fullExePath, args);
-        break;
-      case "macos":
-        await runUrlArgs("open", ["-a", fullExePath, "--args", ...args]);
-        break;
-    }
+//     switch (platform) {
+//       case "linux":
+//         await runUrlArgs(fullExePath, args);
+//         break;
+//       case "windows":
+//         await runUrlArgs(fullExePath, args);
+//         break;
+//       case "macos":
+//         await runUrlArgs("open", ["-a", fullExePath, "--args", ...args]);
+//         break;
+//     }
 
-    return true;
-  } catch (err) {
-    // console.log("Failed to runD53: ", err);
-    return false;
-  }
-};
+//     return true;
+//   } catch (err) {
+//     // console.log("Failed to runD53: ", err);
+//     return false;
+//   }
+// };
 
 export async function openDir() {
   return invoke("open_directory", {
@@ -315,7 +311,7 @@ export const getFullExecutablePathNewGame = async (game: IGame) => {
   try {
     const prefix: string = await appDataDir();
     const exePath: string = await getExecutablePathNewGame(game);
-    const fullPath = prefix + `/v${tymt_version}/games/${game.project_name}/` + exePath;
+    const fullPath = prefix + `/v${CONFIG_TYMT_VERSION}/games/${game.project_name}/` + exePath;
     // console.log("getFullExecutablePathNewGame", fullPath);
     return fullPath;
   } catch (err) {
@@ -550,7 +546,7 @@ export const getDownloadFileFullPath = async (game: IGame) => {
 
 export const getInstallDir = async (game: IGame) => {
   try {
-    const res = `${await appDataDir()}/v${tymt_version}/games/${game?.project_name}`;
+    const res = `${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game?.project_name}`;
     // console.log("getInstallDir", res);
     return res;
   } catch (err) {
@@ -638,7 +634,7 @@ export const fetchMetaUri = async (game) => {
     const metaUri = game?.releaseMeta?.meta_uri;
     const res1: any = await tauriFetch(metaUri, {
       method: "GET",
-      connectTimeout: 30
+      connectTimeout: 30,
     });
     const res = await res1.json();
     return res;

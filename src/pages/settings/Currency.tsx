@@ -1,20 +1,24 @@
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
-import { supportCurrency } from "../../consts/SupportCurrency";
-
 import { Box, Button, Divider, Stack } from "@mui/material";
 
+import { CONST_SUPPORT_CURRENCIES } from "../../const/CurrencyConsts";
+
 import { AppDispatch } from "../../store";
-import { getCurrentCurrency, setCurrentCurrency } from "../../features/wallet/CurrentCurrencySlice";
+import { getCurrentCurrency, setCurrentCurrency } from "../../store/CurrentCurrencySlice";
 
-import backIcon from "../../assets/settings/back-icon.svg";
-import checkImg from "../../assets/settings/check-icon.svg";
+import { ICurrentCurrency } from "../../types/CurrencyTypes";
 
-import { propsType } from "../../types/settingTypes";
-import { ICurrentCurrency } from "../../types/walletTypes";
+import backIcon from "../../assets/setting/BackIcon.svg";
+import checkImg from "../../assets/setting/CheckIcon.svg";
 
-const Currency = ({ view, setView }: propsType) => {
+export interface IPropsCurrency {
+  view: string;
+  setView: (_: string) => void;
+}
+
+const Currency = ({ view, setView }: IPropsCurrency) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -22,6 +26,7 @@ const Currency = ({ view, setView }: propsType) => {
 
   const handleCurrencyClick = (_currency: string) => {
     dispatch(setCurrentCurrency(_currency));
+    setView("wallet");
   };
 
   return (
@@ -36,7 +41,7 @@ const Currency = ({ view, setView }: propsType) => {
           </Stack>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
           <Stack direction={"column"} justifyContent={""}>
-            {supportCurrency?.map((supportCurrency) => (
+            {CONST_SUPPORT_CURRENCIES?.map((supportCurrency) => (
               <>
                 <Button
                   className="common-btn"

@@ -1,16 +1,12 @@
+// This page is for importing the passphrase
+
+import { useState, useCallback } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { readText } from "@tauri-apps/plugin-clipboard-manager";
-import { emit } from "@tauri-apps/api/event";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
-
-import "../../../global.css";
-
-import { TauriEventNames } from "../../../consts/TauriEventNames";
 
 import { Grid, Box, Stack } from "@mui/material";
 
@@ -21,27 +17,21 @@ import AccountNextButton from "../../../components/account/AccountNextButton";
 import Stepper from "../../../components/account/Stepper";
 import MnemonicRevealPad from "../../../components/account/MnemonicRevealPad";
 
-import { getTempAccount, setTempAccount } from "../../../features/account/TempAccountSlice";
-import { setTempWallet } from "../../../features/wallet/TempWalletSlice";
-import { getAccountList } from "../../../features/account/AccountListSlice";
+import { getAccountList } from "../../../store/AccountListSlice";
+
+import { IAccountList } from "../../../types/AccountTypes";
+
+import { checkMnemonic } from "../../../lib/helper/WalletHelper";
 
 import tymt2 from "../../../assets/account/tymt2.png";
-
-import { checkMnemonic, getWalletAddressFromPassphrase } from "../../../lib/helper/WalletHelper";
-import { getRsaKeyPair } from "../../../features/chat/RsaApi";
-
-import { IAccount, IAccountList } from "../../../types/accountTypes";
-import { INotificationParams } from "../../../types/NotificationTypes";
 
 const NonCustodialLogIn2 = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-
-  const tempAccountStore: IAccount = useSelector(getTempAccount);
-  const accountListStore: IAccountList = useSelector(getAccountList);
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
   const formik = useFormik({
     initialValues: {
@@ -66,53 +56,26 @@ const NonCustodialLogIn2 = () => {
     onSubmit: async () => {
       try {
         setLoading(true);
-
-        const newPassphrase = formik.values.mnemonic.trim();
-        const newWalletAddress = await getWalletAddressFromPassphrase(newPassphrase);
-        const newRsaPubKey = (await getRsaKeyPair(newPassphrase))?.publicKey;
-
-        if (accountListStore?.list?.some((one) => one?.sxpAddress === newWalletAddress?.solar)) {
-          navigate("/start");
-          const noti: INotificationParams = {
-            status: "warning",
-            title: "Warning",
-            message: "That wallet was already imported in tymt!",
-            link: null,
-            translate: true,
-          };
-          emit(TauriEventNames.NOTIFICATION, noti);
-          return;
-        }
-
-        dispatch(setTempWallet(newWalletAddress));
-        dispatch(
-          setTempAccount({
-            ...tempAccountStore,
-            mnemonic: newPassphrase,
-            sxpAddress: newWalletAddress?.solar,
-            rsaPubKey: newRsaPubKey,
-          })
-        );
-
-        navigate("/non-custodial/import/1");
+        const passphrase: string = formik.values.mnemonic;
+        navigate("/non-custodial-import-1/signup", { state: { passphrase: passphrase } });
         setLoading(false);
       } catch (err) {
-        // console.log("Failed at NonCustodialLogin2: ", err);
+        console.error("Failed to onSubmit at NonCustodialLogin2: ", err);
         setLoading(false);
       }
     },
   });
 
-  const handleBackClick = () => {
-    navigate("/start");
-  };
+  const handleBackClick = useCallback(() => {
+    accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
+  }, [accountListStore]);
 
   const handlePasteClick = async () => {
     try {
-      const mnemonic = await readText();
+      const mnemonic = await navigator.clipboard.readText();
       formik.setFieldValue("mnemonic", mnemonic);
-    } catch (error) {
-      console.error("Failed to read clipboard contents: ", error);
+    } catch (err) {
+      console.error("Failed to handlePasteClick: ", err);
     }
   };
 

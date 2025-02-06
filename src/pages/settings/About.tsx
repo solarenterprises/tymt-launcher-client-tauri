@@ -1,19 +1,19 @@
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import backIcon from "../../assets/settings/back-icon.svg";
-import externalIcon from "../../assets/settings/external-link.svg";
-import twitterIcon from "../../assets/settings/twitter-icon.svg";
-import discordIcon from "../../assets/settings/discord-icon.svg";
-import { propsType } from "../../types/settingTypes";
-import { openLink } from "../../lib/helper/DownloadHelper";
-import { tymtlinks } from "../../lib/setting/tymtlinks";
-import Tymtlinks from "../../lib/setting/tymtlinks";
-import { tymt_version } from "../../configs";
+import backIcon from "../../assets/setting/BackIcon.svg";
+import externalIcon from "../../assets/setting/ExternalLink.svg";
+import twitterIcon from "../../assets/setting/TwitterIcon.svg";
+import discordIcon from "../../assets/setting/DiscordIcon.svg";
 
-const About = ({ view, setView }: propsType) => {
+export interface IPropsAbout {
+  view: string;
+  setView: (_: string) => void;
+}
+
+const About = ({ view, setView }: IPropsAbout) => {
   const { t } = useTranslation();
-  const tymtlinks: tymtlinks = Tymtlinks;
+
   return (
     <>
       {view === "about" && (
@@ -31,7 +31,7 @@ const About = ({ view, setView }: propsType) => {
                 className="common-btn"
                 sx={{ padding: "20px" }}
                 onClick={() => {
-                  openLink(tymtlinks.links.documentation);
+                  // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.documentation);
                 }}
               >
                 <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
@@ -46,7 +46,7 @@ const About = ({ view, setView }: propsType) => {
                 className="common-btn"
                 sx={{ padding: "20px" }}
                 onClick={() => {
-                  openLink(tymtlinks.links.policy);
+                  // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.policy);
                 }}
               >
                 <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
@@ -79,7 +79,7 @@ const About = ({ view, setView }: propsType) => {
                     className="button_navbar_common"
                     sx={{ padding: 0 }}
                     onClick={() => {
-                      openLink(tymtlinks.links.twitter);
+                      // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.twitter);
                     }}
                   >
                     <Box className="center-align">
@@ -90,7 +90,7 @@ const About = ({ view, setView }: propsType) => {
                     className="button_navbar_common"
                     sx={{ padding: 0 }}
                     onClick={() => {
-                      openLink(tymtlinks.links.discord);
+                      // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.discord);
                     }}
                   >
                     <Box className="center-align">
@@ -109,7 +109,7 @@ const About = ({ view, setView }: propsType) => {
               left: "16px",
             }}
           >
-            {`${t("set-84_app-version")} v${tymt_version}`}
+            {/* {`${t("set-84_app-version")} v${tymt_version}`} */}
           </Box>
         </>
       )}

@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 
-import { IGame } from "../../types/GameTypes";
+// import { IGame } from "../../types/GameTypes";
+type IGame = any;
 import { useNavigate } from "react-router-dom";
 
 export interface IPropsComingGameCard {
@@ -36,7 +37,7 @@ const ComingGameCard = ({ game }: IPropsComingGameCard) => {
             },
           }}
           onClick={() => {
-            navigate(`/coming/${game._id}`);
+            navigate(`/game/${game._id}`);
           }}
         >
           <Box

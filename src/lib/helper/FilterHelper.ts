@@ -1,4 +1,4 @@
-import { FilterOptionNames } from "../../consts/FilterOptionNames";
+import { FilterOptionNames } from "../../const/FilterOptionNames";
 import { IGame } from "../../types/GameTypes";
 
 export const filterByPlatform = (games: IGame[], platform: string) => {
@@ -22,6 +22,7 @@ export const filterByGenre = (games: IGame[], genre: string) => {
   try {
     let data = games;
     if (genre === FilterOptionNames.GENRE_ALL) {
+      return data;
     } else if (genre === FilterOptionNames.GENRE_ACTION) {
       data = data.filter((game) => game.projectMeta.tags.some((tag) => tag === "Action"));
     } else if (genre === FilterOptionNames.GENRE_ADVENTURE) {
@@ -44,6 +45,7 @@ export const filterByRank = (games: IGame[], rank: string) => {
   try {
     let data = games;
     if (rank === FilterOptionNames.RANK_ALL) {
+      return data;
     } else if (rank === FilterOptionNames.RANK_10) {
       data = data.filter((game) => game.rank <= 10);
     } else if (rank === FilterOptionNames.RANK_50) {
@@ -62,6 +64,7 @@ export const filterByType = (games: IGame[], type: string) => {
   try {
     let data = games;
     if (type === FilterOptionNames.TYPE_ALL) {
+      return data;
     } else if (type === FilterOptionNames.TYPE_NATIVE) {
       data = data.filter((game) => game.projectMeta.type === "native");
     } else if (type === FilterOptionNames.TYPE_BROWSER) {

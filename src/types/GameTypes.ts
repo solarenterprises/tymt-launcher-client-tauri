@@ -1,6 +1,6 @@
-import windows from "../assets/main/windows.png";
-import mac from "../assets/main/mac.svg";
-import linux from "../assets/main/linux.svg";
+import windows from "../assets/main/Windows.png";
+import mac from "../assets/main/Mac.svg";
+import linux from "../assets/main/Linux.svg";
 
 export enum platformEnum {
   "windows",
@@ -111,4 +111,14 @@ export interface IGameReleaseNative {
 export interface IGameReleaseBrowser {
   name: string;
   external_url: string;
+}
+
+export interface IFeedback {
+  _id: string;
+  rating: number;
+  text: string;
+  createdAt: Date;
+  userNickname: string;
+  userAvatar: string;
+  userOnlineStatus: boolean;
 }

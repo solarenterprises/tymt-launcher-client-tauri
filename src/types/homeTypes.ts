@@ -5,16 +5,16 @@ export interface PaginationType {
   page: string;
 }
 
-export interface TymtlogoType {
+export interface tymtLogoType {
   isDrawerExpanded: boolean;
 }
 
-export interface propsmodeType {
+export interface IPropsMode {
   status: number;
   setStatus: (status: number) => void;
 }
 
-export interface librarymodeType {
+export interface ILibraryMode {
   mode: number;
 }
 

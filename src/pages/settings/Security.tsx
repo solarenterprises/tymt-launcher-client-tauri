@@ -4,39 +4,36 @@ import { useTranslation } from "react-i18next";
 
 import { Box, Button, Divider, Stack } from "@mui/material";
 
-import ComingModal from "../../components/modals/ComingModal";
+import ComingModal from "../../components/modal/ComingModal";
 
-import { getAccount } from "../../features/account/AccountSlice";
+import { getAccount } from "../../store/AccountSlice";
 
-import { getKeccak256Hash } from "../../lib/api/Encrypt";
+import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 
-import backIcon from "../../assets/settings/back-icon.svg";
-import arrowImg from "../../assets/settings/arrow-right.svg";
+import { IAccount } from "../../types/AccountTypes";
 
-import { propsType } from "../../types/settingTypes";
-import { IAccount } from "../../types/accountTypes";
-import { emit } from "@tauri-apps/api/event";
-import { TauriEventNames } from "../../consts/TauriEventNames";
+import backIcon from "../../assets/setting/BackIcon.svg";
+import arrowImg from "../../assets/setting/ArrowRight.svg";
 
-const Security = ({ view, setView }: propsType) => {
+export interface IPropsSecurity {
+  view: string;
+  setView: (_: string) => void;
+}
+
+const Security = ({ view, setView }: IPropsSecurity) => {
   const { t } = useTranslation();
 
   const accountStore: IAccount = useSelector(getAccount);
 
-  const isGuest = useMemo(() => accountStore?.nickName === "Guest" && accountStore?.password === getKeccak256Hash(""), [accountStore]);
+  const isGuest = useMemo(() => accountStore?.nickname === "Guest" && accountStore?.password === getKeccak256Hash(""), [accountStore]);
 
   const [coming, setComing] = useState<boolean>(false);
 
   const handleBackupClick = () => {
-    try {
-      if (isGuest) {
-        emit(TauriEventNames.GUEST_MODAL_VIEW, true);
-        return;
-      }
-      setView("backup");
-    } catch (err) {
-      // console.log("Failed to handleBackupClick: ", err);
+    if (isGuest) {
+      return;
     }
+    setView("backup");
   };
 
   return (
@@ -70,29 +67,6 @@ const Security = ({ view, setView }: propsType) => {
               </Stack>
             </Button>
             <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
-            <Stack
-              direction={"column"}
-              justifyContent={"flex-start"}
-              gap={1}
-              padding={"20px"}
-              sx={{
-                cursor: "pointer",
-                "&:hover": {
-                  backgroundColor: "#ffffff1a",
-                },
-              }}
-              onClick={() => setComing(true)}
-            >
-              <Box className="fs-h4 white">{t("set-72_multi-factor-auth")}</Box>
-              <Box
-                className="fs-16-regular gray"
-                sx={{
-                  whiteSpace: "normal",
-                }}
-              >
-                {t("set-73_multi-factor-detail")}
-              </Box>
-            </Stack>
           </Stack>
           <ComingModal open={coming} setOpen={setComing} />
         </Stack>

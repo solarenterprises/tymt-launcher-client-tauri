@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-
-import "../../../global.css";
 
 import { Grid, Box, Stack } from "@mui/material";
 
@@ -16,51 +14,50 @@ import MnemonicComboBox from "../../../components/account/MnemonicComboBox";
 import MnemonicPad from "../../../components/account/MnemonicPad";
 import PassphraseModal from "../../../components/account/PassphraseModal";
 
-import { getTempAccount, setTempAccount } from "../../../features/account/TempAccountSlice";
-
-import { getRsaKeyPair } from "../../../features/chat/RsaApi";
+import { getAccountList } from "../../../store/AccountListSlice";
 
 import { getMnemonic } from "../../../lib/helper/WalletHelper";
 
-import tymt3 from "../../../assets/account/tymt3.png";
+import { IAccountList } from "../../../types/AccountTypes";
 
-import { IAccount } from "../../../types/accountTypes";
+import tymt3 from "../../../assets/account/tymt3.png";
 
 const NonCustodialSignUp2 = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
-  const dispatch = useDispatch();
 
-  const tempAccountStore: IAccount = useSelector(getTempAccount);
-
+  const { password } = location.state || {};
   const [open, setOpen] = useState(false);
   const [length, setLength] = useState<number>(12);
   const [passphrase, setPassphrase] = useState<string>(getMnemonic(12));
+
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
   useEffect(() => {
     setPassphrase(getMnemonic(length));
   }, [length]);
 
-  const handleBackClick = () => {
-    navigate("/start");
-  };
+  const handleBackClick = useCallback(() => {
+    accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
+  }, [accountListStore]);
 
   const handleNextClick = useCallback(async () => {
     try {
       if (!passphrase) return;
-      const newRsaPubKey = (await getRsaKeyPair(passphrase))?.publicKey;
-      dispatch(
-        setTempAccount({
-          ...tempAccountStore,
-          mnemonic: passphrase,
-          rsaPubKey: newRsaPubKey,
-        })
-      );
+      // const newRsaPubKey = (await getRsaKeyPair(passphrase))?.publicKey;
+      // dispatch(
+      //   setTempAccount({
+      //     ...tempAccountStore,
+      //     mnemonic: passphrase,
+      //     publicKey: newRsaPubKey,
+      //   })
+      // );
       setOpen(true);
     } catch (err) {
       // console.log("Failed to handleNextClick: ", err);
     }
-  }, [passphrase, tempAccountStore]);
+  }, [passphrase]);
 
   return (
     <>
@@ -115,7 +112,7 @@ const NonCustodialSignUp2 = () => {
           </motion.div>
         </Grid>
       </Grid>
-      <PassphraseModal open={open} setOpen={setOpen} />
+      <PassphraseModal open={open} setOpen={setOpen} passphrase={passphrase} password={password} />
     </>
   );
 };

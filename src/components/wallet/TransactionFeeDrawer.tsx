@@ -1,25 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import numeral from "numeral";
-
-import { currencySymbols } from "../../consts/SupportCurrency";
 
 import { SwipeableDrawer, Box, Stack, IconButton, Divider, TextField, InputAdornment } from "@mui/material";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 
-import FeeSwitchButton from "../FeeSwitchButton";
+import { useWallet } from "../../providers/WalletProvider";
 
-import { getWalletSetting, setWalletSetting } from "../../features/settings/WalletSettingSlice";
-import { getCurrencyList } from "../../features/wallet/CurrencyListSlice";
-import { getCurrentCurrency } from "../../features/wallet/CurrentCurrencySlice";
+import FeeSwitchButton from "../home/FeeSwitchButton";
 
 import SettingStyle from "../../styles/SettingStyle";
 
-import closeImg from "../../assets/settings/collaps-close-btn.svg";
-
-import { IWalletSetting } from "../../types/settingTypes";
-import { ICurrencyList, ICurrentCurrency } from "../../types/walletTypes";
+import closeImg from "../../assets/setting/CollapsCloseBtn.svg";
 
 type Anchor = "right";
 
@@ -30,21 +21,11 @@ interface props {
 
 const TransactionFeeDrawer = ({ view, setView }: props) => {
   const classname = SettingStyle();
-
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-
-  const walletSettingStore: IWalletSetting = useSelector(getWalletSetting);
-  const currencyListStore: ICurrencyList = useSelector(getCurrencyList);
-  const currentCurrencyStore: ICurrentCurrency = useSelector(getCurrentCurrency);
-
-  const reserve: number = useMemo(
-    () => currencyListStore?.list?.find((one) => one?.name === currentCurrencyStore?.currency)?.reserve,
-    [currencyListStore, currentCurrencyStore]
-  );
-  const symbol: string = useMemo(() => currencySymbols[currentCurrencyStore?.currency], [currentCurrencyStore]);
+  const { sxpFee, currentSupportChain, setSxpFeeAsInput } = useWallet();
 
   const [state, setState] = useState({ right: false });
+  const [displaySxpFee, setDisplaySxpFee] = useState<string>(sxpFee.toString());
 
   const toggleDrawer = (anchor: Anchor, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (event && event.type === "keydown" && ((event as React.KeyboardEvent).key === "Tab" || (event as React.KeyboardEvent).key === "Shift")) {
@@ -53,6 +34,10 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
 
     setState({ ...state, [anchor]: open });
   };
+
+  useEffect(() => {
+    setDisplaySxpFee(sxpFee.toString());
+  }, [sxpFee]);
 
   return (
     <SwipeableDrawer
@@ -65,6 +50,15 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
       slotProps={{
         backdrop: {
           onClick: toggleDrawer("right", false),
+        },
+      }}
+      sx={{
+        "& .MuiBox-root": {
+          overflow: "auto", // Enable scrolling
+          scrollbarWidth: "none", // Firefox
+          "&::-webkit-scrollbar": {
+            display: "none", // Chrome, Safari
+          },
         },
       }}
     >
@@ -94,10 +88,10 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
         />
         <Stack direction={"column"} justifyContent={"space-between"}>
           <Stack direction={"column"}>
-            <Box className="center-align" padding={"30px 10px 10px 10px"}>
+            <Box className="center-align" padding={"30px 10px 10px 30px"}>
               <FeeSwitchButton />
             </Box>
-            <Box className="center-align" padding={"10px"}>
+            <Box className="center-align" padding={"10px 32px"}>
               <TextField
                 type="text"
                 id="outlined-adornment-weight"
@@ -106,30 +100,28 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
                   inputMode: "numeric",
                   endAdornment: (
                     <InputAdornment position="end" classes={{ root: classname.adornment }}>
-                      {symbol}
+                      {currentSupportChain?.native?.symbol}
                     </InputAdornment>
                   ),
                   classes: {
                     input: classname.input,
                   },
                 }}
-                value={numeral(Number(walletSettingStore?.fee) * Number(reserve)).format("0,0.0000")}
+                value={displaySxpFee}
                 onChange={(e) => {
-                  dispatch(
-                    setWalletSetting({
-                      ...walletSettingStore,
-                      status: "input",
-                      fee: Number(e.target.value) / Number(reserve),
-                    })
-                  );
+                  setDisplaySxpFee(e.target.value);
+                }}
+                onBlur={() => {
+                  setSxpFeeAsInput(parseFloat(displaySxpFee));
                 }}
                 className={classname.input}
               />
             </Box>
             <Box
-              className="fs-14-light white p-10"
+              className="fs-14-light white"
               sx={{
                 whiteSpace: "normal",
+                padding: "0px 32px",
               }}
             >
               {t("set-56_transaction-detail")}

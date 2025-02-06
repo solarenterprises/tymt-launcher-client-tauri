@@ -1,14 +1,17 @@
 import { useTranslation } from "react-i18next";
-import { useSelector, useDispatch } from "react-redux";
-import { getThreeConfirm, setThreeConfirm } from "../../features/account/ThreeConfirmSlice";
-import { Box } from "@mui/material";
-import MnemonicInput from "./MnemonicInput";
-import { threeConfirmType } from "../../types/accountTypes";
 
-const MnemonicConfirm = () => {
+import { Box } from "@mui/material";
+
+import MnemonicInput from "./MnemonicInput";
+
+export interface IPropsMnemonicConfirm {
+  confirmedPassphrase: string[];
+  selectedInput: number;
+  setSelectedInput: (_: number) => void;
+}
+
+const MnemonicConfirm = ({ confirmedPassphrase, selectedInput, setSelectedInput }: IPropsMnemonicConfirm) => {
   const { t } = useTranslation();
-  const threeConfirmStore: threeConfirmType = useSelector(getThreeConfirm);
-  const dispatch = useDispatch();
 
   return (
     <div>
@@ -21,11 +24,11 @@ const MnemonicConfirm = () => {
         <div
           style={{ width: "163px", height: "69px" }}
           onClick={() => {
-            dispatch(setThreeConfirm({ ...threeConfirmStore, focus: 1 }));
+            setSelectedInput(1);
           }}
         >
           <Box className={"fs-14-regular light m-b-8"}>{t("ncca-33_third-word")}</Box>
-          <MnemonicInput word={threeConfirmStore.first} focus={threeConfirmStore.focus === 1 ? true : false} />
+          <MnemonicInput word={confirmedPassphrase[0] ?? ""} focus={selectedInput === 1} />
         </div>
         <div
           style={{
@@ -35,20 +38,20 @@ const MnemonicConfirm = () => {
             marginRight: "13px",
           }}
           onClick={() => {
-            dispatch(setThreeConfirm({ ...threeConfirmStore, focus: 2 }));
+            setSelectedInput(2);
           }}
         >
           <Box className={"fs-14-regular light m-b-8"}>{t("ncca-34_sixth-word")}</Box>
-          <MnemonicInput word={threeConfirmStore.second} focus={threeConfirmStore.focus === 2 ? true : false} />
+          <MnemonicInput word={confirmedPassphrase[1] ?? ""} focus={selectedInput === 2} />
         </div>
         <div
           style={{ width: "163px", height: "69px" }}
           onClick={() => {
-            dispatch(setThreeConfirm({ ...threeConfirmStore, focus: 3 }));
+            setSelectedInput(3);
           }}
         >
           <Box className={"fs-14-regular light m-b-8"}>{t("ncca-35_ninth-word")}</Box>
-          <MnemonicInput word={threeConfirmStore.third} focus={threeConfirmStore.focus === 3 ? true : false} />
+          <MnemonicInput word={confirmedPassphrase[2] ?? ""} focus={selectedInput === 3} />
         </div>
       </div>
     </div>

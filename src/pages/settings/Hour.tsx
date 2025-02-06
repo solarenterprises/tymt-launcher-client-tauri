@@ -1,25 +1,28 @@
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { useCallback } from "react";
-import backIcon from "../../assets/settings/back-icon.svg";
-import checkImg from "../../assets/settings/check-icon.svg";
-import { selectNotification, setNotification } from "../../features/settings/NotificationSlice";
-import { propsType, notificationType } from "../../types/settingTypes";
+import { FC } from "react";
+import backIcon from "../../assets/setting/BackIcon.svg";
+// import { selectNotification, setNotification } from "../../features/settings/NotificationSlice";
+// import { notificationType } from "../../types/settingTypes";
+
+interface IPropsHour {
+  view: string;
+  setView: (panel: string) => void;
+}
 
 const hours = [1, 2, 3, 6, 12];
 
-const Hour = ({ view, setView }: propsType) => {
+const Hour: FC<IPropsHour> = ({ view, setView }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const data: notificationType = useSelector(selectNotification);
-  const setHour = useCallback(
-    (hour: Number) => {
-      let updateData = { ...data, hour: hour };
-      dispatch(setNotification(updateData));
-    },
-    [data]
-  );
+  // const data: notificationType = useSelector(selectNotification);
+  // const setHour = useCallback(
+  //   (hour: Number) => {
+  //     let updateData = { ...data, hour: hour };
+  //     dispatch(setNotification(updateData));
+  //   },
+  //   [data]
+  // );
+
   return (
     <>
       {view === "hour" && (
@@ -38,14 +41,14 @@ const Hour = ({ view, setView }: propsType) => {
                   className="common-btn"
                   sx={{ padding: "20px" }}
                   onClick={() => {
-                    setHour(item);
+                    // setHour(item);
                   }}
                 >
                   <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
                     <Box className="fs-h4 white">
                       {t("set-46_for")} {item} {t("set-47_hours")}
                     </Box>
-                    <Box className="center-align">{data.hour == item && <img src={checkImg} />}</Box>
+                    <Box className="center-align">{/* {data.hour == item && <img src={checkImg} />} */}</Box>
                   </Stack>
                 </Button>
                 <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />

@@ -1,15 +1,6 @@
-import { useCallback } from "react";
-import { save } from "@tauri-apps/plugin-dialog";
-import { invoke } from "@tauri-apps/api/core";
-import { emit } from "@tauri-apps/api/event";
-
-import { TauriEventNames } from "../../consts/TauriEventNames";
-
 import CopyIconButton from "../home/CopyIconButton";
 import ExportIconButton from "../home/ExportIconButton";
 import MnemonicWord from "./MnemonicWord";
-
-import { INotificationParams } from "../../types/NotificationTypes";
 
 export interface IPropsMnemonicRevealPad {
   passphrase: string;
@@ -20,44 +11,11 @@ export interface IPropsMnemonicRevealPad {
 const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPad) => {
   const mnemonic = passphrase?.split(" ");
 
-  const copyMnemonicToClipboard = useCallback(() => {
+  const copyMnemonicToClipboard = () => {
     navigator.clipboard.writeText(passphrase);
-  }, [passphrase]);
-
-  const saveFile = async () => {
-    if (passphrase) {
-      const filepath = await save({
-        defaultPath: "tymt_passphrase.txt",
-        filters: [{ name: "Text Files", extensions: ["txt"] }],
-      });
-      if (filepath) {
-        const content = passphrase;
-        // console.log(filepath);
-        try {
-          await invoke("write_file", { content, filepath });
-          // console.log("File saved at:", filepath);
-          const noti_0: INotificationParams = {
-            status: "success",
-            title: `Success`,
-            message: `Passphrase has been exported!`,
-            link: null,
-            translate: true,
-          };
-          emit(TauriEventNames.NOTIFICATION, noti_0);
-        } catch (error) {
-          // console.error("Error saving file:", error);
-          const noti_0: INotificationParams = {
-            status: "failed",
-            title: `Error`,
-            message: error.toString(),
-            link: null,
-            translate: true,
-          };
-          emit(TauriEventNames.NOTIFICATION, noti_0);
-        }
-      }
-    }
   };
+
+  const saveFile = async () => {};
 
   return (
     <div

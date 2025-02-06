@@ -4,20 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 
 import SettingStyle from "../../styles/SettingStyle";
 
-import backIcon from "../../assets/settings/back-icon.svg";
-import editIcon from "../../assets/settings/edit-icon.svg";
-import deleteIcon from "../../assets/settings/trash-icon.svg";
+import backIcon from "../../assets/setting/BackIcon.svg";
+import editIcon from "../../assets/setting/EditIcon.svg";
+import deleteIcon from "../../assets/setting/TrashIcon.svg";
 import InputText from "../../components/account/InputText";
-import emptyImg from "../../assets/settings/empty-address.svg";
-import { selectAddress, setAddress } from "../../features/settings/AddressSlice";
-import { useCallback, useState } from "react";
-import { propsType, addressType } from "../../types/settingTypes";
+import emptyImg from "../../assets/setting/EmptyAddress.svg";
+import { selectAddress, setAddress } from "../../store/AddressSlice";
+import { FC, useCallback, useState } from "react";
+import { IAddress } from "../../types/SettingTypes";
 
-import { useNotification } from "../../providers/NotificationProvider";
+// import { useNotification } from "../../providers/NotificationProvider";
 
-const Address = ({ view, setView }: propsType) => {
+interface IPropsAddress {
+  view: string;
+  setView: (panel: string) => void;
+}
+
+const Address: FC<IPropsAddress> = ({ view, setView }) => {
   const dispatch = useDispatch();
-  const data: addressType[] = useSelector(selectAddress);
+  const data: IAddress[] = useSelector(selectAddress);
   const [name, setName] = useState("");
   const [info, setInfo] = useState("");
   const [status, setStatus] = useState("normal");
@@ -25,48 +30,55 @@ const Address = ({ view, setView }: propsType) => {
   const classname = SettingStyle();
   const { t } = useTranslation();
 
-  const { setNotificationStatus, setNotificationTitle, setNotificationDetail, setNotificationOpen, setNotificationLink } = useNotification();
+  // const {
+  //   setNotificationStatus,
+  //   setNotificationTitle,
+  //   setNotificationDetail,
+  //   setNotificationOpen,
+  //   setNotificationLink,
+  // } = useNotification();
 
   const updateAddress = useCallback(() => {
     setStatus("normal");
     if (seq == -1) {
       const updatedData = [...data, { name: name, address: info }];
       dispatch(setAddress(updatedData));
-      setNotificationTitle(t("set-85_success"));
-      setNotificationDetail(t("set-86_wallet-successfully-added"));
+      // setNotificationTitle(t("set-85_success"));
+      // setNotificationDetail(t("set-86_wallet-successfully-added"));
     } else {
       const updateData = [...data];
       updateData[seq] = { name: name, address: info };
       dispatch(setAddress(updateData));
-      setNotificationTitle(t("set-85_success"));
-      setNotificationDetail(t("set-87_wallet-successfully-updated"));
+      // setNotificationTitle(t("set-85_success"));
+      // setNotificationDetail(t("set-87_wallet-successfully-updated"));
     }
-    setNotificationStatus("success");
-    setNotificationOpen(true);
-    setNotificationLink(null);
+    // setNotificationStatus("success");
+    // setNotificationOpen(true);
+    // setNotificationLink(null);
   }, [data, dispatch, name, info, seq]);
 
   const editAddress = useCallback(
     (index: number) => {
       setStatus("edit");
       const { name, address } = data[index];
-      setName(name), setInfo(address);
+      setName(name);
+      setInfo(address);
       setSeq(index);
     },
-    [data, name, info, seq]
+    [data]
   );
 
   const deleteAddress = useCallback(
     (deleteId: number) => {
       const updatedData = data.filter((_, index) => index !== deleteId);
       dispatch(setAddress(updatedData));
-      setNotificationStatus("success");
-      setNotificationTitle(t("alt-13_delete-wallet"));
-      setNotificationDetail(t("alt-14_delete-wallet-intro"));
-      setNotificationOpen(true);
-      setNotificationLink(null);
+      // setNotificationStatus("success");
+      // setNotificationTitle(t("alt-13_delete-wallet"));
+      // setNotificationDetail(t("alt-14_delete-wallet-intro"));
+      // setNotificationOpen(true);
+      // setNotificationLink(null);
     },
-    [data, dispatch, name, info, seq]
+    [data, dispatch]
   );
 
   return (

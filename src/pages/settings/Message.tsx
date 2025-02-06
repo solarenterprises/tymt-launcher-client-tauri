@@ -1,23 +1,25 @@
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import backIcon from "../../assets/settings/back-icon.svg";
-import checkImg from "../../assets/settings/check-icon.svg";
-import { selectChat, setChat } from "../../features/settings/ChatSlice";
-import { propsType, chatType } from "../../types/settingTypes";
+import { FC } from "react";
+import backIcon from "../../assets/setting/BackIcon.svg";
+// import { selectChat, setChat } from "../../features/settings/ChatSlice";
+// import { chatType } from "../../types/settingTypes";
 
-const Message = ({ view, setView }: propsType) => {
+interface IPropsMessage {
+  view: string;
+  setView: (panel: string) => void;
+}
+
+const Message: FC<IPropsMessage> = ({ view, setView }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const data: chatType = useSelector(selectChat);
-  const setMessage = useCallback(
-    (item: string) => {
-      let updateData = { ...data, message: item };
-      dispatch(setChat(updateData));
-    },
-    [data]
-  );
+  // const data: chatType = useSelector(selectChat);
+  // const setMessage = useCallback(
+  //   (item: string) => {
+  //     let updateData = { ...data, message: item };
+  //     dispatch(setChat(updateData));
+  //   },
+  //   [data]
+  // );
 
   return (
     <>
@@ -35,12 +37,12 @@ const Message = ({ view, setView }: propsType) => {
               className="common-btn"
               sx={{ padding: "20px" }}
               onClick={() => {
-                setMessage("anyone");
+                // setMessage("anyone");
               }}
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
                 <Box className="fs-h4 white">{t("set-23_anyone")}</Box>
-                <Box className="center-align">{data.message == "anyone" && <img src={checkImg} />}</Box>
+                <Box className="center-align">{/* {data.message == "anyone" && <img src={checkImg} />} */}</Box>
               </Stack>
             </Button>
             <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
@@ -48,12 +50,12 @@ const Message = ({ view, setView }: propsType) => {
               className="common-btn"
               sx={{ padding: "20px" }}
               onClick={() => {
-                setMessage("noone");
+                // setMessage("noone");
               }}
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
                 <Box className="fs-h4 white">{t("set-26_no-one")}</Box>
-                <Box className="center-align">{data.message == "noone" && <img src={checkImg} />}</Box>
+                <Box className="center-align">{/* {data.message == "noone" && <img src={checkImg} />} */}</Box>
               </Stack>
             </Button>
             <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
@@ -61,12 +63,12 @@ const Message = ({ view, setView }: propsType) => {
               className="common-btn"
               sx={{ padding: "20px" }}
               onClick={() => {
-                setMessage("friend");
+                // setMessage("friend");
               }}
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
                 <Box className="fs-h4 white">{t("set-27_friends")}</Box>
-                <Box className="center-align">{data.message == "friend" && <img src={checkImg} />}</Box>
+                <Box className="center-align">{/* {data.message == "friend" && <img src={checkImg} />} */}</Box>
               </Stack>
             </Button>
             <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />

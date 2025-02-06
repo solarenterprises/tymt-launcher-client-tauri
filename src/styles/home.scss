@@ -66,7 +66,7 @@
 // Button group styles
 .button_group {
   margin-right: 0%;
-  width: 420px;
+  gap: 8px;
   height: 44px;
   display: flex;
   align-items: center;
@@ -124,6 +124,32 @@
     backdrop-filter: blur(50px);
     &:hover {
       background-color: var(--bg-stroke-icon-button-bg-10, rgba(128, 128, 128, 0.1));
+    }
+    &:active {
+      background: var(--bg-stroke-icon-button-bg-active-30, rgba(128, 128, 128, 0.3));
+    }
+  }
+}
+
+.button_metamask {
+  &.MuiButtonBase-root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: none;
+    min-width: 44px;
+    height: 44px;
+    text-transform: none;
+    border-radius: var(--Angle-Small, 16px);
+    border: 1px solid var(--Stroke-linear-Hover, rgba(255, 255, 255, 0.1));
+    z-index: 11;
+    background: var(--bg-stroke-icon-button-bg-10, rgba(128, 128, 128, 0.1));
+    background-blend-mode: luminosity;
+    position: relative;
+    backdrop-filter: blur(50px);
+    &:hover {
+      background-color: var(--bg-stroke-icon-button-bg-10, rgba(128, 128, 128, 0.1));
+      border: 2px solid var(--Stroke-linear-Hover, rgba(255, 255, 255, 0.2));
     }
     &:active {
       background: var(--bg-stroke-icon-button-bg-active-30, rgba(128, 128, 128, 0.3));

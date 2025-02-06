@@ -1,11 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
-
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
-import "../../../global.css";
 
 import { Grid, Box, Stack } from "@mui/material";
 
@@ -15,17 +14,24 @@ import InputText from "../../../components/account/InputText";
 import AccountNextButton from "../../../components/account/AccountNextButton";
 import Stepper from "../../../components/account/Stepper";
 
+import { getAccountList } from "../../../store/AccountListSlice";
+
+import { getWalletAddressesFromPassphrase } from "../../../lib/helper/WalletHelper";
+
+import { IAccountList } from "../../../types/AccountTypes";
+
 import tymt3 from "../../../assets/account/tymt3.png";
-import { IAccount } from "../../../types/accountTypes";
-import { useDispatch, useSelector } from "react-redux";
-import { getTempAccount, setTempAccount } from "../../../features/account/TempAccountSlice";
 
 const NonCustodialSignUp4 = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const location = useLocation();
+  const { mode } = useParams();
 
-  const tempAccountStore: IAccount = useSelector(getTempAccount);
+  const { passphrase, password } = location.state || {};
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
   const formik = useFormik({
     initialValues: {
@@ -39,20 +45,29 @@ const NonCustodialSignUp4 = () => {
         .matches(/^[a-zA-Z0-9_ !@#$%^&*()\-+=,.?]+$/, t("ncca-61_invalid-characters")),
     }),
     onSubmit: async () => {
-      const newNickName = formik.values.nickname;
-      dispatch(
-        setTempAccount({
-          ...tempAccountStore,
-          nickName: newNickName,
-        })
-      );
-      navigate("/confirm-information/signup");
+      try {
+        setLoading(true);
+        const walletAddresses = await getWalletAddressesFromPassphrase(passphrase);
+        const newNickName = formik.values.nickname;
+        navigate(`/confirm-information${mode === "guest" ? "/guest" : "/signup"}`, {
+          state: {
+            passphrase: passphrase,
+            password: password,
+            nickname: newNickName,
+            walletAddresses: walletAddresses,
+          },
+        });
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to onSubmit at NonCustodialSignUp4.tsx: ", err);
+        setLoading(false);
+      }
     },
   });
 
-  const handleBackClick = () => {
-    navigate("/start");
-  };
+  const handleBackClick = useCallback(() => {
+    accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
+  }, [accountListStore]);
 
   return (
     <>
@@ -106,7 +121,12 @@ const NonCustodialSignUp4 = () => {
                         )}
                       </Grid>
                       <Grid item xs={12} mt={"48px"}>
-                        <AccountNextButton isSubmit={true} text={t("ncca-44_verify-and-complete")} disabled={formik.errors.nickname ? true : false} />
+                        <AccountNextButton
+                          isSubmit={true}
+                          text={t("ncca-44_verify-and-complete")}
+                          disabled={formik.errors.nickname ? true : false}
+                          loading={loading}
+                        />
                       </Grid>
                     </form>
                   </Grid>

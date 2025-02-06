@@ -1,92 +1,56 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-
+import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { Box, Stack } from "@mui/material";
 
-import { AppDispatch } from "../../store";
-import { getAccount } from "../../features/account/AccountSlice";
-import { setLogin } from "../../features/account/LoginSlice";
-import { getSaltToken, setSaltToken } from "../../features/account/SaltTokenSlice";
-import { setMnemonic } from "../../features/account/MnemonicSlice";
-import { getMachineId } from "../../features/account/MachineIdSlice";
-import { fetchMyInfoAsync } from "../../features/account/MyInfoSlice";
-
 import AccountNextButton from "./AccountNextButton";
 import InputText from "./InputText";
 
-import AuthAPI from "../../lib/api/AuthAPI";
+import { getAccount } from "../../store/AccountSlice";
 
-import { decrypt, getKeccak256Hash } from "../../lib/api/Encrypt";
-import { getNonCustodySignInToken, getReqBodyNonCustodyBeforeSignIn, getReqBodyNonCustodySignIn } from "../../lib/helper/AuthAPIHelper";
+import { decrypt, getKeccak256Hash } from "../../lib/helper/EncryptHelper";
+import { getWalletAddressesFromPassphrase } from "../../lib/helper/WalletHelper";
 
-import { IAccount, IMachineId, ISaltToken } from "../../types/accountTypes";
-import { getRsaKeyPairAsync } from "../../features/chat/RsaSlice";
-import { generateSocketHash } from "../../features/chat/SocketHashApi";
-import { setSocketHash } from "../../features/chat/SocketHashSlice";
+import { IAccount } from "../../types/AccountTypes";
 
 const LoginAccountForm = () => {
   const { t } = useTranslation();
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const accountStore: IAccount = useSelector(getAccount);
-  const saltTokenStore: ISaltToken = useSelector(getSaltToken);
-  const machineIdStore: IMachineId = useSelector(getMachineId);
 
   const accountStoreRef = useRef(accountStore);
-  const saltTokenStoreRef = useRef(saltTokenStore);
-  const machineIdStoreRef = useRef(machineIdStore);
 
   useEffect(() => {
     accountStoreRef.current = accountStore;
   }, [accountStore]);
-  useEffect(() => {
-    saltTokenStoreRef.current = saltTokenStore;
-  }, [saltTokenStore]);
-  useEffect(() => {
-    machineIdStoreRef.current = machineIdStore;
-  }, [machineIdStore]);
 
   const isGuest: boolean = useMemo(() => {
-    if (accountStore?.nickName === "Guest" && accountStore?.password === getKeccak256Hash("")) return true;
+    if (accountStore?.nickname === "Guest" && accountStore?.password === getKeccak256Hash("")) return true;
     return false;
   }, [accountStore]);
 
   const handleGuestLogin = useCallback(async () => {
     try {
-      const decryptedMnemonic: string = await decrypt(accountStore?.mnemonic, "");
-      dispatch(setMnemonic(decryptedMnemonic));
-      dispatch(getRsaKeyPairAsync(decryptedMnemonic));
-
-      const body1 = getReqBodyNonCustodyBeforeSignIn(accountStore, decryptedMnemonic);
-      const res1 = await AuthAPI.nonCustodyBeforeSignin(body1);
-
-      const salt: string = res1?.data?.salt;
-      const token: string = getNonCustodySignInToken(salt, saltTokenStore, decryptedMnemonic);
-      dispatch(
-        setSaltToken({
-          salt: salt,
-          token: token,
-        })
-      );
-
-      const body2 = getReqBodyNonCustodySignIn(accountStore, machineIdStore, token);
-      const res2 = await AuthAPI.nonCustodySignin(body2);
-
-      const uid = res2?.data?._id;
-      await dispatch(fetchMyInfoAsync(uid));
-
-      dispatch(setLogin(true));
-      navigate("/home");
+      const password = "";
+      const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
+      const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
+      navigate("/confirm-information/login", {
+        state: {
+          password: password,
+          walletAddresses: walletAddresses,
+          nickname: "Guest",
+          passphrase: decryptedMnemonic,
+        },
+      });
     } catch (err) {
-      // console.log("Failed at handleGuestLogin: ", err);
+      console.error("Failed to handleGuestLogin: ", err);
     }
-  }, [accountStore, saltTokenStore, machineIdStore]);
+  }, [accountStore]);
 
   const formik = useFormik({
     initialValues: {
@@ -115,35 +79,19 @@ const LoginAccountForm = () => {
     }),
     onSubmit: async () => {
       try {
-        const decryptedMnemonic: string = await decrypt(accountStoreRef?.current?.mnemonic, formik.values.password);
-
-        const body1 = getReqBodyNonCustodyBeforeSignIn(accountStoreRef?.current, decryptedMnemonic);
-        const res1 = await AuthAPI.nonCustodyBeforeSignin(body1);
-
-        const salt: string = res1?.data?.salt;
-        const token: string = getNonCustodySignInToken(salt, saltTokenStoreRef?.current, decryptedMnemonic);
-        dispatch(
-          setSaltToken({
-            salt: salt,
-            token: token,
-          })
-        );
-
-        const body2 = getReqBodyNonCustodySignIn(accountStoreRef?.current, machineIdStoreRef?.current, token);
-        const res2 = await AuthAPI.nonCustodySignin(body2);
-        const uid = res2?.data?._id;
-
-        await dispatch(fetchMyInfoAsync(uid));
-
-        const newSocketHash = generateSocketHash(decryptedMnemonic);
-        dispatch(setSocketHash(newSocketHash));
-        dispatch(setMnemonic(decryptedMnemonic));
-        dispatch(getRsaKeyPairAsync(decryptedMnemonic));
-
-        dispatch(setLogin(true));
-        navigate("/home");
+        const password = formik.values.password;
+        const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
+        const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
+        navigate("/confirm-information/login", {
+          state: {
+            password: password,
+            walletAddresses: walletAddresses,
+            nickname: accountStoreRef?.current?.nickname,
+            passphrase: decryptedMnemonic,
+          },
+        });
       } catch (err) {
-        // console.log("Failed at LoginAccountForm: ", err);
+        console.error("Failed to onSubmit at LoginAccountForm:  ", err);
       }
     },
   });

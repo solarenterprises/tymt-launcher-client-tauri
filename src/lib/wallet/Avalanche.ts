@@ -1,19 +1,14 @@
-import { IWallet } from "./IWallet";
 import { ethers } from "ethers";
 import * as ethereumjsWallet from "ethereumjs-wallet";
 import * as bip39 from "bip39";
-import { avax_api_url, avax_rpc_url, net_name } from "../../configs";
-import { ISupportToken, IBalance } from "../../types/walletTypes";
-import tymtStorage from "../Storage";
 
-class Avalanche implements IWallet {
-  address: string;
-  ticker: "AVAX" = "AVAX";
+import { CONFIG_AVAX_API_URL, CONFIG_AVAX_RPC_URL, CONFIG_NETWORK_NAME } from "../../config/MainConfig";
+import tymtStorage from "../storage/tymtStorage";
 
-  constructor() {
-    this.address = "";
-  }
+import { ISupportToken } from "../../types/ChainTypes";
+import { IBalance } from "../../types/WalletTypes";
 
+export class Avalanche {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
     const seed = await bip39.mnemonicToSeed(mnemonic);
     const hdNode = ethereumjsWallet.hdkey.fromMasterSeed(seed);
@@ -32,7 +27,7 @@ class Avalanche implements IWallet {
 
   static async getBalance(addr: string): Promise<number> {
     try {
-      const customProvider = new ethers.JsonRpcProvider(avax_rpc_url);
+      const customProvider = new ethers.JsonRpcProvider(CONFIG_AVAX_RPC_URL);
       return parseFloat(ethers.formatEther(await customProvider.getBalance(addr))) / 1e9 / 1e9;
     } catch {
       return 0;
@@ -43,7 +38,7 @@ class Avalanche implements IWallet {
     try {
       let result: IBalance[] = [];
       for (let i = 0; i < tokens.length; i++) {
-        if (net_name === "testnet") {
+        if (CONFIG_NETWORK_NAME === "testnet") {
           result.push({
             symbol: tokens[i].symbol,
             balance: 0.0,
@@ -51,7 +46,7 @@ class Avalanche implements IWallet {
         } else {
           const tokenContractAddress = tokens[i].address;
           const tokenAbi = ["function balanceOf(address owner) view returns (uint256)"];
-          const customProvider = new ethers.JsonRpcProvider(avax_rpc_url);
+          const customProvider = new ethers.JsonRpcProvider(CONFIG_AVAX_RPC_URL);
           const tokenContract = new ethers.Contract(tokenContractAddress, tokenAbi, customProvider);
           result.push({
             symbol: tokens[i].symbol,
@@ -70,10 +65,10 @@ class Avalanche implements IWallet {
     if (page === 1) {
       let endpoint = "";
       tymtStorage.set(`avaxNextToken`, "");
-      if (net_name === "mainnet") {
-        endpoint = `${avax_api_url}/address/${addr}/erc20-transfers?limit=15`;
+      if (CONFIG_NETWORK_NAME === "mainnet") {
+        endpoint = `${CONFIG_AVAX_API_URL}/address/${addr}/erc20-transfers?limit=15`;
       } else {
-        endpoint = `${avax_api_url}/address/${addr}/transactions?&limit=15`;
+        endpoint = `${CONFIG_AVAX_API_URL}/address/${addr}/transactions?&limit=15`;
       }
       try {
         const res = await (await fetch(endpoint)).json();
@@ -86,7 +81,7 @@ class Avalanche implements IWallet {
       }
     } else {
       const nextToken = tymtStorage.get(`avaxNextToken`);
-      let endpoint = `${avax_api_url}/address/${addr}/erc20-transfers?limit=15&next=${nextToken}`;
+      let endpoint = `${CONFIG_AVAX_API_URL}/address/${addr}/erc20-transfers?limit=15&next=${nextToken}`;
       try {
         const res = await (await fetch(endpoint)).json();
         const nextToken: string = res.link.nextToken;
@@ -103,7 +98,7 @@ class Avalanche implements IWallet {
     if (tx.recipients.length > 0) {
       try {
         let wallet = await Avalanche.getWalletFromMnemonic(passphrase);
-        const customProvider = new ethers.JsonRpcProvider(avax_rpc_url);
+        const customProvider = new ethers.JsonRpcProvider(CONFIG_AVAX_RPC_URL);
         wallet = wallet.connect(customProvider);
         tx.recipients.map(async (recipient) => {
           const response = await wallet.sendTransaction({

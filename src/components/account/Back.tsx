@@ -1,6 +1,6 @@
 import { Button, Box } from "@mui/material";
 
-import arrow from "../../assets/account/left-arrow.png";
+import LeftArrow from "../../assets/arrow/LeftArrow.png";
 
 interface props {
   onClick: () => void;
@@ -9,7 +9,7 @@ interface props {
 const Back = ({ onClick }: props) => {
   return (
     <Button className={"back-button"} onClick={onClick}>
-      <Box component={"img"} src={arrow}></Box>
+      <Box component={"img"} src={LeftArrow}></Box>
     </Button>
   );
 };

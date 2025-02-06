@@ -1,5 +1,5 @@
 import { Stack, Box } from "@mui/material";
-import question from "../../assets/account/question.svg";
+import question from "../../assets/account/Question.svg";
 import { useTranslation } from "react-i18next";
 
 interface props {
@@ -33,7 +33,7 @@ const SecurityLevel = ({ password }: props) => {
   ];
 
   const getSecurityLevel = () => {
-    let i: number = 0;
+    let i = 0;
     requirements.forEach((req) => {
       if (req.condition) i++;
     });

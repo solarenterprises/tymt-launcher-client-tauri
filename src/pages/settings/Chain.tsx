@@ -1,80 +1,61 @@
-import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-
-import { supportChains } from "../../consts/SupportTokens";
+import { useDispatch } from "react-redux";
 
 import { Box, Button, Divider, Stack } from "@mui/material";
 
-import ChainBox from "../../components/ChainBox";
+import { CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
+
+import ChainBox from "../../components/home/ChainBox";
 
 import { AppDispatch } from "../../store";
-import { setCurrentChain } from "../../features/wallet/CurrentChainSlice";
-import { getWallet } from "../../features/wallet/WalletSlice";
+import { setCurrentChain } from "../../store/CurrentChainSlice";
 
-import backIcon from "../../assets/settings/back-icon.svg";
+import { ISupportChain } from "../../types/ChainTypes";
 
-import { getCurrentChainWalletAddress } from "../../lib/helper/WalletHelper";
+import backIcon from "../../assets/setting/BackIcon.svg";
 
-import { ISupportChain, IWallet } from "../../types/walletTypes";
-import { propsType } from "../../types/settingTypes";
-import { INotificationParams } from "../../types/NotificationTypes";
-import { TauriEventNames } from "../../consts/TauriEventNames";
-import { emit } from "@tauri-apps/api/event";
+export interface IPropsChain {
+  view: string;
+  setView: (_: string) => void;
+}
 
-const Chain = ({ view, setView }: propsType) => {
+const Chain = ({ view, setView }: IPropsChain) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  const walletStore: IWallet = useSelector(getWallet);
-
   const handleChainBoxClick = (one: ISupportChain) => {
-    dispatch(setCurrentChain(one?.chain?.name));
-    const chainName = one?.chain?.name;
-
-    const noti: INotificationParams = {
-      status: "success",
-      title: t("set-85_success"),
-      message: `${t("alt-12_switched-network-intro")}: ${chainName}`,
-      link: null,
-      translate: false,
-    };
-    emit(TauriEventNames.NOTIFICATION, noti);
+    dispatch(setCurrentChain(one?.native?.name));
+    handleBackClick();
   };
 
-  const copyAddress = useCallback(
-    (one: ISupportChain) => {
-      const chainName = one?.chain?.name;
-      const address = getCurrentChainWalletAddress(walletStore, chainName);
-
-      navigator.clipboard.writeText(address);
-
-      const noti: INotificationParams = {
-        status: "success",
-        title: t("set-85_success"),
-        message: t("set-96_chain_address_copied"),
-        link: null,
-        translate: false,
-      };
-      emit(TauriEventNames.NOTIFICATION, noti);
-    },
-    [walletStore]
-  );
+  const handleBackClick = () => {
+    if (view === "chain-wallet") {
+      setView("wallet");
+    } else {
+      setView("main");
+    }
+  };
 
   return (
     <>
-      {view === "chain" && (
+      {(view === "chain" || view === "chain-wallet") && (
         <Stack direction={"column"}>
           <Stack flexDirection={"row"} justifyContent={"flex-start"} gap={"10px"} alignItems={"center"} textAlign={"center"} sx={{ padding: "20px" }}>
-            <Button className={"setting-back-button"} onClick={() => setView("main")}>
+            <Button className={"setting-back-button"} onClick={handleBackClick}>
               <Box component={"img"} src={backIcon}></Box>
             </Button>
             <Box className="fs-h3 white">{t("set-5_choose-chain")}</Box>
           </Stack>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
           <Stack>
-            {supportChains?.map((one, index) => (
-              <ChainBox supportChain={one} key={index} onClick={() => copyAddress(one)} onDoubleClick={() => handleChainBoxClick(one)} />
+            {CONST_SUPPORT_CHAINS?.map((one, index) => (
+              <ChainBox
+                supportChain={one}
+                key={index}
+                onClick={() => {
+                  handleChainBoxClick(one);
+                }}
+              />
             ))}
           </Stack>
         </Stack>

@@ -1,22 +1,22 @@
-import axios, { AxiosResponse } from "axios";
-import { tymt_backend_url } from "../../configs";
+import axiosAuth from "../core/AxiosAuth";
+import { IGame } from "../../types/GameTypes";
+import { IMetaPagination, IPaginationQuery } from "../../types/APITypes/BasicAPITypes";
 
-class GameAPI {
-  static async fetchGameList(page: number): Promise<AxiosResponse<any, any>> {
-    return await axios.get(`${tymt_backend_url}/store?page=${page}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
+export const GameAPI = {
+  fetchGameList: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
+      return res.data;
+    } catch (err) {
+      console.error("Failed to fetchGameList: ", err.response?.data ?? err);
+      throw new Error(err.response?.data?.error ?? "Failed to fetchGameList");
+    }
+  },
 
-  static async fetchComingGameList(page: number): Promise<AxiosResponse<any, any>> {
-    return await axios.get(`${tymt_backend_url}/store/by-visibility-state/coming%20soon?page=${page}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
-}
+  // fetchComingGameList: async (page: number): Promise<any> => {
+  //   const res = await axiosAuth.get<{ data: any }>(`/store/by-visibility-state/coming%20soon?page=${page}`);
+  //   return res.data.data;
+  // },
+};
 
 export default GameAPI;

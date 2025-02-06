@@ -8,14 +8,14 @@ import { Grid, Box, Stack, Divider } from "@mui/material";
 import AccountHeader from "../../../components/account/AccountHeader";
 import AuthIconButtons from "../../../components/account/AuthIconButtons";
 import ChooseProfileButton from "../../../components/account/ChooseProfileButton";
-import LoginAccountForm from "../../../components/account/LoginAccountForm";
-import OrLine from "../../../components/account/OrLine";
-import DontHaveAccount from "../../../components/account/DontHaveAccount";
 import ChooseProfileDrawer from "../../../components/account/ChooseProfileDrawer";
+import LoginAccountForm from "../../../components/account/LoginAccountForm";
+import DontHaveAccount from "../../../components/account/DontHaveAccount";
+import OrLine from "../../../components/account/OrLine";
 
-import { getAccount } from "../../../features/account/AccountSlice";
+import { getAccount } from "../../../store/AccountSlice";
 
-import { IAccount } from "../../../types/accountTypes";
+import { IAccount } from "../../../types/AccountTypes";
 
 import tymt1 from "../../../assets/account/tymt1.png";
 

@@ -1,6 +1,6 @@
 import { Button, Stack, Box } from "@mui/material";
 
-import chevronRight from "../../assets/account/chevron-right.png";
+import { ChevronRight } from "@mui/icons-material";
 
 interface props {
   src: string;
@@ -37,7 +37,7 @@ const PaymentButton = ({ src, text, onClick }: props) => {
           </Box>
         </Stack>
 
-        <Box component={"img"} src={chevronRight} />
+        <ChevronRight />
       </Stack>
     </Button>
   );

@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
+
 import { Tooltip, Stack, Box, IconButton } from "@mui/material";
+
 import CopyIcon from "../../assets/main/Copy.svg";
 import CopyHoverIcon from "../../assets/main/CopyHover.svg";
 

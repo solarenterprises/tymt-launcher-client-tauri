@@ -1,26 +1,29 @@
-import { useTranslation } from "react-i18next";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, Divider, Stack } from "@mui/material";
 
-import { useNotification } from "../../providers/NotificationProvider";
-
 import InputText from "../../components/account/InputText";
 import SecurityLevel from "../../components/account/SecurityLevel";
 
-import { getAccount, setAccount } from "../../features/account/AccountSlice";
+import { getAccount, setAccount } from "../../store/AccountSlice";
 
-import { getKeccak256Hash } from "../../lib/api/Encrypt";
+import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
+
+import { IAccount } from "../../types/AccountTypes";
+import { addAccountList } from "../../store/AccountListSlice";
 
 import SettingStyle from "../../styles/SettingStyle";
 
-import backIcon from "../../assets/settings/back-icon.svg";
+import backIcon from "../../assets/setting/BackIcon.svg";
 
-import { propsType } from "../../types/settingTypes";
-import { IAccount } from "../../types/accountTypes";
+export interface IPropsPassword {
+  view: string;
+  setView: (_: string) => void;
+}
 
-const Password = ({ view, setView }: propsType) => {
+const Password = ({ view, setView }: IPropsPassword) => {
   const classname = SettingStyle();
   const { t } = useTranslation();
   const dispatch = useDispatch();
@@ -31,55 +34,32 @@ const Password = ({ view, setView }: propsType) => {
   const [oldPwd, setOldPwd] = useState("");
   const [cfmPwd, setCfmPwd] = useState("");
 
-  const { setNotificationStatus, setNotificationTitle, setNotificationDetail, setNotificationOpen, setNotificationLink } = useNotification();
-
   const updatePassword = useCallback(() => {
     if (accountStore?.password !== getKeccak256Hash(oldPwd)) {
-      setNotificationStatus("failed");
-      setNotificationTitle(t("alt-15_update-password"));
-      setNotificationDetail(t("alt-16_update-password-old"));
-      setNotificationOpen(true);
-      setNotificationLink(null);
       setNewPwd("");
       setOldPwd("");
       setCfmPwd("");
       return;
     }
     if (accountStore?.password === getKeccak256Hash(newPwd)) {
-      setNotificationStatus("failed");
-      setNotificationTitle(t("alt-15_update-password"));
-      setNotificationDetail(t("alt-17_update-password-new"));
-      setNotificationOpen(true);
-      setNotificationLink(null);
       setNewPwd("");
       setOldPwd("");
       setCfmPwd("");
       return;
     }
     if (cfmPwd !== newPwd) {
-      setNotificationStatus("failed");
-      setNotificationTitle(t("alt-15_update-password"));
-      setNotificationDetail(t("alt-18_update-password-new-not"));
-      setNotificationOpen(true);
-      setNotificationLink(null);
       setNewPwd("");
       setOldPwd("");
       setCfmPwd("");
       return;
     }
-    setNotificationStatus("success");
-    setNotificationTitle(t("alt-15_update-password"));
-    setNotificationDetail(t("alt-19_update-password-success"));
-    setNotificationOpen(true);
-    setNotificationLink(null);
-
     dispatch(
       setAccount({
         ...accountStore,
         password: getKeccak256Hash(newPwd),
       })
     );
-
+    dispatch(addAccountList(accountStore));
     setNewPwd("");
     setOldPwd("");
     setCfmPwd("");

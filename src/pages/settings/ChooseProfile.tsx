@@ -8,11 +8,11 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import RedStrokeButton from "../../components/account/RedStrokeButton";
 import ProfileCard from "../../components/account/ProfileCard";
 
-import { getAccountList } from "../../features/account/AccountListSlice";
+import { getAccountList } from "../../store/AccountListSlice";
+
+import { IAccountList } from "../../types/AccountTypes";
 
 import SettingStyle from "../../styles/SettingStyle";
-
-import { IAccountList } from "../../types/accountTypes";
 
 export interface IPropsChooseProfile {
   view: string;
@@ -26,14 +26,19 @@ const ChooseProfile = ({ view, setView }: IPropsChooseProfile) => {
   const accountListStore: IAccountList = useSelector(getAccountList);
 
   const handleAddNewProfileButtonClick = () => {
-    navigate("/non-custodial/login/2");
+    navigate("/non-custodial-login-2");
   };
 
   return (
     view === "chooseProfile" && (
       <>
         <Box className={classname.setting_pan}>
-          <Stack direction={"row"} alignItems={"center"} spacing={"16px"} padding={"18px 16px"}>
+          <Stack
+            direction={"row"}
+            alignItems={"center"}
+            spacing={"16px"}
+            padding={"18px 16px"}
+          >
             <IconButton
               className="icon-button"
               sx={{
@@ -53,14 +58,22 @@ const ChooseProfile = ({ view, setView }: IPropsChooseProfile) => {
               marginBottom: "24px",
             }}
           />
-          <Stack direction={"column"} justifyContent={"space-between"} padding={"0px 16px"} minHeight={"calc(100% - 110px)"}>
+          <Stack
+            direction={"column"}
+            justifyContent={"space-between"}
+            padding={"0px 16px"}
+            minHeight={"calc(100% - 110px)"}
+          >
             <Stack direction={"column"} gap={"16px"}>
               {accountListStore?.list?.map((one, index) => (
                 <ProfileCard account={one} key={index} />
               ))}
             </Stack>
             <Stack mt={"16px"} mb={"16px"}>
-              <RedStrokeButton text="Add new profile" onClick={handleAddNewProfileButtonClick} />
+              <RedStrokeButton
+                text="Add new profile"
+                onClick={handleAddNewProfileButtonClick}
+              />
             </Stack>
           </Stack>
         </Box>

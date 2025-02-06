@@ -1,20 +1,22 @@
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import QRCode from "react-qr-code";
 
 import { Box, Stack, Modal, Tooltip, Button, Fade } from "@mui/material";
 
-import { getWallet } from "../../features/wallet/WalletSlice";
-
-import closeIcon from "../../assets/settings/x-icon.svg";
-import copyIcon from "../../assets/settings/copy-icon.svg";
-
-import SettingStyle from "../../styles/SettingStyle";
+import { getWallet } from "../../store/WalletSlice";
 
 import { getCurrentChainWalletAddress } from "../../lib/helper/WalletHelper";
 
-import { ISupportChain, IWallet } from "../../types/walletTypes";
+import { IWalletAddresses } from "../../types/WalletTypes";
+import { ISupportChain } from "../../types/ChainTypes";
+
+import closeIcon from "../../assets/setting/XIcon.svg";
+import copyIcon from "../../assets/setting/CopyIcon.svg";
+
+import SettingStyle from "../../styles/SettingStyle";
 
 export interface IPropsQrModal {
   supportChain: ISupportChain;
@@ -26,9 +28,9 @@ const QrModal = ({ supportChain, open, setOpen }: IPropsQrModal) => {
   const { t } = useTranslation();
   const classnames = SettingStyle();
 
-  const walletStore: IWallet = useSelector(getWallet);
+  const walletStore: IWalletAddresses = useSelector(getWallet);
 
-  const currentWallet = useMemo(() => getCurrentChainWalletAddress(walletStore, supportChain?.chain?.name), [walletStore]);
+  const currentWallet = useMemo(() => getCurrentChainWalletAddress(walletStore, supportChain?.native?.name), [walletStore]);
 
   const modalStyle = {
     display: "flex",
@@ -49,8 +51,8 @@ const QrModal = ({ supportChain, open, setOpen }: IPropsQrModal) => {
         <Stack direction={"column"} alignItems={"center"} textAlign={"center"} className="modal-content qr-modal">
           <Stack direction={"row"} justifyContent={"space-between"} sx={{ width: "100%" }}>
             <Stack direction={"row"} alignItems={"center"} className="" gap={"10px"}>
-              <Box component={"img"} src={supportChain?.chain?.logo} width={"32px"} height={"32px"} />
-              <Box className="fs-h3 white">{supportChain?.chain?.name}</Box>
+              <Box component={"img"} src={supportChain?.native?.logo} width={"32px"} height={"32px"} />
+              <Box className="fs-h3 white">{supportChain?.native?.name}</Box>
             </Stack>
             <Stack className="center-align" onClick={() => setOpen(false)} sx={{ cursor: "pointer" }}>
               <img src={closeIcon} />

@@ -1,5 +1,4 @@
 import { makeStyles } from "@mui/styles";
-import "../App.css";
 
 const storeStyles = makeStyles({
   platform: {

@@ -1,453 +1,209 @@
 import { Managers, Identities, Transactions, Crypto } from "@solar-network/crypto";
 import { generateMnemonic } from "bip39";
-import { IWallet } from "./IWallet";
+import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import Big from "big.js";
-import SolarAPI from "../api/SolarAPI";
-import { net_name, solar_api_url } from "../../configs/index";
-import { IRecipient } from "../../features/wallet/CryptoApi";
-import { testAccountTokens } from "../../consts/testMnemonics";
-import { IPriceList } from "../../types/walletTypes";
-import { getSupportChainByName, getTokenPriceByCmc } from "../helper/WalletHelper";
-import { ChainNames } from "../../consts/Chains";
 
-export class Solar implements IWallet {
-  address: string;
-  name?: string;
-  publicKey?: string;
-  balance?: number;
-  passphrase: string;
-  secondPassphrase?: string;
-  ticker: "SXP" = "SXP";
+import { CONFIG_NETWORK_NAME, CONFIG_SOLAR_API_URL } from "../../config/MainConfig";
 
-  constructor(mnemonic: string) {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
+import { IRecipient } from "../../types/TransactionTypes";
 
-    this.passphrase = mnemonic;
-    this.address = Identities.Address.fromPassphrase(mnemonic);
-    fetch(`${solar_api_url}/wallets/${this.address}`).then((response) => {
-      response.json().then((data) => {
-        this.publicKey = data.publicKey;
-      });
-    });
+export class Solar {
+  static async generateMnemonic(): Promise<string> {
+    const passphrase = generateMnemonic();
+    return passphrase;
   }
 
   static async getAddress(mnemonic: string): Promise<string> {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-
+    Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
     return Identities.Address.fromPassphrase(mnemonic.normalize("NFD"));
   }
 
   static getPublicKey(mnemonic: string): string {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-
     return Identities.PublicKey.fromPassphrase(mnemonic.normalize("NFD"));
   }
 
-  async getCurrentBalance(): Promise<number> {
-    try {
-      return (await (await fetch(`${solar_api_url}/wallets/${this.address}`)).json()).data.balance as number;
-    } catch {
-      return 0;
+  static async addTxToQueue(body: any, url: string): Promise<AxiosResponse<any, any>> {
+    return await axios.post(`${url}/transactions`, body, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+  }
+
+  static async getData(query: any, url: string): Promise<AxiosResponse<any, any>> {
+    const config: AxiosRequestConfig = {
+      params: query,
+    };
+    return await axios.get(`${CONFIG_SOLAR_API_URL}/${url}`, config);
+  }
+
+  static async getBlockchain() {
+    return this.getData({}, "blockchain");
+  }
+
+  static async get53Delegates(page: number) {
+    const query1 = {
+      page: page,
+      limit: 53,
+      isResigned: false,
+      orderBy: "rank:asc",
+    };
+    return this.getData(query1, "delegates");
+  }
+
+  static async getAllDelegates() {
+    const query1 = {
+      page: 1,
+      limit: 100,
+      isResigned: false,
+      orderBy: "address:asc",
+    };
+    const res1: any = await this.getData(query1, "delegates");
+    const numberOfDelegates = res1.data.meta.totalCount;
+    const numberOfPages = Math.ceil(numberOfDelegates / 100);
+    let queries = [];
+    for (let i = 2; i <= numberOfPages; i++) {
+      queries.push({
+        page: i,
+        limit: 100,
+        isResigned: false,
+        orderBy: "address:asc",
+      });
     }
+    const res2: any[] = await Promise.all(queries.map((query) => this.getData(query, "delegates")));
+    let res3: any[] = res1.data.data;
+    for (let i = 0; i < res2.length; i++) {
+      res3 = [...res3, ...res2[i].data.data];
+    }
+    return res3;
+  }
+
+  static async getVotingData(address: string) {
+    try {
+      const query2 = {
+        page: 1,
+        limit: 1,
+      };
+      return this.getData(query2, `wallets/${address}/votes`);
+    } catch (err) {
+      console.error("Failed to getVotingData: ", err);
+    }
+  }
+
+  static async getCurrentNonce(address: string): Promise<number> {
+    try {
+      const response = await axios.get(`${CONFIG_SOLAR_API_URL}/wallets/${address}`);
+      return parseInt(response.data.data.nonce);
+    } catch (e) {
+      throw new Error(`Failed to get current nonce: ${e.message}`);
+    }
+  }
+
+  static async vote(passphrase: string, addr: string, votesAsset: any, feeUSD: string, sxpPriceUSD: number) {
+    Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
+    let nonce = await this.getCurrentNonce(addr);
+    let tx = Transactions.BuilderFactory.vote()
+      .nonce((nonce + 1).toString())
+      .votesAsset(votesAsset)
+      .fee(
+        Big(feeUSD)
+          .times((10 ** 8 / Number(sxpPriceUSD)) as number)
+          .toFixed(0)
+      )
+      .sign(passphrase);
+    let txJson = tx.build().toJson();
+    let res = this.addTxToQueue(JSON.stringify({ transactions: [txJson] }), CONFIG_SOLAR_API_URL ?? "");
+    return res;
   }
 
   static async getBalance(addr: string): Promise<number> {
     try {
-      return ((await (await fetch(`${solar_api_url}/wallets/${addr}`)).json()).data.balance as number) / 1e8;
+      const response = await axios.get(`${CONFIG_SOLAR_API_URL}/wallets/${addr}`);
+      return response.data.data.balance / 1e8;
     } catch {
       return 0;
     }
   }
 
   static validateAddress(address: string): boolean {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
+    Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
     return Identities.Address.validate(address);
   }
 
-  static isValidPassphrase(passphrase: string): boolean {
-    if (passphrase.split(" ").length >= 8) {
-      if (Identities.Address.fromPassphrase(passphrase).length === 34) {
-        return true;
-      }
-    }
-    return false;
-  }
-  static async generateMnemonic(): Promise<string> {
-    const passphrase = generateMnemonic();
-    return passphrase;
-  }
-  static async isSecondSignatureFromAddress(address: string) {
-    let walletAttributes = (await (await fetch(`${solar_api_url}/wallets/${address}`)).json()).data.attributes;
-    if (walletAttributes) {
-      if (walletAttributes.secondPublicKey) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-  async isSecondSignature() {
-    let walletAttributes = (await (await fetch(`${solar_api_url}/wallets/${this.address}`)).json()).data.attributes;
-    if (walletAttributes) {
-      if (walletAttributes.secondPublicKey) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-  static async isSecondSignatureFromPassphrase(passphrase: string): Promise<boolean> {
-    return await this.isSecondSignatureFromAddress(this.addressFromPassphrase(passphrase));
-  }
-  static async isValidSecondSignature(passphrase: string, secondpassphrase: string): Promise<boolean> {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-    let testTx = Transactions.BuilderFactory.vote().nonce("1").votesAsset({}).fee("42").sign(passphrase).secondSign(secondpassphrase).getStruct();
-    let walletPublicKey = (await (await fetch(`${solar_api_url}/wallets/${this.addressFromPassphrase(passphrase)}`)).json()).data.attributes.secondPublicKey;
-    if (walletPublicKey) {
-      return Transactions.Verifier.verifySecondSignature(testTx, walletPublicKey);
-    } else {
-      return false;
-    }
-  }
-  static addressFromPassphrase(passphrase: string): string {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-    return Identities.Address.fromPassphrase(passphrase);
-  }
-
-  validateAddress(address: string): boolean {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-    return Identities.Address.validate(address);
-  }
-
-  async getVote(): Promise<any> {
-    try {
-      return (await (await fetch(`${solar_api_url}/wallets/${this.address}`)).json()).data.votingFor;
-    } catch {
-      return "";
-    }
-  }
-
-  static async getTransactions(addr: string, page: number): Promise<any> {
-    try {
-      return (await (await fetch(`${solar_api_url}/wallets/${addr}/transactions?page=${page}&limit=100`)).json()).data;
-    } catch {
-      return [];
-    }
-  }
-
-  async getTransaction(txId: string): Promise<any> {
-    try {
-      return (await (await fetch(`${solar_api_url}/transactions/${txId}`)).json()).data;
-    } catch {
-      return undefined;
-    }
-  }
-  static async getDelegates(query: any, url: string) {
-    try {
-      return await SolarAPI.getData(query, url);
-    } catch {
-      return undefined;
-    }
-  }
   static async sendTransaction(
     passphrase: string,
-    tx: { recipients: IRecipient[]; fee: string; vendorField?: string }, // fee in USD
+    tx: { recipients: IRecipient[]; fee: string; vendorField?: string }, // fee in SXP
     secondPassphrase?: string
-  ) {
+  ): Promise<{ success: boolean; message?: string; error?: string }> {
     const addr = await Solar.getAddress(passphrase);
     let nonce: number = await Solar.getCurrentNonce(addr);
-    if (tx.recipients.length > 0) {
-      if (tx.recipients.length > 1) {
-        Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-        let transaction = Transactions.BuilderFactory.transfer();
-        tx.recipients.map((recipient) => {
-          transaction.addTransfer(
-            recipient.address,
-            Big(recipient.amount)
-              .times(10 ** 8)
-              .toFixed(0)
-          );
-        });
-
-        const priceListStore: IPriceList = JSON.parse(sessionStorage.getItem(`priceList`));
-        const sxpPriceUSD = getTokenPriceByCmc(priceListStore, getSupportChainByName(ChainNames.SOLAR)?.chain?.cmc);
-        let itransaction = transaction
-          .fee(
-            Big(tx.fee)
-              .times((10 ** 8 / Number(sxpPriceUSD)) as number)
-              .toFixed(0)
-          )
-          .nonce((nonce + 1).toString());
-
-        if (tx.vendorField && tx.vendorField.length > 0) {
-          itransaction = itransaction.memo(tx.vendorField);
-        }
-        let txJson = itransaction.sign(passphrase);
-
-        if (secondPassphrase?.length) {
-          txJson = itransaction.secondSign(secondPassphrase);
-        }
-
-        let iTxJson = txJson.build().toJson();
-        // console.log("sending start");
-        let res = await SolarAPI.addTxToQueue(JSON.stringify({ transactions: [iTxJson] }), solar_api_url ?? "");
-        // console.log("sending res", res);
-        if (res.status !== 200) {
-          return {
-            status: "failed",
-            title: "Send SXP",
-            message: "Request failed",
-          };
-        } else {
-          if (res.data.errors === undefined) {
-            return {
-              status: "success",
-              title: "Send SXP",
-              message: `Transaction confirmed.`,
-              transactionId: res.data.data.accept[0],
-            };
-          } else {
-            return {
-              status: "failed",
-              title: "Send SXP",
-              message: res.data.errors[res.data.data.invalid[0]].message as string,
-            };
-          }
-        }
-      } else {
-        Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-        let transaction = Transactions.BuilderFactory.transfer()
-          .recipientId(tx.recipients[0].address)
-          .version(3)
-          .amount(
-            Big(tx.recipients[0].amount)
-              .times(10 ** 8)
-              .toFixed(0)
-          );
-
-        const priceListStore: IPriceList = JSON.parse(sessionStorage.getItem(`priceList`));
-        const sxpPriceUSD = getTokenPriceByCmc(priceListStore, getSupportChainByName(ChainNames.SOLAR)?.chain?.cmc);
-        let itransaction = transaction
-          .fee(
-            Big(tx.fee)
-              .times((10 ** 8 / Number(sxpPriceUSD)) as number)
-              .toFixed(0)
-          )
-          .nonce((nonce + 1).toString());
-        if (tx.vendorField && tx.vendorField.length > 0) {
-          itransaction = itransaction.memo(tx.vendorField);
-        }
-
-        let txJson = itransaction.sign(passphrase);
-
-        if (secondPassphrase && secondPassphrase.length > 0) {
-          txJson = itransaction.secondSign(secondPassphrase);
-        }
-
-        let res = await SolarAPI.addTxToQueue(JSON.stringify({ transactions: [txJson.build().toJson()] }), solar_api_url ?? "");
-
-        if (res.status !== 200) {
-          return {
-            status: "failed",
-            title: "Send SXP",
-            message: "Request failed",
-          };
-        } else {
-          if (res.data.errors === undefined) {
-            return {
-              status: "success",
-              title: "Send SXP",
-              message: `Transaction confirmed.`,
-              transactionId: res.data.data.accept[0],
-            };
-          } else {
-            return {
-              status: "failed",
-              title: "Send SXP",
-              message: res.data.errors[res.data.data.invalid[0]].message as string,
-            };
-          }
-        }
-      }
+    if (tx.recipients.length === 0) {
+      return {
+        success: false,
+        error: "No recipients provided",
+      };
     }
-  }
 
-  static async sendTransactionAPI(
-    passphrase: string,
-    tx: { recipients: IRecipient[]; fee: string; vendorField?: string }, // fee in USD
-    secondPassphrase?: string
-  ) {
-    const addr = await Solar.getAddress(passphrase);
-    let nonce: number = await Solar.getCurrentNonce(addr);
-    if (tx.recipients.length > 0) {
-      if (tx.recipients.length > 1) {
-        Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-        let transaction = Transactions.BuilderFactory.transfer();
-        tx.recipients.map((recipient) => {
-          transaction.addTransfer(
-            recipient.address,
-            Big(recipient.amount)
-              .times(10 ** 8)
-              .toFixed(0)
-          );
-        });
+    Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
+    let transaction = Transactions.BuilderFactory.transfer();
 
-        const priceListStore: IPriceList = JSON.parse(sessionStorage.getItem(`priceList`));
-        const sxpPriceUSD = getTokenPriceByCmc(priceListStore, getSupportChainByName(ChainNames.SOLAR)?.chain?.cmc);
-        let itransaction = transaction
-          .fee(
-            Big(tx.fee)
-              .times((10 ** 8 / Number(sxpPriceUSD)) as number)
-              .toFixed(0)
-          )
-          .nonce((nonce + 1).toString());
-
-        if (tx.vendorField && tx.vendorField.length > 0) {
-          itransaction = itransaction.memo(tx.vendorField);
-        }
-        let txJson = itransaction.sign(passphrase);
-
-        if (secondPassphrase?.length) {
-          txJson = itransaction.secondSign(secondPassphrase);
-        }
-
-        let iTxJson = txJson.build().toJson();
-        // console.log("sending start");
-        let res = await SolarAPI.addTxToQueue(JSON.stringify({ transactions: [iTxJson] }), solar_api_url ?? "");
-        // console.log("sending res", res);
-        if (res.status !== 200) {
-          return {
-            status: "failed",
-            title: "Send SXP",
-            message: "Request failed",
-          };
-        } else {
-          if (res.data.errors === undefined) {
-            return {
-              status: "success",
-              title: "Send SXP",
-              message: `Transaction confirmed.`,
-              transactionId: res.data.data.accept[0],
-            };
-          } else {
-            return {
-              status: "failed",
-              title: "Send SXP",
-              message: res.data.errors[res.data.data.invalid[0]].message as string,
-            };
-          }
-        }
-      } else {
-        Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-        let transaction = Transactions.BuilderFactory.transfer()
-          .recipientId(tx.recipients[0].address)
-          .version(3)
-          .amount(
-            Big(tx.recipients[0].amount)
-              .times(10 ** 8)
-              .toFixed(0)
-          );
-        const priceListStore: IPriceList = JSON.parse(sessionStorage.getItem(`priceList`));
-        const sxpPriceUSD = getTokenPriceByCmc(priceListStore, getSupportChainByName(ChainNames.SOLAR)?.chain?.cmc);
-        let itransaction = transaction
-          .fee(
-            Big(tx.fee)
-              .times((10 ** 8 / Number(sxpPriceUSD)) as number)
-              .toFixed(0)
-          )
-          .nonce((nonce + 1).toString());
-        if (tx.vendorField && tx.vendorField.length > 0) {
-          itransaction = itransaction.memo(tx.vendorField);
-        }
-
-        let txJson = itransaction.sign(passphrase);
-
-        if (secondPassphrase && secondPassphrase.length > 0) {
-          txJson = itransaction.secondSign(secondPassphrase);
-        }
-
-        let res = await SolarAPI.addTxToQueue(JSON.stringify({ transactions: [txJson.build().toJson()] }), solar_api_url ?? "");
-
-        if (res.status !== 200) {
-          return {
-            status: "failed",
-            title: "Send SXP",
-            message: "Request failed",
-          };
-        } else {
-          if (res.data.errors === undefined) {
-            return {
-              status: "success",
-              title: "Send SXP",
-              message: `Transaction confirmed.`,
-              transactionId: res.data.data.accept[0],
-            };
-          } else {
-            return {
-              status: "failed",
-              title: "Send SXP",
-              message: res.data.errors[res.data.data.invalid[0]].message as string,
-            };
-          }
-        }
-      }
-    }
-  }
-
-  static getCurrentNonce(address: string) {
-    return new Promise<number>((resolve, reject) => {
-      (async () => {
-        try {
-          let walletInfo: any = await (await fetch(`${solar_api_url}/wallets/${address}`)).json();
-          resolve(parseInt(walletInfo.data.nonce));
-        } catch (e) {
-          reject(e);
-        }
-      })();
+    tx.recipients.forEach((recipient) => {
+      transaction.addTransfer(
+        recipient.address,
+        Big(recipient.amount)
+          .times(10 ** 8)
+          .toFixed(0)
+      );
     });
-  }
 
-  static async vote(passphrase: string, addr: string, votesAsset: any, fee: string) {
-    Managers.configManager.setFromPreset(net_name === "mainnet" ? "mainnet" : "testnet");
-    const priceListStore: IPriceList = JSON.parse(sessionStorage.getItem(`priceList`));
-    const sxpPriceUSD = getTokenPriceByCmc(priceListStore, getSupportChainByName(ChainNames.SOLAR)?.chain?.cmc);
-    let nonce = await Solar.getCurrentNonce(addr);
-    let tx = Transactions.BuilderFactory.vote()
-      .nonce((nonce + 1).toString())
-      .votesAsset(votesAsset)
+    let itransaction = transaction
       .fee(
-        Big(fee)
-          .times((10 ** 8 / Number(sxpPriceUSD)) as number)
+        Big(tx.fee)
+          .times(10 ** 8)
           .toFixed(0)
       )
-      .sign(passphrase);
+      .nonce((nonce + 1).toString());
 
-    let txJson = tx.build().toJson();
-    let res = SolarAPI.addTxToQueue(JSON.stringify({ transactions: [txJson] }), solar_api_url ?? "");
-    return res;
+    if (tx.vendorField && tx.vendorField.length > 0) {
+      itransaction = itransaction.memo(tx.vendorField);
+    }
+
+    let txJson = itransaction.sign(passphrase);
+
+    if (secondPassphrase && secondPassphrase.length > 0) {
+      txJson = itransaction.secondSign(secondPassphrase);
+    }
+
+    let res = await Solar.addTxToQueue(JSON.stringify({ transactions: [txJson.build().toJson()] }), CONFIG_SOLAR_API_URL ?? "");
+
+    if (res.status !== 200) {
+      return {
+        success: false,
+        error: "Request failed",
+      };
+    } else {
+      if (res.data.errors === undefined) {
+        return {
+          success: true,
+          message: res.data.data.accept[0],
+        };
+      } else {
+        return {
+          success: false,
+          error: res.data.errors[res.data.data.invalid[0]].message as string,
+        };
+      }
+    }
   }
 
-  static signToken = (message: string, mnemonic: string) => {
-    if (testAccountTokens.find((element) => element.mnemonic === mnemonic)) return testAccountTokens.find((element) => element.mnemonic === mnemonic).token;
-    return Crypto.Message.sign(message, mnemonic.normalize("NFD")).signature;
-  };
+  static async signMessage(message: string, passphrase: string): Promise<string> {
+    return Crypto.Message.sign(message, passphrase.normalize("NFD")).signature;
+  }
 
-  static verifyToken = (message: string, publicKey: string, signature: string) => {
-    if (testAccountTokens.find((element) => element.token === signature))
-      return this.getPublicKey(testAccountTokens.find((element) => element.token === signature).mnemonic) === publicKey;
+  static async verifyMessage(message: string, publicKey: string, signature: string): Promise<boolean> {
     return Crypto.Message.verify({ message, publicKey, signature });
-  };
-
-  static signMessage = (message: string, mnemonic: string) => {
-    return Crypto.Message.sign(message, mnemonic.normalize("NFD")).signature;
-  };
-
-  static verifyMessage = (message: string, publicKey: string, signature: string) => {
-    return Crypto.Message.verify({ message, publicKey, signature });
-  };
+  }
 }
+
 export default Solar;

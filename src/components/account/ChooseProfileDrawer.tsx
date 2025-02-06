@@ -3,19 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { SwipeableDrawer, Box, Stack, IconButton, Divider } from "@mui/material";
-
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 
 import RedStrokeButton from "./RedStrokeButton";
+import ProfileCard from "./ProfileCard";
 
-import { getAccountList } from "../../features/account/AccountListSlice";
+import { getAccountList } from "../../store/AccountListSlice";
 
-import { IAccountList } from "../../types/accountTypes";
+import { IAccountList } from "../../types/AccountTypes";
 
-import closeImg from "../../assets/settings/collaps-close-btn.svg";
+import closeImg from "../../assets/setting/CollapsCloseBtn.svg";
 
 import SettingStyle from "../../styles/SettingStyle";
-import ProfileCard from "./ProfileCard";
 
 type Anchor = "right";
 
@@ -41,7 +40,7 @@ const ChooseProfileDrawer = ({ view, setView }: props) => {
   };
 
   const handleAddNewProfileButtonClick = () => {
-    navigate("/non-custodial/login/2");
+    navigate("/welcome");
   };
 
   return (
@@ -54,6 +53,15 @@ const ChooseProfileDrawer = ({ view, setView }: props) => {
       slotProps={{
         backdrop: {
           onClick: toggleDrawer("right", false),
+        },
+      }}
+      sx={{
+        "& .MuiBox-root": {
+          overflow: "auto", // Enable scrolling
+          scrollbarWidth: "none", // Firefox
+          "&::-webkit-scrollbar": {
+            display: "none", // Chrome, Safari
+          },
         },
       }}
     >

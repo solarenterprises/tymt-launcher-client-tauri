@@ -1,12 +1,12 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import "../../../global.css";
+// import "../../../global.css";
 
 import { Grid, Box, Stack } from "@mui/material";
 
@@ -16,95 +16,25 @@ import InputText from "../../../components/account/InputText";
 import AccountNextButton from "../../../components/account/AccountNextButton";
 import Stepper from "../../../components/account/Stepper";
 
-import { AppDispatch } from "../../../store";
-import { getTempAccount, setTempAccount } from "../../../features/account/TempAccountSlice";
-import { setAccount } from "../../../features/account/AccountSlice";
-import { addAccountList } from "../../../features/account/AccountListSlice";
-import { setWallet } from "../../../features/wallet/WalletSlice";
-import { addWalletList } from "../../../features/wallet/WalletListSlice";
-import { getSaltToken, setSaltToken } from "../../../features/account/SaltTokenSlice";
-import { getMachineId } from "../../../features/account/MachineIdSlice";
-import { fetchMyInfoAsync } from "../../../features/account/MyInfoSlice";
-import { getTempWallet } from "../../../features/wallet/TempWalletSlice";
-import { setLogin } from "../../../features/account/LoginSlice";
+import { getAccountList } from "../../../store/AccountListSlice";
 
-import AuthAPI from "../../../lib/api/AuthAPI";
-
-import { getNonCustodySignInToken, getReqBodyNonCustodyBeforeSignIn, getReqBodyNonCustodySignIn } from "../../../lib/helper/AuthAPIHelper";
-import { encrypt, getKeccak256Hash } from "../../../lib/api/Encrypt";
+import { IAccountList } from "../../../types/AccountTypes";
 
 import tymt3 from "../../../assets/account/tymt3.png";
 
-import { IAccount, IMachineId, ISaltToken } from "../../../types/accountTypes";
-import { IWallet } from "../../../types/walletTypes";
-import { setMnemonic } from "../../../features/account/MnemonicSlice";
-import { generateSocketHash } from "../../../features/chat/SocketHashApi";
-import { setSocketHash } from "../../../features/chat/SocketHashSlice";
-import { getRsaKeyPairAsync } from "../../../features/chat/RsaSlice";
+export interface ILocationStateNonCustodialImport1 {
+  passphrase: string;
+}
 
 const NonCustodialImport1 = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const dispatch = useDispatch<AppDispatch>();
+  const { mode } = useParams();
 
-  const tempAccountStore: IAccount = useSelector(getTempAccount);
-  const tempWalletStore: IWallet = useSelector(getTempWallet);
-  const saltTokenStore: ISaltToken = useSelector(getSaltToken);
-  const machineIdStore: IMachineId = useSelector(getMachineId);
+  const { passphrase } = (location.state as ILocationStateNonCustodialImport1) || {};
 
-  const handleImport = useCallback(
-    async (newNickName: string, newPassword: string, newUid: string) => {
-      try {
-        const newAccount: IAccount = {
-          ...tempAccountStore,
-          password: getKeccak256Hash(newPassword),
-          mnemonic: await encrypt(tempAccountStore?.mnemonic, newPassword),
-          nickName: newNickName,
-          uid: newUid,
-        };
-
-        dispatch(setAccount(newAccount));
-        dispatch(addAccountList(newAccount));
-        dispatch(setWallet(tempWalletStore));
-        dispatch(addWalletList(tempWalletStore));
-      } catch (err) {
-        // console.log("Failed to handleSignUp: ", err);
-      }
-    },
-    [tempAccountStore, tempWalletStore]
-  );
-
-  const handleLogin = useCallback(async () => {
-    try {
-      const body1 = getReqBodyNonCustodyBeforeSignIn(tempAccountStore, tempAccountStore?.mnemonic);
-      const res1 = await AuthAPI.nonCustodyBeforeSignin(body1);
-
-      const salt: string = res1?.data?.salt;
-      const token: string = getNonCustodySignInToken(salt, saltTokenStore, tempAccountStore?.mnemonic);
-      dispatch(
-        setSaltToken({
-          salt: salt,
-          token: token,
-        })
-      );
-
-      const body2 = getReqBodyNonCustodySignIn(tempAccountStore, machineIdStore, token);
-      const res2 = await AuthAPI.nonCustodySignin(body2);
-      const uid = res2?.data?._id;
-
-      await dispatch(fetchMyInfoAsync(uid));
-
-      const newSocketHash = generateSocketHash(tempAccountStore?.mnemonic);
-      dispatch(setSocketHash(newSocketHash));
-      dispatch(setMnemonic(tempAccountStore?.mnemonic));
-      dispatch(getRsaKeyPairAsync(tempAccountStore?.mnemonic));
-
-      dispatch(setLogin(true));
-      navigate("/home");
-    } catch (err) {
-      // console.log("Failed to handleLogin: ", err);
-    }
-  }, [tempAccountStore, saltTokenStore]);
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
   const formik = useFormik({
     initialValues: {
@@ -139,33 +69,16 @@ const NonCustodialImport1 = () => {
     onSubmit: async () => {
       try {
         const newPassword = formik.values.password;
-        dispatch(
-          setTempAccount({
-            ...tempAccountStore,
-            password: newPassword,
-          })
-        );
-
-        const newSXPAddress = tempAccountStore?.sxpAddress;
-        const res = await AuthAPI.getUserBySolarAddress(newSXPAddress);
-
-        if (res?.data?.users?.length === 0) {
-          navigate("/non-custodial/signup/4");
-        } else {
-          const newNickName: string = res?.data?.users[0]?.nickName;
-          const newUid: string = res?.data?.users[0]?._id;
-          await handleImport(newNickName, newPassword, newUid);
-          await handleLogin();
-        }
+        navigate(`/non-custodial-signup-4/${mode === "guest" ? "/guest" : "signup"}`, { state: { passphrase: passphrase, password: newPassword } });
       } catch (err) {
-        // console.log("Failed at NonCustodialImport1: ", err);
+        console.error("Failed to onSubmit at NonCustodialImport1: ", err);
       }
     },
   });
 
-  const handleBackClick = () => {
-    navigate("/start");
-  };
+  const handleBackClick = useCallback(() => {
+    accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
+  }, [accountListStore]);
 
   return (
     <>

@@ -1,19 +1,19 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 import { Box, Stack, Modal, CircularProgress, Button, Tooltip, Fade } from "@mui/material";
 
-import { getCurrentChain } from "../../features/wallet/CurrentChainSlice";
+// import { getCurrentChain } from "../../features/wallet/CurrentChainSlice";
 
-import TransactionProviderAPI from "../../lib/api/TransactionProviderAPI";
+// import TransactionProviderAPI from "../../lib/api/TransactionProviderAPI";
 
-import { getSupportChainByName } from "../../lib/helper/WalletHelper";
+// import { getSupportChainByName } from "../../lib/helper/WalletHelper";
 
-import arrowIcon from "../../assets/account/blue-arrow-right.svg";
-import closeIcon from "../../assets/settings/x-icon.svg";
+import arrowIcon from "../../assets/account/BlueArrowRight.svg";
+import closeIcon from "../../assets/setting/XIcon.svg";
 
-import { ICurrentChain, ISupportChain } from "../../types/walletTypes";
+// import { ICurrentChain, ISupportChain } from "../../types/walletTypes";
 
 export interface IPropsSwitchChainModal {
   open: boolean;
@@ -23,12 +23,13 @@ export interface IPropsSwitchChainModal {
   chain: string;
 }
 
-const SwitchChainModal = ({ open, setOpen, handleRejectClick, switchChain, chain }: IPropsSwitchChainModal) => {
+const SwitchChainModal = ({ open, setOpen, handleRejectClick, switchChain }: IPropsSwitchChainModal) => {
   const { t } = useTranslation();
 
-  const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
+  // const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
 
-  const currentSupportChain: ISupportChain = useMemo(() => getSupportChainByName(currentChainStore?.chain), [currentChainStore]);
+  // const currentSupportChain: ISupportChain = useMemo(() => getSupportChainByName(currentChainStore?.chain), [currentChainStore]);
+  const currentSupportChain = { chain: { name: "", logo: "" } };
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -109,7 +110,7 @@ const SwitchChainModal = ({ open, setOpen, handleRejectClick, switchChain, chain
                       border: "1px solid rgb(71, 76, 76)",
                     }}
                   >
-                    <Box className="fs-12-regular white">{TransactionProviderAPI.getChainName(chain)}</Box>
+                    <Box className="fs-12-regular white">{/* {TransactionProviderAPI.getChainName(chain)} */}</Box>
                   </Stack>
                 }
                 PopperProps={{
@@ -122,7 +123,11 @@ const SwitchChainModal = ({ open, setOpen, handleRejectClick, switchChain, chain
                 }}
               >
                 <Box className="center-align">
-                  <img width={48} src={TransactionProviderAPI.getChainIcon(chain)} />
+                  <img
+                    width={48}
+                    // src={TransactionProviderAPI.getChainIcon(chain)}
+                    src={""}
+                  />
                 </Box>
               </Tooltip>
             </Stack>

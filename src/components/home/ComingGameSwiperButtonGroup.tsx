@@ -1,6 +1,6 @@
 import { Stack, Box, IconButton } from "@mui/material";
-import swiperLeftButton from "../../assets/store/swiper-left-button.svg";
-import swiperRightButton from "../../assets/store/swiper-right-button.svg";
+import swiperLeftButton from "../../assets/store/SwiperLeftButton.svg";
+import swiperRightButton from "../../assets/store/SwiperRightButton.svg";
 
 export interface IPropsComingGameSwiperButtonGroup {
   handleNextSlide: () => void;

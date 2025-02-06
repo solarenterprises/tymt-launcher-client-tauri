@@ -1,19 +1,15 @@
-import { IWallet } from "./IWallet";
 import { ethers } from "ethers";
 import * as ethereumjsWallet from "ethereumjs-wallet";
 import * as bip39 from "bip39";
-import { eth_api_url, eth_api_key, eth_rpc_url, net_name } from "../../configs/index";
-import { ISupportToken, IBalance } from "../../types/walletTypes";
 import { validate } from "multicoin-address-validator";
+import axios from "axios";
 
-class Ethereum implements IWallet {
-  address: string;
-  ticker: "ETH" = "ETH";
+import { CONFIG_ETH_API_URL, CONFIG_ETH_API_KEY, CONFIG_NETWORK_NAME } from "../../config/MainConfig";
 
-  constructor() {
-    this.address = "";
-  }
+import { ISupportToken } from "../../types/ChainTypes";
+import { IBalance } from "../../types/WalletTypes";
 
+export class Ethereum {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
     const seed = await bip39.mnemonicToSeed(mnemonic);
     const hdNode = ethereumjsWallet.hdkey.fromMasterSeed(seed);
@@ -35,12 +31,42 @@ class Ethereum implements IWallet {
     return validate(addr, "eth");
   }
 
+  static async signMessage(message: string, passphrase: string): Promise<string> {
+    try {
+      const wallet = await Ethereum.getWalletFromMnemonic(passphrase);
+      const signature = await wallet.signMessage(message);
+      return signature;
+    } catch (err) {
+      console.error("Failed Ethereum signMessage: ", err);
+      throw err;
+    }
+  }
+
+  static async verifyMessage(message: string, signature: string, address: string): Promise<boolean> {
+    try {
+      const recoveredAddress = ethers.verifyMessage(message, signature);
+      return recoveredAddress === address;
+    } catch (err) {
+      console.error("Failed Ethereum verifyMessage: ", err);
+      return false;
+    }
+  }
+
   static async getBalance(addr: string): Promise<number> {
     try {
-      // if (net_name === "testnet") return 0;
-      const result = (await (await fetch(`${eth_api_url}?module=account&action=balance&address=${addr}&tag=latest&apikey=${eth_api_key}`)).json()).result;
-      return (result as number) / 1e9 / 1e9;
-    } catch {
+      const response = await axios.get(`${CONFIG_ETH_API_URL}`, {
+        params: {
+          module: "account",
+          action: "balance",
+          address: addr,
+          tag: "latest",
+          apikey: CONFIG_ETH_API_KEY,
+        },
+      });
+      const result = response.data.result;
+      return parseFloat(result) / 1e18; // Convert from Wei to ETH
+    } catch (err) {
+      console.error("Failed Ethereum getBalance: ", err);
       return 0;
     }
   }
@@ -49,96 +75,33 @@ class Ethereum implements IWallet {
     try {
       let result: IBalance[] = [];
       for (let i = 0; i < tokens.length; i++) {
-        if (net_name === "testnet") {
+        if (CONFIG_NETWORK_NAME === "testnet") {
           result.push({
             symbol: tokens[i].symbol,
             balance: 0,
           });
         } else {
+          const response = await axios.get(`${CONFIG_ETH_API_URL}`, {
+            params: {
+              module: "account",
+              action: "tokenbalance",
+              contractaddress: tokens[i].address,
+              address: addr,
+              tag: "latest",
+              apikey: CONFIG_ETH_API_KEY,
+            },
+          });
+          const balance = parseFloat(response.data.result) / 10 ** (tokens[i].decimals as number);
           result.push({
             symbol: tokens[i].symbol,
-            balance:
-              ((
-                await (
-                  await fetch(
-                    `${eth_api_url}?module=account&action=tokenbalance&contractaddress=${tokens[i].address}&address=${addr}&tag=latest&apikey=${eth_api_key}`
-                  )
-                ).json()
-              ).result as number) /
-              10 ** (tokens[i].decimals as number),
+            balance: balance,
           });
         }
       }
       return result;
     } catch (err) {
-      // console.log("Failed to ETHEREUM getTokenBalance: ", err);
+      console.error("Failed to ETHEREUM getTokenBalance: ", err);
       return [];
-    }
-  }
-
-  static async getTransactions(addr: string): Promise<any> {
-    try {
-      return (
-        await (
-          await fetch(
-            `${eth_api_url}?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc&apikey=${eth_api_key}`
-          )
-        ).json()
-      ).result;
-    } catch {
-      return undefined;
-    }
-  }
-
-  static async sendTransaction(passphrase: string, tx: { recipients: any[]; fee: string; vendorField?: string }) {
-    if (tx.recipients.length > 0) {
-      try {
-        let wallet = await Ethereum.getWalletFromMnemonic(passphrase);
-        const customProvider = new ethers.JsonRpcProvider(eth_rpc_url);
-        wallet = wallet.connect(customProvider);
-        tx.recipients.map(async (recipient) => {
-          const response = await wallet.sendTransaction({
-            to: recipient.address,
-            value: ethers.parseEther(recipient.amount),
-          });
-          //@ts-ignore
-          const receipt = await response.wait(1);
-          // const hash = receipt.transactionHash;
-          // const block = receipt.blockNumber;
-          // const status = receipt.status ? "Success" : "Failure";
-          // const gas = receipt.gasUsed.toString();
-          // console.log(`Transaction: [${hash}](^5^${hash})`);
-          // console.log(`Block: ${block}`);
-          // console.log(`Status: ${status}`);
-          // console.log(`Gas Used: ${gas}`);
-          // console.log("----------");
-        });
-        return true;
-      } catch {
-        return false;
-      }
-    }
-  }
-
-  static async signMessage(message: string, passphrase: string): Promise<string> {
-    try {
-      const wallet = await Ethereum.getWalletFromMnemonic(passphrase);
-      const signature = await wallet.signMessage(message);
-      return signature;
-    } catch (error) {
-      // console.error("Error signing message:", error);
-      throw error;
-    }
-  }
-
-  static async verifyMessage(message: string, signature: string, address: string): Promise<boolean> {
-    try {
-      const recoveredAddress = ethers.verifyMessage(message, signature);
-      // console.log(recoveredAddress);
-      return recoveredAddress === address;
-    } catch (error) {
-      // console.error("Error verifying message:", error);
-      return false;
     }
   }
 }

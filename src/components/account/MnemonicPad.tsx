@@ -1,9 +1,12 @@
+import { useTranslation } from "react-i18next";
+
 import { IconButton, Tooltip, Box, Stack } from "@mui/material";
 import LoopIcon from "@mui/icons-material/Loop";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+
 import MnemonicWord from "./MnemonicWord";
+
 import { getMnemonic } from "../../lib/helper/WalletHelper";
-import { useTranslation } from "react-i18next";
 
 interface props {
   editable: boolean;

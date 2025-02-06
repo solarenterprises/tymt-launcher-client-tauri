@@ -1,17 +1,17 @@
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 import { Box, Grid, Stack } from "@mui/material";
 
-import StoreGameCard from "./StoreGameCard";
-import AnimatedComponent from "../AnimatedComponent";
+import StoreGameCard from "../game/StoreGameCard";
+import AnimatedComponent from "../home/AnimatedComponent";
 
-import { getGameList } from "../../features/store/GameListSlice";
+import { getGameList } from "../../store/GameListSlice";
+import { useAppSelector } from "../../store";
 
 import { filterByGenre, filterByKeyword, filterByPlatform, filterByRank, filterByType } from "../../lib/helper/FilterHelper";
 
-import NoGamePng from "../../assets/main/nogames.png";
+import NoGamePng from "../../assets/main/NoGames.png";
 
 import { IGame, IGameList } from "../../types/GameTypes";
 
@@ -27,7 +27,7 @@ export interface IPropsStoreGameItems {
 const StoreComingGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGameItems) => {
   const { t } = useTranslation();
 
-  const gameListStore: IGameList = useSelector(getGameList);
+  const gameListStore: IGameList = useAppSelector(getGameList);
 
   const comingGameListStore: IGameList = useMemo(() => {
     const data = gameListStore?.games?.filter((one) => one?.visibilityState === "coming soon");
@@ -38,7 +38,7 @@ const StoreComingGameItems = ({ platform, genre, rank, type, keyword }: IPropsSt
   }, [gameListStore]);
 
   const resultGames: IGame[] = useMemo(() => {
-    let data = [...comingGameListStore?.games];
+    let data = [...comingGameListStore.games];
     if (platform) data = filterByPlatform(data, platform);
     if (genre) data = filterByGenre(data, genre);
     // if (releaseDate) data = filterByReleaseDate(data, releaseDate);

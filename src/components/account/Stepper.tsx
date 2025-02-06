@@ -1,14 +1,15 @@
 import { Box, Stack } from "@mui/material";
-import disableStep from "../../assets/account/disable-step.svg";
-import enableStep from "../../assets/account/enable-step.svg";
 
-interface props {
+import disableStep from "../../assets/account/DisableStep.svg";
+import enableStep from "../../assets/account/EnableStep.svg";
+
+interface IPropsStepper {
   all: number;
   now: number;
   text: string;
 }
 
-const Stepper = ({ all, now, text }: props) => {
+const Stepper = ({ all, now, text }: IPropsStepper) => {
   const items = Array.from({ length: all });
 
   return (

@@ -1,27 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
 
 import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import { Grid, Box } from "@mui/material";
-import foxhead from "../../assets/main/foxhead-comingsoon.png";
+import foxhead from "../../assets/main/FoxHeadComingSoon.png";
+import ellipse from "../../assets/main/Ellipse.svg";
 
 import ComingGameCard from "./ComingGameCard";
 import ComingGameSwiperButtonGroup from "./ComingGameSwiperButtonGroup";
 
-import { getGameList } from "../../features/store/GameListSlice";
+import { useAppSelector } from "../../store";
+import { getGameList } from "../../store/GameListSlice";
 
 import { IGameList } from "../../types/GameTypes";
-
-import ellipse from "../../assets/main/ellipse.svg";
 
 const ComingSoonD53 = () => {
   const { t } = useTranslation();
 
-  const gameListStore: IGameList = useSelector(getGameList);
+  const gameListStore: IGameList = useAppSelector(getGameList);
 
   const comingGameListStore: IGameList = useMemo(() => {
     const data = gameListStore?.games?.filter((one) => one?.visibilityState === "coming soon");
@@ -73,17 +72,30 @@ const ComingSoonD53 = () => {
             zIndex: -1,
           }}
         />
-        <Grid container sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Grid
+          container
+          sx={{ justifyContent: "space-between", alignItems: "center" }}
+        >
           <Box className={"fs-40-bold"} color={"white"} textTransform={"none"}>
             {t("hom-11_coming-soon")}
           </Box>
         </Grid>
         {comingGameListStore?.games?.length === 0 ? (
           <>
-            <Box sx={{ justifyContent: "center", display: "flex", marginTop: "32px" }}>
+            <Box
+              sx={{
+                justifyContent: "center",
+                display: "flex",
+                marginTop: "32px",
+              }}
+            >
               <img src={foxhead} width={"220px"} />
             </Box>
-            <Box className={"fs-24-regular white"} textAlign={"center"} marginBottom={"30px"}>
+            <Box
+              className={"fs-24-regular white"}
+              textAlign={"center"}
+              marginBottom={"30px"}
+            >
               {t("hom-19_more-games")}
             </Box>
           </>
@@ -104,7 +116,10 @@ const ComingSoonD53 = () => {
                 </SwiperSlide>
               ))}
             </Swiper>
-            <ComingGameSwiperButtonGroup handleNextSlide={handleNextSlide} handlePrevSlide={handlePrevSlide} />
+            <ComingGameSwiperButtonGroup
+              handleNextSlide={handleNextSlide}
+              handlePrevSlide={handlePrevSlide}
+            />
           </>
         )}
       </Box>

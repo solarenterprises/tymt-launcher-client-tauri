@@ -1,11 +1,12 @@
 import { Box, Stack, Modal, Fade } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import closeIcon from "../../assets/settings/x-icon.svg";
-import arrowIcon from "../../assets/account/blue-arrow-right.svg";
-import arrowsconnect from "../../assets/wallet/arrowsconnect.svg";
+import closeIcon from "../../assets/setting/XIcon.svg";
+import arrowIcon from "../../assets/account/BlueArrowRight.svg";
+import arrowsconnect from "../../assets/wallet/ArrowsConnect.svg";
 
-import { connectModalType } from "../../types/accountTypes";
+// import { connectModalType } from "../../types/accountTypes";
+type connectModalType = any;
 
 const ConnectModal = ({ coin, src, title, open, setOpen }: connectModalType) => {
   const { t } = useTranslation();

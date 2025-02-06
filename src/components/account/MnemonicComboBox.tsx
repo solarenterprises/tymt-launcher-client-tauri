@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { Button, Stack, Box } from "@mui/material";
 
-import downArrow from "../../assets/account/down-arrow.svg";
+import downArrow from "../../assets/arrow/DownArrow.svg";
 
 interface props {
   text: string;

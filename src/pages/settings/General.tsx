@@ -1,14 +1,23 @@
-import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import backIcon from "../../assets/settings/back-icon.svg";
-import arrowImg from "../../assets/settings/arrow-right.svg";
-import { selectLanguage } from "../../features/settings/LanguageSlice";
-import { propsType } from "../../types/settingTypes";
 
-const General = ({ view, setView }: propsType) => {
+import { Box, Button, Divider, Stack } from "@mui/material";
+
+import { getLanguageSetting } from "../../store/LanguageSettingSlice";
+
+import { ILanguageSetting } from "../../types/SettingTypes";
+
+import backIcon from "../../assets/setting/BackIcon.svg";
+import arrowImg from "../../assets/setting/ArrowRight.svg";
+
+export interface IPropsGeneral {
+  view: string;
+  setView: (_: string) => void;
+}
+
+const General = ({ view, setView }: IPropsGeneral) => {
   const { t } = useTranslation();
-  const language = useSelector(selectLanguage);
+  const languageSettingStore: ILanguageSetting = useSelector(getLanguageSetting);
 
   return (
     <>
@@ -30,8 +39,8 @@ const General = ({ view, setView }: propsType) => {
                 </Stack>
                 <Stack direction={"row"} justifyContent={"flex-end"} textAlign={"center"} gap={1}>
                   <Box className="fs-16-regular center-align gray">
-                    {language == "en" && t("set-9_english")}
-                    {language == "jp" && t("set-17_japanese")}
+                    {languageSettingStore?.lang == "en" && t("set-9_english")}
+                    {languageSettingStore?.lang == "jp" && t("set-17_japanese")}
                   </Box>
                   <Box className="center-align">
                     <img src={arrowImg} />
@@ -57,15 +66,6 @@ const General = ({ view, setView }: propsType) => {
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"15px"}>
                 <Box className="fs-h4 white">{t("set-11_notifications")}</Box>
-                <Box className="center-align">
-                  <img src={arrowImg} />
-                </Box>
-              </Stack>
-            </Button>
-            <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
-            <Button className="common-btn" onClick={() => setView("chat")}>
-              <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"15px"}>
-                <Box className="fs-h4 white">{t("set-12_chat")}</Box>
                 <Box className="center-align">
                   <img src={arrowImg} />
                 </Box>

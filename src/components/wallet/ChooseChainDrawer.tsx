@@ -1,30 +1,21 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { supportChains } from "../../consts/SupportTokens";
-import { currencySymbols } from "../../consts/SupportCurrency";
+import { Box, SwipeableDrawer, Stack, Button, Divider } from "@mui/material";
 
-import { SwipeableDrawer, Box, Stack, Divider, IconButton, Button } from "@mui/material";
-import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import ChainBox from "../home/ChainBox";
 
-import Loading from "../../components/Loading";
+import { CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
+
+import { setCurrentChain } from "../../store/CurrentChainSlice";
+
+import { ISupportChain } from "../../types/ChainTypes";
 
 import SettingStyle from "../../styles/SettingStyle";
 
-import { getWallet } from "../../features/wallet/WalletSlice";
-import { getBalanceList } from "../../features/wallet/BalanceListSlice";
-import { getPriceList } from "../../features/wallet/PriceListSlice";
-import { getCurrencyList } from "../../features/wallet/CurrencyListSlice";
-import { getCurrentCurrency } from "../../features/wallet/CurrentCurrencySlice";
-import { getCurrentChain, setCurrentChain } from "../../features/wallet/CurrentChainSlice";
-
-import { IBalanceList, ICurrencyList, ICurrentChain, ICurrentCurrency, IPriceList, IWallet } from "../../types/walletTypes";
-
-import { formatBalance } from "../../lib/helper";
-import { getCurrentChainWalletAddress, getTokenBalanceBySymbol, getTokenPriceByCmc } from "../../lib/helper/WalletHelper";
-
-import closeImg from "../../assets/settings/collaps-close-btn.svg";
+import closeImg from "../../assets/setting/CollapsCloseBtn.svg";
+import backIcon from "../../assets/setting/BackIcon.svg";
 
 type Anchor = "right";
 
@@ -38,20 +29,6 @@ const ChooseChainDrawer = ({ view, setView }: IPropsChooseChainDrawer) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  const walletStore: IWallet = useSelector(getWallet);
-  const balanceListStore: IBalanceList = useSelector(getBalanceList);
-  const priceListStore: IPriceList = useSelector(getPriceList);
-  const currencyListStore: ICurrencyList = useSelector(getCurrencyList);
-  const currentCurrencyStore: ICurrentCurrency = useSelector(getCurrentCurrency);
-  const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
-
-  const reserve: number = useMemo(
-    () => currencyListStore?.list?.find((one) => one?.name === currentCurrencyStore?.currency)?.reserve,
-    [currencyListStore, currentCurrencyStore]
-  );
-  const symbol: string = useMemo(() => currencySymbols[currentCurrencyStore?.currency], [currentCurrencyStore]);
-
-  // const [loading, setLoading] = useState<boolean>(false);
   const [state, setState] = useState({ right: false });
 
   const toggleDrawer = (anchor: Anchor, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -62,9 +39,13 @@ const ChooseChainDrawer = ({ view, setView }: IPropsChooseChainDrawer) => {
     setState({ ...state, [anchor]: open });
   };
 
+  const handleChainBoxClick = (one: ISupportChain) => {
+    dispatch(setCurrentChain(one?.native?.name));
+    setView(false);
+  };
+
   return (
     <SwipeableDrawer
-      key={`choose-chain-drawer`}
       anchor="right"
       open={view}
       onClose={() => setView(false)}
@@ -75,70 +56,40 @@ const ChooseChainDrawer = ({ view, setView }: IPropsChooseChainDrawer) => {
           onClick: toggleDrawer("right", false),
         },
       }}
+      sx={{
+        "& .MuiBox-root": {
+          overflow: "auto", // Enable scrolling
+          scrollbarWidth: "none", // Firefox
+          "&::-webkit-scrollbar": {
+            display: "none", // Chrome, Safari
+          },
+        },
+      }}
     >
-      {false && <Loading />}
-      <Box key={`1-box`} className={classname.collaps_pan}>
+      <Box className={classname.collaps_pan}>
         <img src={closeImg} className={classname.close_icon} onClick={() => setView(false)} />
       </Box>
-      <Box key={`2-box`} className={classname.setting_pan}>
-        <Stack direction={"row"} alignItems={"center"} spacing={"16px"} padding={"18px 16px"}>
-          <IconButton
-            className="icon-button"
-            sx={{
-              width: "24px",
-              height: "24px",
-              padding: "4px",
-            }}
-            onClick={() => setView(false)}
-          >
-            <ArrowBackOutlinedIcon className="icon-button" />
-          </IconButton>
-          <Box className="fs-24-bold white">{t("set-5_choose-chain")}</Box>
-        </Stack>
-        <Divider
-          sx={{
-            backgroundColor: "#FFFFFF1A",
-          }}
-        />
-
-        {supportChains?.map((supportChain, index) => (
-          <div key={`${supportChain?.chain?.symbol}-${index}-${index}`}>
-            <Button
-              className={`common-btn ${currentChainStore?.chain === supportChain?.chain?.name ? "active" : null}`}
-              onClick={() => {
-                dispatch(setCurrentChain(supportChain?.chain?.name));
-              }}
-              fullWidth
-            >
-              <Stack direction={"row"} alignItems={"center"} justifyContent={"space-between"} padding={"12px 16px"}>
-                <Stack direction={"row"} alignItems={"center"} spacing={"16px"}>
-                  <Box component={"img"} src={supportChain?.chain?.logo} width="32px" height="32px" />
-                  <Stack>
-                    <Box className="fs-18-regular white">{supportChain?.chain?.name}</Box>
-                    <Box className="fs-12-regular blue">{getCurrentChainWalletAddress(walletStore, supportChain?.chain?.name)}</Box>
-                  </Stack>
-                </Stack>
-                <Stack>
-                  <Box className="fs-18-regular white t-right">
-                    {formatBalance(getTokenBalanceBySymbol(balanceListStore, supportChain?.chain?.symbol) ?? 0, 4)}
-                  </Box>
-                  <Box className="fs-12-regular light t-right">
-                    {`${symbol} ${formatBalance(
-                      Number(getTokenBalanceBySymbol(balanceListStore, supportChain?.chain?.symbol) ?? 0) *
-                        Number(getTokenPriceByCmc(priceListStore, supportChain?.chain?.cmc) ?? 0) *
-                        reserve
-                    )}`}
-                  </Box>
-                </Stack>
-              </Stack>
+      <Box className={classname.setting_pan}>
+        <Stack direction={"column"}>
+          <Stack flexDirection={"row"} justifyContent={"flex-start"} gap={"10px"} alignItems={"center"} textAlign={"center"} sx={{ padding: "20px" }}>
+            <Button className={"setting-back-button"} onClick={() => setView(false)}>
+              <Box component={"img"} src={backIcon}></Box>
             </Button>
-            <Divider
-              sx={{
-                backgroundColor: "#FFFFFF1A",
-              }}
-            />
-          </div>
-        ))}
+            <Box className="fs-h3 white">{t("set-5_choose-chain")}</Box>
+          </Stack>
+          <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
+          <Stack>
+            {CONST_SUPPORT_CHAINS?.map((one, index) => (
+              <ChainBox
+                supportChain={one}
+                key={index}
+                onClick={() => {
+                  handleChainBoxClick(one);
+                }}
+              />
+            ))}
+          </Stack>
+        </Stack>
       </Box>
     </SwipeableDrawer>
   );

@@ -8,72 +8,72 @@ import Arbitrum from "../wallet/Arbitrum";
 import Bitcoin from "../wallet/Bitcoin";
 import Optimism from "../wallet/Optimism";
 
-export type BlockchainKey = "solar" | "bsc" | "eth" | "solana" | "polygon" | "avalanche" | "arbitrum" | "btc" | "op";
+import { CONST_CHAIN_NAMES } from "../../const/ChainConsts";
+import { CONST_CHAIN_SYMBOLS } from "../../const/ChainConsts";
+
+// export type BlockchainKey = "solar" | "bsc" | "eth" | "solana" | "polygon" | "avalanche" | "arbitrum" | "btc" | "op";
 
 const tymtCore = {
-  Launcher: {
-    download: async () => {},
-  },
   Blockchains: {
     solar: {
-      name: "Solar Blockchain",
-      ticker: "SXP",
+      name: CONST_CHAIN_NAMES.SOLAR,
+      symbol: CONST_CHAIN_SYMBOLS.SOLAR,
       wallet: Solar,
       explorer: "https://solarscan.com/wallet/",
       txexplorer: "https://solarscan.com/transaction/",
     },
     bsc: {
-      name: "Binance",
-      ticker: "BNB",
+      name: CONST_CHAIN_NAMES.BINANCE,
+      symbol: CONST_CHAIN_SYMBOLS.BINANCE,
       wallet: BSC,
       explorer: "https://bscscan.com/address/",
       txexplorer: "https://bscscan.com/tx/",
     },
     eth: {
-      name: "Ethereum",
-      ticker: "ETH",
+      name: CONST_CHAIN_NAMES.ETHEREUM,
+      symbol: CONST_CHAIN_SYMBOLS.ETHEREUM,
       wallet: Ethereum,
       explorer: "https://etherscan.io/address/",
       txexplorer: "https://etherscan.io/tx/",
     },
     btc: {
-      name: "Bitcoin",
-      ticker: "BTC",
+      name: CONST_CHAIN_NAMES.BITCOIN,
+      symbol: CONST_CHAIN_SYMBOLS.BITCOIN,
       wallet: Bitcoin,
       explorer: "https://www.blockchain.com/explorer/addresses/btc/",
       txexplorer: "https://www.blockchain.com/explorer/transactions/btc/",
     },
     solana: {
-      name: "Solana",
-      ticker: "SOL",
+      name: CONST_CHAIN_NAMES.SOLANA,
+      symbol: CONST_CHAIN_SYMBOLS.SOLANA,
       wallet: Solana,
       explorer: "https://solscan.io/account/",
       txexplorer: "https://solscan.io/tx/",
     },
     polygon: {
-      name: "Polygon",
-      ticker: "MATIC",
+      name: CONST_CHAIN_NAMES.POLYGON,
+      symbol: CONST_CHAIN_SYMBOLS.POLYGON,
       wallet: Polygon,
       explorer: "https://polygonscan.com/address/",
       txexplorer: "https://polygonscan.com/tx/",
     },
     avalanche: {
-      name: "Avalanche C-Chain",
-      ticker: "AVAX",
+      name: CONST_CHAIN_NAMES.AVALANCHE,
+      symbol: CONST_CHAIN_SYMBOLS.AVALANCHE,
       wallet: Avalanche,
       explorer: "https://avascan.info/blockchain/c/address/",
       txexplorer: "https://avascan.info/blockchain/c/tx/",
     },
     arbitrum: {
-      name: "Arbitrum One",
-      ticker: "ETH",
+      name: CONST_CHAIN_NAMES.ARBITRUM,
+      symbol: CONST_CHAIN_SYMBOLS.ARBITRUM,
       wallet: Arbitrum,
       explorer: "https://arbiscan.io/address/",
       txexplorer: "https://arbiscan.io/tx/",
     },
     op: {
-      name: "Optimism",
-      ticker: "ETH",
+      name: CONST_CHAIN_NAMES.OPTIMISM,
+      symbol: CONST_CHAIN_SYMBOLS.OPTIMISM,
       wallet: Optimism,
       explorer: "https://optimistic.etherscan.io/address/",
       txexplorer: "https://optimistic.etherscan.io/tx/",

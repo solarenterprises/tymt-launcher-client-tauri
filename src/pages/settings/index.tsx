@@ -6,7 +6,6 @@ import Main from "./Main";
 import Chain from "./Chain";
 import General from "./General";
 import Language from "./Language";
-import Chat from "./Chat";
 import Message from "./Message";
 import Friend from "./Friend";
 import Wallet from "./Wallet";
@@ -24,13 +23,16 @@ import ChooseProfile from "./ChooseProfile";
 
 import SettingStyle from "../../styles/SettingStyle";
 
-import { propsSettingType } from "../../types/settingTypes";
-
-import closeImg from "../../assets/settings/collaps-close-btn.svg";
+import closeImg from "../../assets/setting/CollapsCloseBtn.svg";
 
 type Anchor = "right";
 
-const Settings = ({ view, setView }: propsSettingType) => {
+export interface IPropsSettings {
+  view: boolean;
+  setView: (_: boolean) => void;
+}
+
+const Settings = ({ view, setView }: IPropsSettings) => {
   const classname = SettingStyle();
   const [state, setState] = useState({ right: false });
   const [panel, setPanel] = useState("main");
@@ -56,6 +58,15 @@ const Settings = ({ view, setView }: propsSettingType) => {
           onClick: toggleDrawer("right", false),
         },
       }}
+      sx={{
+        "& .MuiBox-root": {
+          overflow: "auto", // Enable scrolling
+          scrollbarWidth: "none", // Firefox
+          "&::-webkit-scrollbar": {
+            display: "none", // Chrome, Safari
+          },
+        },
+      }}
     >
       <Box className={classname.collaps_pan}>
         <img src={closeImg} className={classname.close_icon} onClick={() => setView(false)} />
@@ -65,7 +76,6 @@ const Settings = ({ view, setView }: propsSettingType) => {
         <Chain view={panel} setView={setPanel} />
         <General view={panel} setView={setPanel} />
         <Language view={panel} setView={setPanel} />
-        <Chat view={panel} setView={setPanel} />
         <Message view={panel} setView={setPanel} />
         <Friend view={panel} setView={setPanel} />
         <Wallet view={panel} setView={setPanel} />

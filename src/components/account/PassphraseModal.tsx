@@ -1,17 +1,21 @@
-import { Box, Stack, Modal, Fade } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import closeIcon from "../../assets/settings/x-icon.svg";
-import encryptIcon from "../../assets/account/encrypt-icon.svg";
-import infoIcon from "../../assets/account/info-icon.svg";
-import benefitImg from "../../assets/account/benefit.svg";
+
+import { Box, Stack, Modal, Fade } from "@mui/material";
+
+import closeIcon from "../../assets/setting/XIcon.svg";
+import encryptIcon from "../../assets/account/EncryptIcon.svg";
+import infoIcon from "../../assets/account/InfoIcon.svg";
+import benefitImg from "../../assets/account/Benefit.svg";
 
 export interface IPropsPassphraseModal {
   open: boolean;
   setOpen: (_: boolean) => void;
+  passphrase: string;
+  password: string;
 }
 
-const PassphraseModal = ({ open, setOpen }: IPropsPassphraseModal) => {
+const PassphraseModal = ({ open, setOpen, passphrase, password }: IPropsPassphraseModal) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const modalStyle = {
@@ -36,6 +40,10 @@ const PassphraseModal = ({ open, setOpen }: IPropsPassphraseModal) => {
             backdropFilter: "blur(10px)",
             maxHeight: "80%",
             overflowY: "auto",
+            scrollbarWidth: "none", // For Firefox
+            "&::-webkit-scrollbar": {
+              display: "none", // For Chrome, Safari, and Edge
+            },
           }}
         >
           <img src={closeIcon} alt="close icon" className="close-icon" onClick={() => setOpen(false)} />
@@ -64,7 +72,15 @@ const PassphraseModal = ({ open, setOpen }: IPropsPassphraseModal) => {
                 <Box className="fs-14-light light">{`• ${t("ncca-28_storing-your-key")}`}</Box>
               </Stack>
             </Stack>
-            <Box onClick={() => navigate("/non-custodial/signup/3")} className="action-btn fs-18-light blue center-align" sx={{ minWidth: "100%" }}>
+            <Box
+              onClick={() =>
+                navigate("/non-custodial-signup-3", {
+                  state: { passphrase: passphrase, password: password }, // Pass the passphrase here
+                })
+              }
+              className="action-btn fs-18-light blue center-align"
+              sx={{ minWidth: "100%" }}
+            >
               {t("wc-26_got-it")}
             </Box>
           </Stack>

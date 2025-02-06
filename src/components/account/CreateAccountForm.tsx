@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
@@ -11,16 +9,10 @@ import { Box, Stack } from "@mui/material";
 import AccountNextButton from "./AccountNextButton";
 import InputText from "./InputText";
 import IAgreeTerms from "./IAgreeTerms";
-import { IAccount } from "../../types/accountTypes";
-
-import { getTempAccount, setTempAccount } from "../../features/account/TempAccountSlice";
 
 const CreateAccountForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const tempAccountStore: IAccount = useSelector(getTempAccount);
 
   const [checked, setChecked] = useState<boolean>(false);
 
@@ -31,7 +23,7 @@ const CreateAccountForm = () => {
     },
     validationSchema: Yup.object({
       password: Yup.string()
-        .test("password-requirements", t("cca-66_password-must-be"), (value) => {
+        .test("password-requirements", t("cca-66_password-must-be"), (value: string) => {
           if (!value) {
             return false;
           }
@@ -53,12 +45,9 @@ const CreateAccountForm = () => {
     onSubmit: () => {
       try {
         const newPassword = formik.values.password;
-        const newTempAccountStore: IAccount = {
-          ...tempAccountStore,
-          password: newPassword,
-        };
-        dispatch(setTempAccount(newTempAccountStore));
-        navigate("/non-custodial/signup/2");
+        navigate("/non-custodial-signup-2", {
+          state: { password: newPassword },
+        });
       } catch (err) {
         // console.log("Failed at CreateAccountForm: ", err);
       }

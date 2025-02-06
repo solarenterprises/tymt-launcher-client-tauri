@@ -1,12 +1,12 @@
 import { Box, Stack } from "@mui/material";
 
-interface props {
+interface IPropsMnemonicWord {
   number?: string;
   word?: string;
   focus?: boolean;
 }
 
-const MnemonicWord = ({ number, word, focus }: props) => {
+const MnemonicWord = ({ number, word, focus }: IPropsMnemonicWord) => {
   return (
     <Box
       className={focus ? "mnemonic-word-box-focus" : "mnemonic-word-box"}

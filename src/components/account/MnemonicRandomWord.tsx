@@ -1,45 +1,21 @@
-import { useSelector, useDispatch } from "react-redux";
-import { getThreeConfirm, setThreeConfirm } from "../../features/account/ThreeConfirmSlice";
 import { Box, Stack } from "@mui/material";
-import { threeConfirmType } from "../../types/accountTypes";
 
 interface props {
   number?: string;
   word?: string;
+  confirmedPassphrase: string[];
+  setConfirmedPassphrase: (_: string[]) => void;
+  selectedInput: number;
+  setSelectedInput: (_: number) => void;
 }
 
-const MnemonicRandomWord = ({ number, word }: props) => {
-  const dispatch = useDispatch();
-  const threeConfirmStore: threeConfirmType = useSelector(getThreeConfirm);
+const MnemonicRandomWord = ({ number, word, confirmedPassphrase, setConfirmedPassphrase, selectedInput, setSelectedInput }: props) => {
   return (
     <Box
       className="mnemonic-word-box"
       onClick={() => {
-        threeConfirmStore.focus === 1
-          ? dispatch(
-              setThreeConfirm({
-                ...threeConfirmStore,
-                first: word,
-                focus: 2,
-              })
-            )
-          : threeConfirmStore.focus === 2
-          ? dispatch(
-              setThreeConfirm({
-                ...threeConfirmStore,
-                second: word,
-                focus: 3,
-              })
-            )
-          : threeConfirmStore.focus === 3
-          ? dispatch(
-              setThreeConfirm({
-                ...threeConfirmStore,
-                third: word,
-                focus: 0,
-              })
-            )
-          : {};
+        setConfirmedPassphrase(confirmedPassphrase.map((_, index) => (index === selectedInput - 1 ? word : confirmedPassphrase[index])));
+        setSelectedInput(selectedInput + 1 > 3 ? 3 : selectedInput + 1);
       }}
     >
       <Stack

@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { BasicGameList } from "../../lib/game/BasicGameList";
+import { CONST_GAME_LIST } from "../../const/games/GameConsts";
 
 import { Grid, Box, Stack } from "@mui/material";
 
-import StoreGameCard from "../store/StoreGameCard";
-import AnimatedComponent from "../AnimatedComponent";
+import AnimatedComponent from "../home/AnimatedComponent";
+import StoreGameCard from "../game/StoreGameCard";
 
 import { isInstalled } from "../../lib/helper/DownloadHelper";
 
-import NoGamePng from "../../assets/main/nogames.png";
+import NoGamePng from "../../assets/main/NoGames.png";
 
 import { IGame, IGameList } from "../../types/GameTypes";
 import { useSelector } from "react-redux";
-import { getGameList } from "../../features/store/GameListSlice";
+import { getGameList } from "../../store/GameListSlice";
 
 export interface IPropsLibraryShow {
   status: number;
@@ -26,7 +26,7 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
   const gameListStore: IGameList = useSelector(getGameList);
 
   const activeGameList: IGame[] = useMemo(() => gameListStore?.games?.filter((one) => one?.visibilityState === "active"), [gameListStore]);
-  const displayGameList: IGame[] = useMemo(() => [...BasicGameList, ...activeGameList], [activeGameList, BasicGameList]);
+  const displayGameList: IGame[] = useMemo(() => [...CONST_GAME_LIST, ...activeGameList], [activeGameList, CONST_GAME_LIST]);
 
   const [installedList, setInstalledList] = useState<IGame[]>([]);
 

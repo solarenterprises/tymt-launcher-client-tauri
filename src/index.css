@@ -1,0 +1,106 @@
+@font-face {
+  font-family: "Cobe";
+  src: url("./fonts/Cobe/Cobe-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Cobe-Bold";
+  src: url("./fonts/Cobe/Cobe-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Cobe-Extra-Bold-Italic";
+  src: url("./fonts/Cobe/Cobe-Extra-Bold-Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Cobe-Italic";
+  src: url("./fonts/Cobe/Cobe-Italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Cobe-Heavy-Italic";
+  src: url("./fonts/Cobe/Cobe-Heavy-Italic.ttf") format("truetype");
+}
+
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: "Cobe"; */
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: #0f0f0f;
+  /* background-color: #f6f6f6; */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --tymt-red: #ef4444;
+  --tymt-blue: #52e1f2;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: auto;
+  overflow: hidden;
+  background-color: black;
+  /* max-width: 38rem; */
+  /* padding: 2rem; */
+}
+
+.splash-logo {
+  position: absolute;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+.red-blur {
+  position: absolute;
+  bottom: -8vw;
+  left: -8vw;
+  width: 37.5vw;
+  height: 37.5vw;
+  filter: blur(5vw);
+  background: radial-gradient(circle at 50% 50%, var(--tymt-red), #00000000);
+  animation: blink 1s infinite 0.3s;
+}
+
+.blue-blur {
+  position: absolute;
+  top: -8vw;
+  right: -8vw;
+  width: 37.5vw;
+  height: 37.5vw;
+  filter: blur(5vw);
+  background: radial-gradient(circle at 50% 50%, var(--tymt-blue), #00000000);
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.basic-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background: linear-gradient(180deg, #0e1e20 0%, #0b0b0b 100%);
+}

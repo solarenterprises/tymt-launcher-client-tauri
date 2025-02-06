@@ -1,5 +1,5 @@
 import { Button, Grid, Box } from "@mui/material";
-import property from "../../assets/main/property.png";
+import property from "../../assets/main/Property.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 

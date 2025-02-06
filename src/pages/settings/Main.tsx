@@ -1,96 +1,52 @@
-import { Box, Button, Divider, Stack, Tooltip } from "@mui/material";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useCallback, useMemo } from "react";
 import numeral from "numeral";
 
-import { currencySymbols } from "../../consts/SupportCurrency";
-import { supportChains } from "../../consts/SupportTokens";
+import { Box, Button, Divider, Stack, Tooltip } from "@mui/material";
+
+import { useWallet } from "../../providers/WalletProvider";
 
 import Avatar from "../../components/home/Avatar";
 
-import { selectNotification } from "../../features/settings/NotificationSlice";
-import { getMyInfo } from "../../features/account/MyInfoSlice";
-import { getCurrencyList } from "../../features/wallet/CurrencyListSlice";
-import { getCurrentCurrency } from "../../features/wallet/CurrentCurrencySlice";
-import { getCurrentChain } from "../../features/wallet/CurrentChainSlice";
-import { getBalanceList } from "../../features/wallet/BalanceListSlice";
-import { getPriceList } from "../../features/wallet/PriceListSlice";
-import { getWallet } from "../../features/wallet/WalletSlice";
+import { getAccount } from "../../store/AccountSlice";
 
-import { getExplorerUrl } from "../../lib/helper";
-import { openLink } from "../../lib/helper/DownloadHelper";
-import { getCurrentChainWalletAddress } from "../../lib/helper/WalletHelper";
+import { IAccount } from "../../types/AccountTypes";
 
 import SettingStyle from "../../styles/SettingStyle";
 
-import settingImg from "../../assets/settings/setting-icon1.svg";
-import walletImg from "../../assets/settings/wallet-icon.svg";
-import arrowImg from "../../assets/settings/arrow-right.svg";
-import copyIcon from "../../assets/settings/copy-icon.svg";
-import searchIcon from "../../assets/settings/search-icon.svg";
-import exitIcon from "../../assets/settings/exit-icon.svg";
+import settingImg from "../../assets/setting/SettingIcon1.svg";
+import walletImg from "../../assets/setting/WalletIcon.svg";
+import arrowImg from "../../assets/setting/ArrowRight.svg";
+import copyIcon from "../../assets/setting/CopyIcon.svg";
+import searchIcon from "../../assets/setting/SearchIcon.svg";
+import exitIcon from "../../assets/setting/ExitIcon.svg";
 
-import { IMyInfo } from "../../types/chatTypes";
-import { notificationType, propsType } from "../../types/settingTypes";
-import { IBalanceList, ICurrencyList, ICurrentChain, ICurrentCurrency, IPriceList, ISupportChain, IWallet } from "../../types/walletTypes";
+export interface IPropsMain {
+  view: string;
+  setView: (_: string) => void;
+}
 
-const Main = ({ view, setView }: propsType) => {
+const Main = ({ view, setView }: IPropsMain) => {
   const classname = SettingStyle();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const {
+    currentSupportChain,
+    currentChainWalletAddress,
+    currentChainExplorerUrl,
+    currentChainNativeBalance,
+    currentChainNativePrice,
+    currentCurrencySymbol,
+    totalBalance,
+  } = useWallet();
 
-  const currencyListStore: ICurrencyList = useSelector(getCurrencyList);
-  const currentCurrencyStore: ICurrentCurrency = useSelector(getCurrentCurrency);
-  const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
-  const notificationStore: notificationType = useSelector(selectNotification);
-  const myInfoStore: IMyInfo = useSelector(getMyInfo);
-  const walletStore: IWallet = useSelector(getWallet);
-  const balanceListStore: IBalanceList = useSelector(getBalanceList);
-  const priceListStore: IPriceList = useSelector(getPriceList);
-
-  const reserve: number = useMemo(
-    () => currencyListStore?.list?.find((one) => one?.name === currentCurrencyStore?.currency)?.reserve,
-    [currencyListStore, currentCurrencyStore]
-  );
-  const symbol: string = useMemo(() => currencySymbols[currentCurrencyStore?.currency], [currentCurrencyStore]);
-  const currentChainInfo: ISupportChain = useMemo(() => supportChains?.find((one) => one?.chain?.name === currentChainStore?.chain), [currentChainStore]);
-  const currentChainWalletAddress: string = useMemo(
-    () => getCurrentChainWalletAddress(walletStore, currentChainStore?.chain),
-    [walletStore, currentChainStore]
-  );
-  const currentChainNativeBalance = useMemo(
-    () => balanceListStore?.list?.find((one) => one?.symbol === currentChainInfo?.chain?.symbol)?.balance,
-    [balanceListStore, currentChainInfo]
-  );
-  const currentChainNativePrice = useMemo(
-    () => priceListStore?.list?.find((one) => one?.cmc === currentChainInfo?.chain?.cmc)?.price,
-    [priceListStore, currentChainInfo]
-  );
-  const totalBalance = useMemo(() => {
-    let total = 0;
-
-    for (const supportChain of supportChains ?? []) {
-      const nativeBalance = balanceListStore?.list?.find((one) => one?.symbol === supportChain?.chain?.symbol)?.balance;
-      const nativePrice = priceListStore?.list?.find((one) => one?.cmc === supportChain?.chain?.cmc)?.price;
-      total += (nativeBalance ?? 0) * (nativePrice ?? 0);
-
-      for (const token of supportChain?.tokens ?? []) {
-        const tokenBalance = balanceListStore?.list?.find((one) => one?.symbol === token?.symbol)?.balance;
-        const tokenPrice = priceListStore?.list?.find((one) => one?.cmc === token?.cmc)?.price;
-        total += (tokenBalance ?? 0) * (tokenPrice ?? 0);
-      }
-    }
-
-    const res = total * reserve;
-    return res;
-  }, [balanceListStore, priceListStore, reserve]);
+  const accountStore: IAccount = useSelector(getAccount);
 
   const handleExplorer = useCallback(() => {
-    const url = getExplorerUrl(currentChainInfo, walletStore);
-    openLink(url);
-  }, [currentChainInfo]);
+    // ElectronAPI.openExternalLink(currentChainExplorerUrl);
+  }, [currentChainExplorerUrl]);
 
   return (
     <>
@@ -110,11 +66,11 @@ const Main = ({ view, setView }: propsType) => {
           >
             <Box sx={{ display: "flex", gap: "10px" }}>
               <Box className="center-align">
-                <Avatar onlineStatus={true} url={myInfoStore?.avatar} size={60} status={!notificationStore.alert ? "donotdisturb" : "online"} />
+                <Avatar onlineStatus={true} url={accountStore?.avatar} size={60} status={"active"} />
               </Box>
               <Box className="center-align" sx={{ flexDirection: "column", alignItems: "flex-start" }}>
                 <Box className="fs-14-light white">{t("set-1_welcome")}</Box>
-                <Box className="fs-h4 white">{myInfoStore?.nickName}</Box>
+                <Box className="fs-h4 white">{accountStore?.nickname}</Box>
               </Box>
               <Box component={"img"} src={arrowImg} />
             </Box>
@@ -133,18 +89,24 @@ const Main = ({ view, setView }: propsType) => {
             </Box>
           </Box>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
-          <Button onClick={() => setView("chain")} className="center-align common-btn">
+          <Button
+            onClick={() => setView("chain")}
+            className="center-align common-btn"
+            sx={{
+              padding: "16px 16px",
+            }}
+          >
             <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} alignItems={"center"}>
               <Box className="center-align" sx={{ gap: "10px" }}>
                 <Box className="center-align" sx={{ position: "relative" }}>
                   <img src={walletImg} />
                   <img
-                    src={currentChainInfo?.chain?.logo}
+                    src={currentSupportChain?.native?.logo}
                     style={{
                       position: "absolute",
-                      right: "-5px",
-                      bottom: "-5px",
-                      width: "25px",
+                      right: "0px",
+                      bottom: "0px",
+                      width: "20px",
                     }}
                   />
                 </Box>
@@ -156,11 +118,11 @@ const Main = ({ view, setView }: propsType) => {
                     marginLeft: "10px",
                   }}
                 >
-                  <Box className="fs-14-light gray">{t("set-3_connected-method")}:</Box>
-                  <Box className="fs-14-light white">{t("wc-12_non-custodial-wallet")}</Box>
+                  <Box className="fs-14-light gray">{t("set-3_connected-chain")}:</Box>
+                  <Box className="fs-14-light white">{currentSupportChain?.native?.name}</Box>
                 </Box>
               </Box>
-              <Box>
+              <Box className="center-align">
                 <img src={arrowImg} />
               </Box>
             </Stack>
@@ -179,14 +141,11 @@ const Main = ({ view, setView }: propsType) => {
                 <Box className="fs-14-light gray">{t("set-2_connected-wallet-address")}:</Box>
                 <Box className="fs-14-light blue">{currentChainWalletAddress ?? ""}</Box>
                 <Box className="fs-14-light gray">
-                  {`${t("set-4_balance")} ${numeral(currentChainNativeBalance ?? 0).format("0,0.0000")} ${currentChainInfo?.chain?.symbol} (${numeral(
+                  {`${t("set-4_balance")} ${numeral(currentChainNativeBalance ?? 0).format("0,0.0000")} ${currentSupportChain?.native?.symbol} (${numeral(
                     (currentChainNativeBalance ?? 0) * (currentChainNativePrice ?? 0)
-                  ).format("0,0.00")} ${symbol})`}
+                  ).format("0,0.00")} ${currentCurrencySymbol})`}
                 </Box>
-                <Box className="fs-14-light gray">{`${t("set-88_total_balance")} ${numeral(totalBalance).format("0,0.00")} ${symbol}`}</Box>
-              </Box>
-              <Box className="center-align">
-                <img src={arrowImg} />
+                <Box className="fs-14-light gray">{`${t("set-88_total_balance")} ${numeral(totalBalance).format("0,0.00")} ${currentCurrencySymbol}`}</Box>
               </Box>
             </Box>
             <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
@@ -205,7 +164,7 @@ const Main = ({ view, setView }: propsType) => {
                   </Box>
                 </Tooltip>
               </Button>
-              <Button className="tooltip-btn" onClick={() => navigate("/start")}>
+              <Button className="tooltip-btn" onClick={() => navigate("/welcome")}>
                 <Tooltip title={t("set-81_disconnect")} classes={{ tooltip: classname.tooltip }}>
                   <Box className="center-align">
                     <img src={exitIcon} />

@@ -98,7 +98,6 @@ const SettingStyle = makeStyles({
   },
   main_container: {
     display: "flex",
-    gap: "16px",
     borderRadius: "24px",
     margin: "16px",
     flexDirection: "column",
@@ -109,7 +108,7 @@ const SettingStyle = makeStyles({
     justifyContent: "space-between",
     textAlign: "center",
     alignItems: "center",
-    padding: "15px",
+    padding: "32px 16px",
   },
   wallet_pad: {
     display: "flex",

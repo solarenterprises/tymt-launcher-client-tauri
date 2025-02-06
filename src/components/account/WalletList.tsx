@@ -1,18 +1,21 @@
 import { Grid } from "@mui/material";
+
 import WalletBar from "./WalletBar";
-import solar from "../../assets/chains/solar.png";
-import binance from "../../assets/chains/binance.png";
-import ethereum from "../../assets/chains/ethereum.png";
-import bitcoin from "../../assets/chains/bitcoin.png";
-import solana from "../../assets/chains/solana.png";
-import polygon from "../../assets/chains/polygon.png";
-import avalanche from "../../assets/chains/avalanche.png";
-import arbitrumOne from "../../assets/chains/arbitrumOne.png";
-import optimism from "../../assets/chains/optimism.png";
-import { IWallet } from "../../types/walletTypes";
+
+import { IWalletAddresses } from "../../types/WalletTypes";
+
+import solar from "../../assets/chain/Solar.svg";
+import binance from "../../assets/chain/Binance.svg";
+import ethereum from "../../assets/chain/Ethereum.svg";
+import bitcoin from "../../assets/chain/Bitcoin.svg";
+import solana from "../../assets/chain/Solana.svg";
+import polygon from "../../assets/chain/Polygon.svg";
+import avalanche from "../../assets/chain/Avalanche.svg";
+import arbitrumOne from "../../assets/chain/Arbitrum.svg";
+import optimism from "../../assets/chain/Optimism.svg";
 
 export interface IPropsWalletList {
-  wallet: IWallet;
+  wallet: IWalletAddresses;
 }
 
 const WalletList = ({ wallet }: IPropsWalletList) => {

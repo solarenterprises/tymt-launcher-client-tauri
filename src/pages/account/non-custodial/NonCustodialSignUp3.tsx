@@ -1,75 +1,57 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSelector, useDispatch } from "react-redux";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { getThreeConfirm } from "../../../features/account/ThreeConfirmSlice";
-import { setThreeConfirm } from "../../../features/account/ThreeConfirmSlice";
+import { useState, useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+
 import { Grid, Box, Stack } from "@mui/material";
+
 import Back from "../../../components/account/Back";
 import AccountHeader from "../../../components/account/AccountHeader";
 import AccountNextButton from "../../../components/account/AccountNextButton";
 import Stepper from "../../../components/account/Stepper";
 import MnemonicRandomPad from "../../../components/account/MnemonicRandomPad";
 import MnemonicConfirm from "../../../components/account/MnemonicConfirm";
-// import { getTempAddressesFromMnemonicAsync } from "../../../features/wallet/TempMultiWalletSlice";
+
+import { getAccountList } from "../../../store/AccountListSlice";
+
+import { IAccountList } from "../../../types/AccountTypes";
+
 import tymt3 from "../../../assets/account/tymt3.png";
-import "../../../global.css";
-import { IAccount, threeConfirmType } from "../../../types/accountTypes";
-import { AppDispatch } from "../../../store";
-import { motion } from "framer-motion";
-import { getTempAccount, setTempAccount } from "../../../features/account/TempAccountSlice";
-import { getWalletAddressFromPassphrase } from "../../../lib/helper/WalletHelper";
-import { setTempWallet } from "../../../features/wallet/TempWalletSlice";
 
 const NonCustodialSignUp3 = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
-  const dispatch = useDispatch<AppDispatch>();
 
-  const threeConfirmStore: threeConfirmType = useSelector(getThreeConfirm);
-  const tempAccountStore: IAccount = useSelector(getTempAccount);
+  const { passphrase, password } = location.state || {}; // Destructure the variable
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [confirmedPassphrase, setConfirmedPassphrase] = useState<string[]>(["", "", ""]);
+  const [selectedInput, setSelectedInput] = useState<number>(1);
 
-  const mnemonic = useMemo(() => tempAccountStore?.mnemonic?.split(" "), [tempAccountStore]);
-  const compare = useMemo(() => {
-    if (threeConfirmStore?.first === mnemonic[2] && threeConfirmStore?.second === mnemonic[5] && threeConfirmStore?.third === mnemonic[8]) return true;
-    return false;
-  }, [mnemonic, threeConfirmStore]);
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
-  const handleBackClick = () => {
-    navigate("/start");
-  };
+  const splitPassphrase = useMemo<string[]>(() => passphrase?.split(" ") ?? [], [passphrase]);
+  const passphraseIsConfirmed = useMemo<boolean>(
+    () => confirmedPassphrase[0] === splitPassphrase[2] && confirmedPassphrase[1] === splitPassphrase[5] && confirmedPassphrase[2] === splitPassphrase[8],
+    [passphrase, confirmedPassphrase]
+  );
+
+  const handleBackClick = useCallback(() => {
+    accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
+  }, [accountListStore]);
 
   const handleNextClick = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getWalletAddressFromPassphrase(tempAccountStore?.mnemonic);
-      dispatch(setTempWallet(res));
-      dispatch(
-        setTempAccount({
-          ...tempAccountStore,
-          sxpAddress: res?.solar,
-        })
-      );
-      navigate("/non-custodial/signup/4");
+      navigate("/non-custodial-signup-4/signup", { state: { passphrase: passphrase, password: password } });
       setLoading(false);
     } catch (err) {
-      // console.log("Failed to handleNextClick: ", err);
+      console.error("Failed to handleNextClick: ", err);
       setLoading(false);
     }
-  }, [tempAccountStore]);
-
-  useEffect(() => {
-    dispatch(
-      setThreeConfirm({
-        first: "",
-        second: "",
-        third: "",
-        focus: 1,
-      })
-    );
-  }, []);
+  }, [passphrase]);
 
   return (
     <>
@@ -103,15 +85,21 @@ const NonCustodialSignUp3 = () => {
                       <AccountHeader title={t("ncca-13_secure-passphrase")} text={t("ncca-14_here-your-mnemonic")} />
                     </Grid>
                     <Grid item xs={12} mt={"48px"}>
-                      <MnemonicConfirm />
+                      <MnemonicConfirm confirmedPassphrase={confirmedPassphrase} selectedInput={selectedInput} setSelectedInput={setSelectedInput} />
                     </Grid>
                     <Grid item xs={12} mt={"40px"}>
-                      <MnemonicRandomPad passphrase={tempAccountStore?.mnemonic} />
+                      <MnemonicRandomPad
+                        passphrase={passphrase}
+                        confirmedPassphrase={confirmedPassphrase}
+                        setConfirmedPassphrase={setConfirmedPassphrase}
+                        selectedInput={selectedInput}
+                        setSelectedInput={setSelectedInput}
+                      />
                     </Grid>
                     <Grid item xs={12} mt={"48px"}>
                       <AccountNextButton
                         text={t("ncca-44_verify-and-complete")}
-                        disabled={loading || threeConfirmStore?.first === "" || threeConfirmStore?.second === "" || threeConfirmStore?.third === "" || !compare}
+                        disabled={loading || !confirmedPassphrase[0] || !confirmedPassphrase[1] || !confirmedPassphrase[2] || !passphraseIsConfirmed}
                         loading={loading}
                         onClick={handleNextClick}
                       />

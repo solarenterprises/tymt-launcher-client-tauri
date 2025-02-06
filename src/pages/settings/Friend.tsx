@@ -1,23 +1,26 @@
 import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import backIcon from "../../assets/settings/back-icon.svg";
-import checkImg from "../../assets/settings/check-icon.svg";
-import { selectChat, setChat } from "../../features/settings/ChatSlice";
-import { propsType, chatType } from "../../types/settingTypes";
+import { FC } from "react";
+import backIcon from "../../assets/setting/BackIcon.svg";
+// import { selectChat, setChat } from "../../features/settings/ChatSlice";
+// import { chatType } from "../../types/settingTypes";
 
-const Friend = ({ view, setView }: propsType) => {
+interface IPropsFriend {
+  view: string;
+  setView: (panel: string) => void;
+}
+
+const Friend: FC<IPropsFriend> = ({ view, setView }) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
-  const data: chatType = useSelector(selectChat);
-  const setFriend = useCallback(
-    (item: string) => {
-      let updateData = { ...data, friend: item };
-      dispatch(setChat(updateData));
-    },
-    [data]
-  );
+  // const data: chatType = useSelector(selectChat);
+  // const setFriend = useCallback(
+  //   (item: string) => {
+  //     let updateData = { ...data, friend: item };
+  //     dispatch(setChat(updateData));
+  //   },
+  //   [data]
+  // );
+
   return (
     <>
       {view === "friend" && (
@@ -34,12 +37,12 @@ const Friend = ({ view, setView }: propsType) => {
               className="common-btn"
               sx={{ padding: "20px" }}
               onClick={() => {
-                setFriend("anyone");
+                // setFriend("anyone");
               }}
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
                 <Box className="fs-h4 white">{t("set-23_anyone")}</Box>
-                <Box className="center-align">{data.friend == "anyone" && <img src={checkImg} />}</Box>
+                <Box className="center-align">{/* {data.friend == "anyone" && <img src={checkImg} />} */}</Box>
               </Stack>
             </Button>
             <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
@@ -47,12 +50,12 @@ const Friend = ({ view, setView }: propsType) => {
               className="common-btn"
               sx={{ padding: "20px" }}
               onClick={() => {
-                setFriend("noone");
+                // setFriend("noone");
               }}
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
                 <Box className="fs-h4 white">{t("set-26_no-one")}</Box>
-                <Box className="center-align">{data.friend == "noone" && <img src={checkImg} />}</Box>
+                <Box className="center-align">{/* {data.friend == "noone" && <img src={checkImg} />} */}</Box>
               </Stack>
             </Button>
             <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />

@@ -1,19 +1,14 @@
-import { IWallet } from "./IWallet";
 import { ethers } from "ethers";
 import * as ethereumjsWallet from "ethereumjs-wallet";
 import * as bip39 from "bip39";
-import { bsc_api_key, bsc_api_url, bsc_rpc_url, net_name } from "../../configs";
-import { ERC20ABI } from "../../abis/ERC20API";
-import { ISupportToken, IBalance } from "../../types/walletTypes";
+import axios from "axios";
 
-class BSC implements IWallet {
-  address: string;
-  ticker: "BNB" = "BNB";
+import { CONFIG_BSC_API_KEY, CONFIG_BSC_API_URL, CONFIG_NETWORK_NAME } from "../../config/MainConfig";
 
-  constructor() {
-    this.address = "";
-  }
+import { ISupportToken } from "../../types/ChainTypes";
+import { IBalance } from "../../types/WalletTypes";
 
+export class BSC {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
     const seed = await bip39.mnemonicToSeed(mnemonic);
     const hdNode = ethereumjsWallet.hdkey.fromMasterSeed(seed);
@@ -32,24 +27,19 @@ class BSC implements IWallet {
 
   static async getBalance(addr: string): Promise<number> {
     try {
-      const result = (await (await fetch(`${bsc_api_url}?module=account&action=balance&address=${addr}&apikey=${bsc_api_key}`)).json()).result;
-      return (result as number) / 1e9 / 1e9;
-    } catch {
+      const response = await axios.get(`${CONFIG_BSC_API_URL}`, {
+        params: {
+          module: "account",
+          action: "balance",
+          address: addr,
+          apikey: CONFIG_BSC_API_KEY,
+        },
+      });
+      const result = response.data.result;
+      return parseFloat(result) / 1e18; // Convert from Wei to BNB
+    } catch (err) {
+      console.error("Failed to BSC getBalance: ", err);
       return 0;
-    }
-  }
-
-  static async getTransactions(addr: string): Promise<any> {
-    try {
-      return (
-        await (
-          await fetch(
-            `${bsc_api_url}?module=account&action=txlist&address=${addr}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc&apikey=${bsc_api_key}`
-          )
-        ).json()
-      ).result;
-    } catch {
-      return undefined;
     }
   }
 
@@ -57,92 +47,32 @@ class BSC implements IWallet {
     try {
       let result: IBalance[] = [];
       for (let i = 0; i < tokens.length; i++) {
-        if (net_name === "testnet") {
+        if (CONFIG_NETWORK_NAME === "testnet") {
           result.push({
             symbol: tokens[i].symbol,
             balance: 0.0,
           });
         } else {
+          const response = await axios.get(`${CONFIG_BSC_API_URL}`, {
+            params: {
+              module: "account",
+              action: "tokenbalance",
+              contractAddress: tokens[i].address,
+              address: addr,
+              apikey: CONFIG_BSC_API_KEY,
+            },
+          });
+          const balance = parseFloat(response.data.result) / 10 ** (tokens[i].decimals as number);
           result.push({
             symbol: tokens[i].symbol,
-            balance:
-              ((
-                await (
-                  await fetch(`${bsc_api_url}?module=account&action=tokenbalance&contractAddress=${tokens[i].address}&address=${addr}&apikey=${bsc_api_key}`)
-                ).json()
-              ).result as number) /
-              10 ** (tokens[i].decimals as number),
+            balance: balance,
           });
         }
       }
       return result;
     } catch (err) {
-      // console.log("Failed to BSC getTokenBalance: ", err);
+      console.error("Failed to BSC getTokenBalance: ", err);
       return [];
-    }
-  }
-
-  static async sendERCTransaction(
-    passphrase: string,
-    tx: {
-      recipients: any[];
-      fee: string;
-      vendorField?: string;
-      tokenAddress: string;
-    }
-  ) {
-    let wallet = await BSC.getWalletFromMnemonic(passphrase);
-    const customProvider = new ethers.JsonRpcProvider(bsc_rpc_url);
-    wallet = wallet.connect(customProvider);
-    const tokenContract = new ethers.Contract(tx.tokenAddress, ERC20ABI, wallet);
-    try {
-      tx.recipients.map(async (recipient) => {
-        const tx = await tokenContract.transfer(recipient.address, ethers.parseUnits("0.001", 18));
-        //@ts-ignore
-        const receipt = await tx.wait(1); // wait for 1 confirmation
-        // const hash = receipt.transactionHash;
-        // const block = receipt.blockNumber;
-        // const status = receipt.status ? "Success" : "Failure";
-        // const gas = receipt.gasUsed.toString();
-        // console.log(`Transaction: [${hash}](^5^${hash})`);
-        // console.log(`Block: ${block}`);
-        // console.log(`Status: ${status}`);
-        // console.log(`Gas Used: ${gas}`);
-        // console.log("----------");
-      });
-    } catch (e) {
-      // console.error(e);
-      return false;
-    }
-  }
-  static async sendTransaction(passphrase: string, tx: { recipients: any[]; fee: string; vendorField?: string }) {
-    if (tx.recipients.length > 0) {
-      try {
-        let wallet = await BSC.getWalletFromMnemonic(passphrase);
-        const customProvider = new ethers.JsonRpcProvider(bsc_rpc_url);
-        wallet = wallet.connect(customProvider);
-        tx.recipients.map(async (recipient) => {
-          const response = await wallet.sendTransaction({
-            to: recipient.address,
-            value: ethers.parseEther(recipient.amount),
-          });
-          //@ts-ignore
-          const receipt = await response.wait(1);
-          // const hash = receipt.transactionHash;
-          // const block = receipt.blockNumber;
-          // const status = receipt.status ? "Success" : "Failure";
-          // const gas = receipt.gasUsed.toString();
-          // console.log(`Transaction: [${hash}](^5^${hash})`);
-          // console.log(`Block: ${block}`);
-          // console.log(`Status: ${status}`);
-          // console.log(`Gas Used: ${gas}`);
-          // console.log("----------");
-        });
-        return true;
-      } catch (e) {
-        // console.log(e);
-        return false;
-      }
     }
   }
 }

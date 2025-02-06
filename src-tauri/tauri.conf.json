@@ -33,7 +33,7 @@
         "title": "tymtLauncherDebug 2.2.2",
         "resizable": true,
         "width": 1440,
-        "height": 1024,
+        "height": 800,
         "minWidth": 1200,
         "minHeight": 800,
         "center": true,

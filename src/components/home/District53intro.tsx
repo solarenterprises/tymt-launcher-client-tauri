@@ -5,26 +5,23 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import D53Modal from "./D53Modal";
-
 import { Grid, Box, Stack, Tooltip } from "@mui/material";
 
-import InstallButton from "../store/InstallButton";
+import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 
-import "../../fonts/Cobe/Cobe-Regular.ttf";
+import D53Modal from "./D53Modal";
+import InstallButton from "../game/InstallButton";
 
 import homeStyles from "../../styles/homeStyles";
-import districteffect from "../../assets/main/districteffect.svg";
-import districteffect1 from "../../assets/main/districteffect1.svg";
-import districteffect2 from "../../assets/main/districteffect2.svg";
+import districteffect from "../../assets/main/DistrictEffect.svg";
+import districteffect1 from "../../assets/main/DistrictEffect1.svg";
+import districteffect2 from "../../assets/main/DistrictEffect2.svg";
 
-import { District53 } from "../../lib/game/district 53/District53";
-
-interface props {
+interface IPropsDistrict53Intro {
   setImage?: (image: any) => void;
 }
 
-const District53intro = ({ setImage }: props) => {
+const District53Intro = ({ setImage }: IPropsDistrict53Intro) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const homeclasses = homeStyles();
@@ -94,7 +91,7 @@ const District53intro = ({ setImage }: props) => {
               cursor: "pointer",
             }}
             onClick={() => {
-              navigate(`/coming/${District53?._id}`);
+              navigate(`/game/${CONST_GAME_DISTRICT53?._id}`);
             }}
           >
             {t("hom-5_district53")}
@@ -123,7 +120,7 @@ const District53intro = ({ setImage }: props) => {
                 justifyContent: "center",
               }}
             >
-              <InstallButton game={District53} />
+              <InstallButton game={CONST_GAME_DISTRICT53} />
             </Grid>
           </Stack>
         </Grid>
@@ -139,7 +136,7 @@ const District53intro = ({ setImage }: props) => {
         }}
       >
         <Swiper spaceBetween={15} slidesPerView={"auto"} loop={true}>
-          {District53?.projectMeta?.gallery?.map((item, index) => (
+          {CONST_GAME_DISTRICT53?.projectMeta?.gallery?.map((item, index) => (
             <SwiperSlide key={index} style={{ width: "150px" }}>
               {item.type === "image" && (
                 <img
@@ -169,4 +166,4 @@ const District53intro = ({ setImage }: props) => {
   );
 };
 
-export default District53intro;
+export default District53Intro;

@@ -1,5 +1,5 @@
 import { FormControl, InputLabel, OutlinedInput } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface props {
   id: string;
@@ -25,7 +25,7 @@ const InputBox = ({
   const [data, setData] = useState(value);
 
   const handleInputChange = useCallback(
-    (event) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
 
       if ((isDecimalNumber(value) && parseFloat(value) >= 0) || value === "") {
@@ -38,7 +38,7 @@ const InputBox = ({
     [data, setData]
   );
 
-  const isDecimalNumber = (value) => {
+  const isDecimalNumber = (value: string) => {
     return /^\d*\.?\d*$/.test(value);
   };
 

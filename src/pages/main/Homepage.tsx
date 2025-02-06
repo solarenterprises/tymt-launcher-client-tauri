@@ -1,39 +1,20 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+
 import { Grid } from "@mui/material";
-import axios from "axios";
-import { tymt_backend_url } from "../../configs";
-import { ISaltToken, ITymt } from "../../types/accountTypes";
-import Tymtshow from "../../components/home/Tymtshow";
+
+import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
+
+import GameBarSticker from "../../components/home/GameBarSticker";
 import Bottom from "../../components/home/Bottom";
 import ComingsoonD53 from "../../components/home/ComingSoon-D53";
-import District53intro from "../../components/home/District53intro";
-import RecentlyAddedD53 from "../../components/home/RecentlyAdded";
+import District53Intro from "../../components/home/District53Intro";
+import RecentlyAddedGames from "../../components/home/RecentlyAddedGames";
 import UpdateModal from "../../components/home/UpdateModal";
-import { getTymt } from "../../features/account/TymtSlice";
-import { getSaltToken } from "../../features/account/SaltTokenSlice";
-import AnimatedComponent from "../../components/AnimatedComponent";
-import { District53 } from "../../lib/game/district 53/District53";
+import AnimatedComponent from "../../components/home/AnimatedComponent";
 
 const Homepage = () => {
-  const [image, setImage] = useState<string>(District53?.imageUrl);
-  const saltTokenStore: ISaltToken = useSelector(getSaltToken);
-  const tymtStore: ITymt = useSelector(getTymt);
+  const [image, setImage] = useState<string>(CONST_GAME_DISTRICT53?.imageUrl);
   const [updateModal, setUpdateModal] = useState<boolean>(false);
-
-  useEffect(() => {
-    const init = async () => {
-      const result = await axios.get(`${tymt_backend_url}/releases`, {
-        headers: {
-          "x-token": saltTokenStore.token,
-        },
-      });
-      if (Number(result.data.result.data[0].versionNumber) > Number(tymtStore.version)) {
-        setUpdateModal(true);
-      }
-    };
-    init();
-  }, []);
 
   return (
     <>
@@ -46,12 +27,30 @@ const Homepage = () => {
             justifyContent: "space-between",
           }}
         >
-          <Tymtshow image={image} />
-          <District53intro setImage={setImage} />
+          <div style={{ width: "calc(100% - 353px)" }}>
+            <Grid item xs={12}>
+              <img
+                className="District53"
+                src={image}
+                width={"100%"}
+                style={{
+                  aspectRatio: "1.78",
+                  borderRadius: "16px",
+                  opacity: 1.0,
+                  flexShrink: 1,
+                }}
+                loading="lazy"
+              />
+            </Grid>
+            <Grid item xs={12} container spacing={"32px"} mt={"0px"}>
+              <GameBarSticker />
+            </Grid>
+          </div>
+          <District53Intro setImage={setImage} />
         </Grid>
       </AnimatedComponent>
       <Grid container sx={{ marginTop: "80px" }}>
-        <RecentlyAddedD53 />
+        <RecentlyAddedGames />
         <AnimatedComponent>
           <ComingsoonD53 />
         </AnimatedComponent>

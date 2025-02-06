@@ -1,6 +1,6 @@
 import { Box, Stack, Button, CircularProgress } from "@mui/material";
 
-import RightArrow from "../../assets/chevronright.svg";
+import RightArrow from "../../assets/arrow/ChevronRight.svg";
 
 export interface IPropsSignModeButton {
   icon: string;

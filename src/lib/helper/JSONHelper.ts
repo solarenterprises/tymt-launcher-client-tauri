@@ -1,7 +1,6 @@
-import { ChatMessageType, IAlert } from "../../types/chatTypes";
+import { IVotingData } from "../../types/WalletTypes";
 
-// Function to compare if two JSON objects have the same structure
-export const compareJSONStructure = (json1, json2) => {
+export const compareJSONStructure = (json1: any, json2: any) => {
   // Get keys of both JSON objects
   const keys1 = Object.keys(json1);
   const keys2 = Object.keys(json2);
@@ -33,34 +32,14 @@ export const compareJSONStructure = (json1, json2) => {
   return true;
 };
 
-export const addChatHistory = (array1: ChatMessageType[], array2: ChatMessageType[], pageSize: number) => {
-  if (array1.length < pageSize) {
-    return [...array2];
+export const compareDictionaries = (dict1: IVotingData, dict2: IVotingData) => {
+  if (Object.keys(dict1).length !== Object.keys(dict2).length) {
+    return false;
   }
-
-  if (array1.length % pageSize !== 0) {
-    array1.splice(-(array1.length % pageSize));
-  }
-
-  const resultArray = [...array1, ...array2];
-  // console.log("addChatHistory", array1, array2, pageSize, resultArray);
-  return resultArray;
-
-  // const resultArray: ChatMessageType[] = [...array1];
-  // for (const obj of array2) {
-  //   if (!resultArray.some((item) => item._id === obj._id)) {
-  //     resultArray.push(obj);
-  //   }
-  // }
-  // return resultArray;
-};
-
-export const addAlertHistory = (array1: IAlert[], array2: IAlert[]) => {
-  const resultArray: IAlert[] = [...array1];
-  for (const obj of array2) {
-    if (!resultArray.some((item) => item._id === obj._id)) {
-      resultArray.push(obj);
+  for (let key in dict1) {
+    if (dict1[key] !== dict2[key]) {
+      return false;
     }
   }
-  return resultArray;
+  return true;
 };

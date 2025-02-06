@@ -6,11 +6,9 @@ import { runNewGame } from "../../lib/helper/DownloadHelper";
 
 import { IGame } from "../../types/GameTypes";
 
-import closeIcon from "../../assets/settings/x-icon.svg";
-import logo from "../../assets/main/foxhead-comingsoon.png";
-import { emit } from "@tauri-apps/api/event";
-import { TauriEventNames } from "../../consts/TauriEventNames";
-import { INotificationParams } from "../../types/NotificationTypes";
+import closeIcon from "../../assets/setting/XIcon.svg";
+import logo from "../../assets/main/FoxHeadComingSoon.png";
+import useNotification from "../../providers/NotificationProvider";
 
 export interface IPropsWarningModalNewGame {
   open: boolean;
@@ -20,6 +18,7 @@ export interface IPropsWarningModalNewGame {
 
 const WarningModalNewGame = ({ open, setOpen, game }: IPropsWarningModalNewGame) => {
   const { t } = useTranslation();
+  const { showNotification } = useNotification();
 
   const modalStyle = {
     display: "flex",
@@ -47,21 +46,21 @@ const WarningModalNewGame = ({ open, setOpen, game }: IPropsWarningModalNewGame)
               <Box className="fs-h3 white">{t("ga-29_not-related-solar")}</Box>
               <Box
                 onClick={async () => {
-                  //   setOpen(false);
+                  setOpen(false);
                   const res = await runNewGame(game);
                   if (res) {
                     setOpen(false);
                     return;
                   }
-
-                  const noti: INotificationParams = {
-                    status: "failed",
-                    title: t("alt-9_run-failed"),
-                    message: t("alt-10_run-failed-intro"),
-                    link: null,
-                    translate: false,
-                  };
-                  emit(TauriEventNames.NOTIFICATION, noti);
+                  showNotification(t("alt-9_run-failed"), t("alt-10_run-failed-intro"));
+                  // const noti: INotificationParams = {
+                  //   status: "failed",
+                  //   title: t("alt-9_run-failed"),
+                  //   message: t("alt-10_run-failed-intro"),
+                  //   link: null,
+                  //   translate: false,
+                  // };
+                  // emit(TauriEventNames.NOTIFICATION, noti);
                 }}
                 className="action-btn fs-18-light blue center-align"
                 sx={{ minWidth: "100%" }}

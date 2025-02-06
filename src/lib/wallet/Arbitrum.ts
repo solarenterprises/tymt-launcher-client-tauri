@@ -1,18 +1,14 @@
-import { IWallet } from "./IWallet";
 import { ethers } from "ethers";
 import * as ethereumjsWallet from "ethereumjs-wallet";
 import * as bip39 from "bip39";
-import { arb_api_key, arb_api_url, arb_rpc_url, net_name } from "../../configs";
-import { ISupportToken, IBalance } from "../../types/walletTypes";
 
-class Arbitrum implements IWallet {
-  address: string;
-  ticker: "ETH" = "ETH";
+import { CONFIG_ARB_API_KEY, CONFIG_ARB_API_URL, CONFIG_ARB_RPC_URL } from "../../config/MainConfig";
+import { CONFIG_NETWORK_NAME } from "../../config/MainConfig";
 
-  constructor() {
-    this.address = "";
-  }
+import { ISupportToken } from "../../types/ChainTypes";
+import { IBalance } from "../../types/WalletTypes";
 
+export class Arbitrum {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
     const seed = await bip39.mnemonicToSeed(mnemonic);
     const hdNode = ethereumjsWallet.hdkey.fromMasterSeed(seed);
@@ -31,7 +27,8 @@ class Arbitrum implements IWallet {
 
   static async getBalance(addr: string): Promise<number> {
     try {
-      const result = (await (await fetch(`${arb_api_url}?module=account&action=balance&address=${addr}&tag=latest&apikey=${arb_api_key}`)).json()).result;
+      const result = (await (await fetch(`${CONFIG_ARB_API_URL}?module=account&action=balance&address=${addr}&tag=latest&apikey=${CONFIG_ARB_API_KEY}`)).json())
+        .result;
       return (result as number) / 1e9 / 1e9;
     } catch {
       return 0;
@@ -42,7 +39,7 @@ class Arbitrum implements IWallet {
     try {
       let result: IBalance[] = [];
       for (let i = 0; i < tokens?.length; i++) {
-        if (net_name === "testnet") {
+        if (CONFIG_NETWORK_NAME === "testnet") {
           result.push({
             symbol: tokens[i].symbol,
             balance: 0.0,
@@ -54,7 +51,7 @@ class Arbitrum implements IWallet {
               ((
                 await (
                   await fetch(
-                    `${arb_api_url}?module=account&action=tokenbalance&contractAddress=${tokens[i].address}&address=${addr}&tag=latest&apikey=${arb_api_key}`
+                    `${CONFIG_ARB_API_URL}?module=account&action=tokenbalance&contractAddress=${tokens[i].address}&address=${addr}&tag=latest&apikey=${CONFIG_ARB_API_KEY}`
                   )
                 ).json()
               ).result as number) /
@@ -64,7 +61,7 @@ class Arbitrum implements IWallet {
       }
       return result;
     } catch (err) {
-      // console.log("Failed to ARBITRUM getTokenBalance: ", err);
+      console.error("Failed to ARBITRUM getTokenBalance: ", err);
       return [];
     }
   }
@@ -74,7 +71,7 @@ class Arbitrum implements IWallet {
       return (
         await (
           await fetch(
-            `${arb_api_url}?module=account&action=txlist&address=${addr}&startblock=0&endblock=latest&page=1&offset=10&sort=desc&apikey=${arb_api_key}`
+            `${CONFIG_ARB_API_URL}?module=account&action=txlist&address=${addr}&startblock=0&endblock=latest&page=1&offset=10&sort=desc&apikey=${CONFIG_ARB_API_KEY}`
           )
         ).json()
       ).result;
@@ -87,7 +84,7 @@ class Arbitrum implements IWallet {
     if (tx.recipients.length > 0) {
       try {
         let wallet = await Arbitrum.getWalletFromMnemonic(passphrase);
-        const customProvider = new ethers.JsonRpcProvider(arb_rpc_url);
+        const customProvider = new ethers.JsonRpcProvider(CONFIG_ARB_RPC_URL);
         wallet = wallet.connect(customProvider);
         tx.recipients.map(async (recipient) => {
           const response = await wallet.sendTransaction({

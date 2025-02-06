@@ -1,18 +1,19 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-import { Button, Stack, Box } from "@mui/material";
+import { Stack, Box } from "@mui/material";
 
 import CompleteButton from "./CompleteButton";
 // import UserAvatar from "../store/UserAvatar";
 import Avatar from "../home/Avatar";
 
-import { getAccount, setAccount } from "../../features/account/AccountSlice";
+import { getAccount, setAccount } from "../../store/AccountSlice";
+import { getAccountList } from "../../store/AccountListSlice";
 
-import { getKeccak256Hash } from "../../lib/api/Encrypt";
+import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 
-import { IAccount } from "../../types/accountTypes";
-import { setLogin } from "../../features/account/LoginSlice";
+import { IAccount, IAccountList } from "../../types/AccountTypes";
 
 export interface IPropsProfileCard {
   account: IAccount;
@@ -20,21 +21,23 @@ export interface IPropsProfileCard {
 
 const ProfileCard = ({ account }: IPropsProfileCard) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const accountStore: IAccount = useSelector(getAccount);
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
-  const isGuest: boolean = useMemo(() => account?.nickName === "Guest" && account?.password === getKeccak256Hash(""), [account]);
+  const isGuest: boolean = useMemo(() => account?.nickname === "Guest" && account?.password === getKeccak256Hash(""), [account]);
 
   const handleClick = useCallback(() => {
-    if (account?.uid !== accountStore?.uid) {
+    if (account?.sxpAddress !== accountStore?.sxpAddress) {
       dispatch(setAccount(account));
-      dispatch(setLogin(false));
+      accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
     }
-  }, [accountStore]);
+  }, [accountStore, accountListStore]);
 
   return (
     <>
-      <Button
+      <Box
         onClick={handleClick}
         sx={{
           textTransform: "none",
@@ -54,17 +57,16 @@ const ProfileCard = ({ account }: IPropsProfileCard) => {
       >
         <Stack gap={"8px"} width={"100%"}>
           <Stack direction="row" alignItems="center" gap="12px" width={"100%"}>
-            <Avatar url={account?.avatar} size={64} />
-            {/* <UserAvatar userId={account?.uid} size={64} /> */}
+            <Avatar url={account?.avatar} size={64} onlineStatus={account?.sxpAddress === accountStore?.sxpAddress} status={"active"} />
             <Stack>
-              <Box className={"fs-16-regular white"}>{account?.nickName}</Box>
+              <Box className={"fs-16-regular white"}>{account?.nickname}</Box>
               <Box className={"fs-14-regular light"}>{`non custodial wallet account`}</Box>
               <Box className={"fs-12-regular blue"}>{account?.sxpAddress}</Box>
             </Stack>
           </Stack>
           <Stack>{isGuest && <CompleteButton account={account} />}</Stack>
         </Stack>
-      </Button>
+      </Box>
     </>
   );
 };
