@@ -2,7 +2,6 @@ import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
-import { open } from "@tauri-apps/plugin-shell";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 
 import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
@@ -125,13 +124,7 @@ export async function openDir() {
   });
 }
 
-export async function openLink(url: string) {
-  try {
-    await open(url);
-  } catch (err) {
-    // console.error("Failed to open link:", err);
-  }
-}
+
 
 export const checkOnline = async (): Promise<boolean> => {
   try {

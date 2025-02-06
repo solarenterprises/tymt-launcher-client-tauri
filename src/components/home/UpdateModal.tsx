@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next";
 
 import { Box, Stack, Modal, Fade } from "@mui/material";
 
+import { openLink } from "../../lib/helper/TauriHelper";
+
 import closeIcon from "../../assets/setting/XIcon.svg";
 import logo from "../../assets/main/FoxHeadComingSoon.png";
 
@@ -42,7 +44,7 @@ const UpdateModal = ({ open, setOpen }: props) => {
                   cursor: "pointer",
                 }}
                 onClick={() => {
-                  // ElectronAPI.openExternalLink("https://tymt.com");
+                  openLink("https://tymt.com");
                 }}
               >
                 https://tymt.com

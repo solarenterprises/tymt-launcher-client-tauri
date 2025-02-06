@@ -22,6 +22,7 @@ import arrowImg from "../../assets/setting/ArrowRight.svg";
 import copyIcon from "../../assets/setting/CopyIcon.svg";
 import searchIcon from "../../assets/setting/SearchIcon.svg";
 import exitIcon from "../../assets/setting/ExitIcon.svg";
+import { openLink } from "../../lib/helper/TauriHelper";
 
 export interface IPropsMain {
   view: string;
@@ -45,7 +46,7 @@ const Main = ({ view, setView }: IPropsMain) => {
   const accountStore: IAccount = useSelector(getAccount);
 
   const handleExplorer = useCallback(() => {
-    // ElectronAPI.openExternalLink(currentChainExplorerUrl);
+    openLink(currentChainExplorerUrl);
   }, [currentChainExplorerUrl]);
 
   return (

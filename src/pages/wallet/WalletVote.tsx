@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import numeral from "numeral";
 
+import { CONFIG_SOLAR_SCAN } from "../../config/MainConfig";
+
 import { Grid, Box, Divider, Stack, Button, Pagination, IconButton, Tooltip } from "@mui/material";
 
 import { useWallet } from "../../providers/WalletProvider";
@@ -12,6 +14,7 @@ import InputVoteBox from "../../components/wallet/InputVoteBox";
 
 import Solar from "../../lib/wallet/Solar";
 import { compareDictionaries } from "../../lib/helper/JSONHelper";
+import { openLink } from "../../lib/helper/TauriHelper";
 
 import { IVotingData } from "../../types/WalletTypes";
 
@@ -305,7 +308,7 @@ const WalletVote = () => {
                       borderLeft: Object.keys(votingData).includes(item.username) && votingData[item.username] !== 0 ? "5px solid #EF4444" : "none",
                     }}
                     onDoubleClick={() => {
-                      // ElectronAPI.openExternalLink(`${CONFIG_SOLAR_SCAN}wallet/${item.username}`);
+                      openLink(`${CONFIG_SOLAR_SCAN}wallet/${item.username}`);
                     }}
                   >
                     <Stack width={"100%"}>

@@ -12,14 +12,8 @@ import WarningModalNewGame from "../home/WarningModalNewGame";
 
 import { getDownloadStatus, setDownloadStatus } from "../../store/DownloadStatusSlice";
 
-import {
-  checkOnline,
-  downloadAndInstallNewGame,
-  getFullExecutablePathNewGame,
-  getGameReleaseBrowser,
-  isInstalled,
-  openLink,
-} from "../../lib/helper/DownloadHelper";
+import { openLink } from "../../lib/helper/TauriHelper";
+import { checkOnline, downloadAndInstallNewGame, getFullExecutablePathNewGame, getGameReleaseBrowser, isInstalled } from "../../lib/helper/DownloadHelper";
 
 import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 

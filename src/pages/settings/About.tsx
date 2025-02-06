@@ -1,5 +1,10 @@
-import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
+
+import { Box, Button, Divider, Stack } from "@mui/material";
+
+import { CONST_TYMT_LINKS } from "../../const/tymtConsts";
+
+import { openLink } from "../../lib/helper/TauriHelper";
 
 import backIcon from "../../assets/setting/BackIcon.svg";
 import externalIcon from "../../assets/setting/ExternalLink.svg";
@@ -31,7 +36,7 @@ const About = ({ view, setView }: IPropsAbout) => {
                 className="common-btn"
                 sx={{ padding: "20px" }}
                 onClick={() => {
-                  // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.documentation);
+                  openLink(CONST_TYMT_LINKS.documentation);
                 }}
               >
                 <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
@@ -46,7 +51,7 @@ const About = ({ view, setView }: IPropsAbout) => {
                 className="common-btn"
                 sx={{ padding: "20px" }}
                 onClick={() => {
-                  // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.policy);
+                  openLink(CONST_TYMT_LINKS.policy);
                 }}
               >
                 <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
@@ -79,7 +84,7 @@ const About = ({ view, setView }: IPropsAbout) => {
                     className="button_navbar_common"
                     sx={{ padding: 0 }}
                     onClick={() => {
-                      // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.twitter);
+                      openLink(CONST_TYMT_LINKS.twitter);
                     }}
                   >
                     <Box className="center-align">
@@ -90,7 +95,7 @@ const About = ({ view, setView }: IPropsAbout) => {
                     className="button_navbar_common"
                     sx={{ padding: 0 }}
                     onClick={() => {
-                      // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.discord);
+                      openLink(CONST_TYMT_LINKS.discord);
                     }}
                   >
                     <Box className="center-align">
