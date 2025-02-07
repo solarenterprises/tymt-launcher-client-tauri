@@ -13,7 +13,7 @@ export const AuthProvider = () => {
 
   useEffect(() => {
     if (!authStore?.accessToken) {
-      navigate("/start");
+      navigate("/");
     }
   }, [authStore]);
 
