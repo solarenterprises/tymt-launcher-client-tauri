@@ -3,7 +3,7 @@
   "identifier": "main-capability",
   "description": "Capability for the main window",
   "windows": [
-    "tymtLauncherDebug",
+    "tymtLauncher",
     "tymt_d53_transaction",
     "game_window"
   ],

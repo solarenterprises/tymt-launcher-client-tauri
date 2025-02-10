@@ -1,8 +1,7 @@
-// import { useSelector } from "react-redux";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import QRCode from "react-qr-code";
+import { QRCodeSVG } from "qrcode.react";
 
 import { Box, Stack, Modal, Tooltip, Button, Fade } from "@mui/material";
 
@@ -60,7 +59,20 @@ const QrModal = ({ supportChain, open, setOpen }: IPropsQrModal) => {
           </Stack>
           <Stack className="qr-container" direction={"column"} alignItems={"center"} textAlign={"center"}>
             <Box className="center-align" sx={{ width: "150px" }}>
-              <QRCode size={50} style={{ height: "auto", maxWidth: "100%", width: "100%" }} value={currentWallet} viewBox={`transparent`} />
+              <QRCodeSVG
+                value={currentWallet}
+                size={150}
+                level={"L"}
+                marginSize={1}
+                imageSettings={{
+                  src: supportChain?.native?.logo,
+                  x: undefined,
+                  y: undefined,
+                  height: 20,
+                  width: 20,
+                  excavate: true,
+                }}
+              />
             </Box>
             <Stack direction={"row"} className="qr-container" gap={"10px"}>
               <Stack direction={"column"} textAlign={"left"}>

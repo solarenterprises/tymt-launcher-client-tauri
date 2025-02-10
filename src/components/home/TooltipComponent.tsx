@@ -27,7 +27,8 @@ const TooltipComponent = ({ children, text, placement }: IPropsTooltipComponent)
         <Stack
           spacing={"10px"}
           sx={{
-            marginBottom: "-20px",
+            marginBottom: `-10px`,
+            marginTop: `-10px`,
             backgroundColor: "rgb(49, 53, 53)",
             padding: "6px 8px",
             borderRadius: "32px",

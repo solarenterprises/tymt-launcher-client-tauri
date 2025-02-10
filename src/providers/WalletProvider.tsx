@@ -34,6 +34,7 @@ import { IPriceList } from "../types/PriceTypes";
 import { IAccount, IMnemonic } from "../types/AccountTypes";
 import { IWalletSetting } from "../types/SettingTypes";
 import { IRecipient } from "../types/TransactionTypes";
+import tymtCore from "../lib/core/tymtCore";
 
 interface WalletContextType {
   passphrase: string;
@@ -42,6 +43,7 @@ interface WalletContextType {
   sxpAddress: string;
   sxpFee: number;
   publicKey: string;
+  ethPrivateKey: string;
   currentSupportChain: ISupportChain;
   currentChainWalletAddress: string;
   currentChainExplorerUrl: string;
@@ -64,6 +66,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
 
   const [sxpFee, setSxpFee] = useState<number>(0);
+  const [ethPrivateKey, setEthPrivagteKey] = useState<string>("");
 
   const mnemonicStore: IMnemonic = useSelector(getMnemonic);
   const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
@@ -98,37 +101,19 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     [balanceListStore, currentSupportChain]
   );
   const currentChainNativePrice = useMemo(() => getTokenPriceByCmc(priceListStore, currentSupportChain?.native?.cmc), [priceListStore, currentSupportChain]);
-  // const totalBalance = useMemo(() => {
-  //   let total = 0;
-  //   for (const supportChain of CONST_SUPPORT_CHAINS ?? []) {
-  //     const nativeBalance = balanceListStore?.list?.find((one) => one?.symbol === supportChain?.native?.symbol)?.balance;
-  //     const nativePrice = priceListStore?.list?.find((one) => one?.cmc === supportChain?.native?.cmc)?.price;
-  //     total += (nativeBalance ?? 0) * (nativePrice ?? 0);
-  //     for (const token of supportChain?.tokens ?? []) {
-  //       const tokenBalance = balanceListStore?.list?.find((one) => one?.symbol === token?.symbol)?.balance;
-  //       const tokenPrice = priceListStore?.list?.find((one) => one?.cmc === token?.cmc)?.price;
-  //       total += (tokenBalance ?? 0) * (tokenPrice ?? 0);
-  //     }
-  //   }
-  //   const res = total * currentCurrencyReserve;
-  //   return res;
-  // }, [balanceListStore, priceListStore, currentCurrencyReserve]);
 
   const totalBalance = useMemo(() => {
     let total = 0;
-
     CONST_SUPPORT_CHAINS.forEach((supportChain) => {
       const nativeBalance = balanceListStore.list.find((one) => one.symbol === supportChain.native.symbol)?.balance || 0;
       const nativePrice = priceListStore.list.find((one) => one.cmc === supportChain.native.cmc)?.price || 0;
       total += nativeBalance * nativePrice;
-
       supportChain.tokens.forEach((token) => {
         const tokenBalance = balanceListStore.list.find((one) => one.symbol === token.symbol)?.balance || 0;
         const tokenPrice = priceListStore.list.find((one) => one.cmc === token.cmc)?.price || 0;
         total += tokenBalance * tokenPrice;
       });
     });
-
     return total * currentCurrencyReserve;
   }, [balanceListStore, priceListStore, currentCurrencyReserve]);
 
@@ -167,6 +152,15 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     // dispatch(setBalanceList(balanceList));
   }, [walletStore, dispatch]);
 
+  const getEthPrivateKey = async (passphrase: string) => {
+    const privateKey = await tymtCore.Blockchains.eth.wallet.getPrivateKey(passphrase);
+    setEthPrivagteKey(privateKey);
+  };
+
+  useEffect(() => {
+    getEthPrivateKey(passphrase);
+  }, [passphrase]);
+
   useEffect(() => {
     fetchBalanceList();
     // const intervalId = setInterval(fetchBalanceList, 10000);
@@ -202,6 +196,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         sxpAddress,
         sxpFee,
         publicKey,
+        ethPrivateKey,
         currentSupportChain,
         currentChainWalletAddress,
         currentChainExplorerUrl,

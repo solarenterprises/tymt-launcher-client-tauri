@@ -21,6 +21,17 @@ export class Ethereum {
     return wallet;
   }
 
+  static async getPrivateKey(mnemonic: string): Promise<string> {
+    const seed = await bip39.mnemonicToSeed(mnemonic);
+    const hdNode = ethereumjsWallet.hdkey.fromMasterSeed(seed);
+    const node = hdNode.derivePath(`m/44'/60'/0'`);
+    const change = node.deriveChild(0);
+    const childNode = change.deriveChild(0);
+    const childWallet = childNode.getWallet();
+    const privateKey = childWallet.getPrivateKey().toString("hex");
+    return privateKey;
+  }
+
   static async getAddress(mnemonic: string): Promise<string> {
     const wallet = await Ethereum.getWalletFromMnemonic(mnemonic.normalize("NFD"));
     return wallet.address;

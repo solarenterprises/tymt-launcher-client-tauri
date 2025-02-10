@@ -34,6 +34,7 @@ import refreshIcon from "../../assets/wallet/RefreshIcon.svg";
 
 import WalletStyle from "../../styles/WalletStyles";
 import SettingStyle from "../../styles/SettingStyle";
+import TooltipComponent from "../../components/home/TooltipComponent";
 
 // const order = ["Solar", "Binance", "Ethereum", "Bitcoin", "Solana", "Polygon", "Avalanche", "Arbitrum", "Optimism"];
 
@@ -100,7 +101,8 @@ const Wallet = () => {
 
                         <Box>
                           {CONST_SUPPORT_CHAINS?.map((supportChain, index) => (
-                            <Tooltip title={supportChain?.native?.name} placement="top" key={index} classes={{ tooltip: tooltip.tooltip }}>
+                            // <Tooltip title={supportChain?.native?.name} placement="top" key={index} classes={{ tooltip: tooltip.tooltip }}>
+                            <TooltipComponent placement="top" text={supportChain?.native?.name}>
                               <img
                                 src={supportChain?.native?.logo}
                                 key={index}
@@ -109,7 +111,9 @@ const Wallet = () => {
                                   cursor: "pointer",
                                 }}
                               />
-                            </Tooltip>
+                            </TooltipComponent>
+
+                            // </Tooltip>
                           ))}
                         </Box>
                       </Stack>

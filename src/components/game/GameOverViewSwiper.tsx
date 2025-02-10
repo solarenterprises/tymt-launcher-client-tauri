@@ -75,7 +75,7 @@ const GameOverViewSwiper = ({ game, currentImageIndex, setSrc, setType, setCurre
                   setCurrentImageIndex(index);
                 }}
               />
-              <ReactPlayer playing className="react-player" url={item.src} width={"150px"} height={"120px"} controls={false} />
+              <ReactPlayer className="react-player" url={item.src} width={"150px"} height={"120px"} controls={false} />
             </Box>
           )}
         </SwiperSlide>

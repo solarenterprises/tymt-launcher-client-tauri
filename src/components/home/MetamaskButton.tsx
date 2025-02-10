@@ -1,4 +1,5 @@
 import { Button, Stack, Box } from "@mui/material";
+import { useSDK } from "@metamask/sdk-react";
 
 import TooltipComponent from "./TooltipComponent";
 
@@ -7,16 +8,16 @@ import { useMetamask } from "../../providers/MetamaskCustomProvider";
 import MetamaskImage from "../../assets/wallet/Metamask.png";
 
 const MetamaskButton = () => {
-  const { account, connect } = useMetamask();
+  const { account } = useSDK();
+  const { connect } = useMetamask();
+
+  const handleConnectButtonClicked = async () => {
+    connect();
+  };
 
   return (
     <TooltipComponent placement="top" text={"Metamask"}>
-      <Button
-        className="button_metamask"
-        onClick={() => {
-          connect();
-        }}
-      >
+      <Button className="button_metamask" onClick={handleConnectButtonClicked}>
         <Stack direction={"row"} alignItems={"center"} marginLeft={"0px"} justifyContent={"left"} spacing={"8px"} height={"32px"}>
           <Box component={"img"} src={MetamaskImage} width={32} height={32} />
           <Stack direction={"column"} width={"110px"} alignItems={"flex-start"}>

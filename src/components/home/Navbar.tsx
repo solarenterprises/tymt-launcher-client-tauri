@@ -9,6 +9,7 @@ import { Grid, Button, TextField, InputAdornment, Stack, Box } from "@mui/materi
 
 import { useWallet } from "../../providers/WalletProvider";
 
+import MetamaskButton from "./MetamaskButton";
 import Avatar from "./Avatar";
 import Back from "./Back";
 import TooltipComponent from "./TooltipComponent";
@@ -27,7 +28,6 @@ import { tymtLogoType } from "../../types/HomeTypes";
 import newlogo from "../../assets/main/NewLogo.png";
 import newlogohead from "../../assets/main/NewLogoHead.png";
 import searchlg from "../../assets/main/SearchLg.svg";
-import MetamaskButton from "./MetamaskButton";
 
 const theme = createTheme({
   palette: {

@@ -65,15 +65,15 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             developerMode: false,
           },
           // communicationServerUrl: process.env.REACT_APP_COMM_SERVER_URL,
-          checkInstallationImmediately: true, // This will automatically connect to MetaMask on page load
+          checkInstallationImmediately: false, // This will automatically connect to MetaMask on page load
           dappMetadata: {
             name: "tymt-launcher",
             url: window.location.host,
           },
         }}
       >
-        <MetamaskCustomProvider>
-          <WalletProvider>
+        <WalletProvider>
+          <MetamaskCustomProvider>
             <HashRouter>
               <Routes>
                 <Route path="/" element={<Splash />} />
@@ -98,8 +98,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                 </Route>
               </Routes>
             </HashRouter>
-          </WalletProvider>
-        </MetamaskCustomProvider>
+          </MetamaskCustomProvider>
+        </WalletProvider>
       </MetaMaskProvider>
     </StoreProvider>
   </React.StrictMode>

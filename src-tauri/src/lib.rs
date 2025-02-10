@@ -196,7 +196,7 @@ pub fn main() -> std::io::Result<()> {
 
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
-                let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                let window = app.get_webview_window("tymtLauncher").unwrap();
                 window.open_devtools();
             }
 
@@ -208,17 +208,17 @@ pub fn main() -> std::io::Result<()> {
                         std::process::exit(0);
                     }
                     "hide" => {
-                        let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                        let window = app.get_webview_window("tymtLauncher").unwrap();
                         window.hide().unwrap();
                     }
                     "showVisible" => {
                         println!("showVisible received a left click");
-                        let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                        let window = app.get_webview_window("tymtLauncher").unwrap();
                         window.show().unwrap();
                         window.set_focus().unwrap();
                     }
                     "fullscreen" => {
-                        let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                        let window = app.get_webview_window("tymtLauncher").unwrap();
                         window.show().unwrap();
                         window.set_focus().unwrap();
                         window
@@ -228,14 +228,14 @@ pub fn main() -> std::io::Result<()> {
                     "wallet" => {
                         app.emit("wallet", "wallet")
                             .expect("failed to emit event wallet");
-                        let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                        let window = app.get_webview_window("tymtLauncher").unwrap();
                         window.show().unwrap();
                         window.set_focus().unwrap();
                     }
                     "games" => {
                         app.emit("games", "games")
                             .expect("failed to emit event games");
-                        let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                        let window = app.get_webview_window("tymtLauncher").unwrap();
                         window.show().unwrap();
                         window.set_focus().unwrap();
                     }
@@ -246,7 +246,7 @@ pub fn main() -> std::io::Result<()> {
                     "signout" => {
                         app.emit("signout", "signout")
                             .expect("failed to emit event signout");
-                        let window = app.get_webview_window("tymtLauncherDebug").unwrap();
+                        let window = app.get_webview_window("tymtLauncher").unwrap();
                         window.show().unwrap();
                         window.set_focus().unwrap();
                     }
@@ -265,7 +265,7 @@ pub fn main() -> std::io::Result<()> {
                     {
                         let apphandle = tray.app_handle();
                         if let Some(webview_window) =
-                            apphandle.get_webview_window("tymtLauncherDebug")
+                            apphandle.get_webview_window("tymtLauncher")
                         {
                             let _ = webview_window.show();
                             let _ = webview_window.set_focus();
@@ -445,7 +445,7 @@ async fn show_transaction_window(app_handle: tauri::AppHandle) {
         eprintln!("Window 'tymt_d53_transaction' not found");
     }
 
-    if let Some(window_to_hide) = app_handle.get_webview_window("tymtLauncherDebug") {
+    if let Some(window_to_hide) = app_handle.get_webview_window("tymtLauncher") {
         if let Err(e) = window_to_hide.hide() {
             eprintln!("Failed to hide window 'tymtLauncher': {}", e);
         }
@@ -477,7 +477,7 @@ async fn hide_transaction_window(app_handle: tauri::AppHandle) {
         eprintln!("Window 'tymt_d53_transaction' not found");
     }
 
-    if let Some(window_to_hide) = app_handle.get_webview_window("tymtLauncherDebug") {
+    if let Some(window_to_hide) = app_handle.get_webview_window("tymtLauncher") {
         if let Err(e) = window_to_hide.show() {
             eprintln!("Failed to show window 'tymtLauncher': {}", e);
         }
