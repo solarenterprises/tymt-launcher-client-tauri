@@ -124,8 +124,6 @@ export async function openDir() {
   });
 }
 
-
-
 export const checkOnline = async (): Promise<boolean> => {
   try {
     await fetch("https://www.google.com", {
@@ -139,14 +137,9 @@ export const checkOnline = async (): Promise<boolean> => {
 
 export const downloadFileToAppDir = async (game: IGame) => {
   try {
-    // console.log("downloadFileToAppDir");
-
     const url: string = await getDownloadLinkNewGame(game);
     const downloadPath: string = await getDownloadFileFullPath(game);
     if (!url || !downloadPath) return false;
-
-    // console.log("url", url);
-    // console.log("downloadPath", downloadPath);
 
     await invoke("download_to_app_dir", {
       url: url,
@@ -155,7 +148,7 @@ export const downloadFileToAppDir = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    // console.error("Failed to downloadFileToAppDir: ", err);
+    console.error("Failed to downloadFileToAppDir: ", err);
     return false;
   }
 };

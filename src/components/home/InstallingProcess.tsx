@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Box, Stack } from "@mui/material";
 
 import InstallProcessContextMenu from "./InstallProcessContextMenu";
 
-import { getDownloadStatus } from "../../store/DownloadStatusSlice";
+import { getDownloadStatus, setDownloadStatus } from "../../store/DownloadStatusSlice";
 import { getCurrentLogo } from "../../store/tymtLogoSlice";
 
 import downloadbig from "../../assets/main/DownloadBig.svg";
@@ -13,6 +13,7 @@ import downloadsmall from "../../assets/main/DownloadSmall.svg";
 import { IDownloadStatus, IPoint, tymtLogoType } from "../../types/HomeTypes";
 import { openDir } from "../../lib/helper/DownloadHelper";
 import numeral from "numeral";
+import { listen } from "@tauri-apps/api/event";
 
 const InstallingProcess = () => {
   const drawer: tymtLogoType = useSelector(getCurrentLogo);
@@ -32,6 +33,18 @@ const InstallingProcess = () => {
     setContextMenuPosition({ x: mouseX, y: mouseY });
     setShowContextMenu(true);
   };
+
+  useEffect(() => {
+    const unlisten_download_progress = listen("game-download-progress", async (event) => {
+      try {
+        console.log(event.payload);
+      } catch (err) {}
+    });
+
+    return () => {
+      unlisten_download_progress.then((unlistenFn) => unlistenFn());
+    };
+  }, []);
 
   return (
     <>
