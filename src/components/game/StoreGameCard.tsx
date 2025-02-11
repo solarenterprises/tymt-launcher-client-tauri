@@ -4,7 +4,6 @@ import { Box, Stack } from "@mui/material";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 
-// import { IGame } from "../../types/GameTypes";
 type IGame = {
   _id: string;
   title: string;
@@ -13,8 +12,6 @@ type IGame = {
     tags: string[];
   };
 };
-
-import solar from "../../assets/chain/Solar.svg";
 
 export interface IPropsStoreGameCard {
   game: IGame;
@@ -29,7 +26,7 @@ const StoreGameCard = ({ game, isComing }: IPropsStoreGameCard) => {
       <div className="store-game-card2">
         <Box
           sx={{
-            width: "276px",
+            width: "180px",
             height: "300px",
             flexShrink: "0",
             borderRadius: "16px",
@@ -110,10 +107,10 @@ const StoreGameCard = ({ game, isComing }: IPropsStoreGameCard) => {
               ))}
             </Swiper>
 
-            <Stack direction={"row"} alignItems={"center"} spacing={1}>
+            {/* <Stack direction={"row"} alignItems={"center"} spacing={1}>
               <Box component={"img"} width={"20px"} height={"20px"} src={solar} />
               <Box className={"fs-16-regular white"}>0.0</Box>
-            </Stack>
+            </Stack> */}
           </Stack>
         </Box>
       </div>

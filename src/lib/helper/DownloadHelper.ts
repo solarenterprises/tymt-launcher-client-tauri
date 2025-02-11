@@ -144,6 +144,7 @@ export const downloadFileToAppDir = async (game: IGame) => {
     await invoke("download_to_app_dir", {
       url: url,
       fileLocation: downloadPath,
+      game: game?._id,
     });
 
     return true;

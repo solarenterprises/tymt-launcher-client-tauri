@@ -10,7 +10,7 @@ import useNotification from "../../providers/NotificationProvider";
 import D53Modal from "../home/D53Modal";
 import WarningModalNewGame from "../home/WarningModalNewGame";
 
-import { getDownloadStatus, setDownloadStatus } from "../../store/DownloadStatusSlice";
+import { getDownloadStatus, resetDownloadStatus } from "../../store/DownloadStatusSlice";
 
 import { openLink } from "../../lib/helper/TauriHelper";
 import { checkOnline, downloadAndInstallNewGame, getFullExecutablePathNewGame, getGameReleaseBrowser, isInstalled } from "../../lib/helper/DownloadHelper";
@@ -38,28 +38,31 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
   const [installed, setInstalled] = useState(false);
 
   const handleClick = useCallback(async () => {
-    if (game?.projectMeta?.type === "browser") {
-      const externalUrl = getGameReleaseBrowser(game)?.external_url;
-      if (!externalUrl) return;
-      openLink(externalUrl);
-      return;
+    try {
+      if (game?.projectMeta?.type === "browser") {
+        const externalUrl = getGameReleaseBrowser(game)?.external_url;
+        if (!externalUrl) return;
+        openLink(externalUrl);
+        return;
+      }
+      if (installed) {
+        if (game?._id === CONST_GAME_DISTRICT53?._id) setD53ModalView(true);
+        else setModalView(true);
+        return;
+      }
+      const id = game?.project_name;
+      if (!id) return;
+      const online = await checkOnline();
+      if (!online) {
+        showNotification(t("alt-26_internet-error"), t("alt-27_you-not-connected"));
+        return;
+      }
+      await downloadAndInstallNewGame(game);
+      setInstalled(await isInstalled(game));
+    } catch (err) {
+    } finally {
+      dispatch(resetDownloadStatus());
     }
-    if (installed) {
-      if (game?._id === CONST_GAME_DISTRICT53?._id) setD53ModalView(true);
-      else setModalView(true);
-      return;
-    }
-    const id = game?.project_name;
-    if (!id) return;
-    const online = await checkOnline();
-    if (!online) {
-      showNotification(t("alt-26_internet-error"), t("alt-27_you-not-connected"));
-      return;
-    }
-    dispatch(setDownloadStatus({ isDownloading: true, game: game }));
-    await downloadAndInstallNewGame(game);
-    dispatch(setDownloadStatus({ isDownloading: false, game: game }));
-    setInstalled(await isInstalled(game));
   }, [game, installed]);
 
   useEffect(() => {
@@ -83,18 +86,12 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
     };
   }, [game]);
 
-  useEffect(() => {
-    // window.electronAPI.onDownloadProgress((progress: number) => {
-    //   dispatch(setDownloadStatus({ isDownloading: true, progress: progress, total: 100, game: game }));
-    // });
-  }, []);
-
   return (
     <>
       <Button
         fullWidth
         onClick={handleClick}
-        disabled={!isSupporting || downloadStatusStore?.isDownloading}
+        disabled={!isSupporting || !!downloadStatusStore?.game}
         sx={{
           height: "46px",
           width: "226px",
@@ -117,9 +114,9 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
         }}
       >
         {!isSupporting && `Not supported`}
-        {isSupporting && !installed && !downloadStatusStore?.isDownloading && t("hom-20_install-game")}
-        {isSupporting && installed && !downloadStatusStore?.isDownloading && t("hom-7_play-game")}
-        {downloadStatusStore?.isDownloading && (
+        {isSupporting && !installed && !downloadStatusStore?.game && t("hom-20_install-game")}
+        {isSupporting && installed && !downloadStatusStore?.game && t("hom-7_play-game")}
+        {downloadStatusStore?.game && (
           <Stack direction={"row"} alignItems={"center"} gap={"4px"}>
             <Box className={"fs-14-regular white t-center"}>{`${t("hom-21_downloading")}`}</Box>
             <ThreeDots height="12px" width={"24px"} radius={4} color={`white`} />

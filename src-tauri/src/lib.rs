@@ -523,7 +523,10 @@ fn write_file(content: String, filepath: String) -> Result<(), String> {
 struct DownloadProgress {
     downloaded: u64,
     speed: Option<f64>,
-    total_size: u64,
+    total: u64,
+    duration: f64,
+    expectation: f64,
+    game: String
 }
 
 #[tauri::command]
@@ -531,6 +534,7 @@ async fn download_to_app_dir(
     app_handle: tauri::AppHandle,
     url: String,
     file_location: String,
+    game: String
 ) -> Result<(), String> {
     let path = Path::new(&file_location);
 
@@ -552,7 +556,7 @@ async fn download_to_app_dir(
         .send()
         .await
         .or(Err(format!("Failed to GET from '{}'", &url)))?;
-    let total_size = res
+    let total = res
         .content_length()
         .ok_or(format!("Failed to get content length from '{}'", &url))?;
 
@@ -567,7 +571,7 @@ async fn download_to_app_dir(
         let chunk = item.or(Err(format!("Error while downloading file")))?;
         file.write_all(&chunk)
             .or(Err(format!("Error while writing to file")))?;
-        downloaded = min(downloaded + (chunk.len() as u64), total_size);
+        downloaded = min(downloaded + (chunk.len() as u64), total);
         let duration = start_time.elapsed().as_secs_f64();
         let speed = if duration > 0.0 {
             Some((downloaded as f64) / duration / 1024.0 / 1024.0)
@@ -576,17 +580,27 @@ async fn download_to_app_dir(
         };
 
         if last_emit_time.elapsed() >= Duration::new(1, 0) {
+            let expectation = if let Some(s) = speed {
+                (total - downloaded) as f64 / (s * 1024.0 * 1024.0)
+            } else {
+                0.0
+            };
+
             let progress = DownloadProgress {
                 downloaded,
                 speed,
-                total_size,
+                total,
+                duration,
+                expectation,
+                game: game.clone(),
             };
 
             app_handle
                 .emit("game-download-progress", &progress)
-                .expect("Failed to emit progress event");
+                .map_err(|e| format!("Failed to emit progress event: {}", e))?;
 
             last_emit_time = Instant::now();
+         
         }
 
         // println!("downloaded => {}", downloaded);
