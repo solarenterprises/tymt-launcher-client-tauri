@@ -66,4 +66,18 @@ export const CONST_NOTIFICATION_CONTENTS = {
     duration: CONST_NOTIFICATION_DURATION.DEFAULT,
     link: "",
   },
+  DOWNLOAD_FAIL: {
+    title: "alt-39_download-failed",
+    text: "alt-39_download-failed",
+    status: CONST_NOTIFICATION_STATUS.FAILED,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
+  INTERNET_ERROR: {
+    title: "alt-26_internet-error",
+    text: "alt-27_you-not-connected",
+    status: CONST_NOTIFICATION_STATUS.FAILED,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
 };

@@ -8,7 +8,6 @@ export const GameAPI = {
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
       return res.data;
     } catch (err) {
-      console.error("Failed to fetchGameList: ", err.response?.data ?? err);
       throw new Error(err.response?.data?.error ?? "Failed to fetchGameList");
     }
   },

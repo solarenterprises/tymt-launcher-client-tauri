@@ -223,23 +223,17 @@ export const installGame = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    // console.log("Failed to installGame: ", err);
-    return false;
+    throw new Error(err.toString());
   }
 };
 
 export const downloadAndInstallNewGame = async (game: IGame) => {
   try {
-    // console.log("downloadAndInstallNewGame");
-
     await downloadFileToAppDir(game);
     await installGame(game);
     await deleteDownloadFile(game);
-
-    return true;
   } catch (err) {
-    // console.error("Failed to downloadAndInstallNewGame: ", err);
-    return false;
+    throw new Error(err.toString());
   }
 };
 

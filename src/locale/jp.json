@@ -592,6 +592,7 @@
     "alt-36_server-required": "サーバーIPが必要です。",
     "alt-37_please-fill-server": "サーバーを選択するか、有効なアドレスを入力してください。",
     "alt-38_sorry-server-full": "申し訳ありませんが、サーバーは現在アクティブなプレイヤーでフル稼働です。",
+    "alt-39_download-failed": "ダウンロードに失敗しました",
     "tol-1_wallet": "ウォレット",
     "tol-2_alert": "警告",
     "tol-3_chat": "チャット",

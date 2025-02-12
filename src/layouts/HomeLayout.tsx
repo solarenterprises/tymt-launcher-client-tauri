@@ -29,7 +29,7 @@ const HomeLayout = () => {
       dispatch(setGameList(res.data));
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.GAME_REFRESH_SUCCESS });
     } catch (err) {
-      showNotification({ content: CONST_NOTIFICATION_CONTENTS.GAME_REFRESH_FAIL, text: err });
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.GAME_REFRESH_FAIL, text: err.toString() });
     }
   };
 

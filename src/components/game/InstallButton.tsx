@@ -8,6 +8,8 @@ import { Button, Stack, Box } from "@mui/material";
 import D53Modal from "../home/D53Modal";
 import WarningModalNewGame from "../home/WarningModalNewGame";
 
+import { useNotification } from "../../providers/NotificationProvider";
+
 import { getDownloadStatus, resetDownloadStatus } from "../../store/DownloadStatusSlice";
 
 import { openLink } from "../../lib/helper/TauriHelper";
@@ -17,6 +19,7 @@ import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 
 import { IGame } from "../../types/GameTypes";
 import { IDownloadStatus } from "../../types/HomeTypes";
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
 export interface IPropsInstallButton {
   game: IGame;
@@ -25,6 +28,7 @@ export interface IPropsInstallButton {
 const InstallButton = ({ game }: IPropsInstallButton) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { showNotification } = useNotification();
 
   const downloadStatusStore: IDownloadStatus = useSelector(getDownloadStatus);
 
@@ -50,12 +54,15 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
       if (!id) return;
       const online = await checkOnline();
       if (!online) {
-        // showNotification(t("alt-26_internet-error"), t("alt-27_you-not-connected"));
+        showNotification({ content: CONST_NOTIFICATION_CONTENTS.INTERNET_ERROR });
         return;
       }
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.DOWNLOAD_START });
       await downloadAndInstallNewGame(game);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.DOWNLOAD_END });
       setInstalled(await isInstalled(game));
     } catch (err) {
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.DOWNLOAD_FAIL, text: err.toString() });
     } finally {
       dispatch(resetDownloadStatus());
     }
