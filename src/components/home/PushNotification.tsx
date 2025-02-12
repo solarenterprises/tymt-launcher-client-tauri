@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { Snackbar, Stack, Box } from "@mui/material";
 import Slide from "@mui/material/Slide";
@@ -22,30 +23,25 @@ export interface IPropsPushNotification {
   content: INotificationContent;
   text: string;
   link: string;
+  open: boolean;
+  setOpen: (_: boolean) => void;
 }
 
-const PushNotification = ({ content, text, link }: IPropsPushNotification) => {
+const PushNotification = ({ content, text, link, open, setOpen }: IPropsPushNotification) => {
   const navigate = useNavigate();
   const classname = CommonStyles();
+  const { t } = useTranslation();
 
   const [border, setBorder] = useState("");
   const [bg, setBg] = useState("");
   const [logo, setLogo] = useState<any>();
-  const [pushContent, setPushContent] = useState<INotificationContent>();
-  const [open, setOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    setPushContent(content);
-    setOpen(true);
-  }, [content]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    if (pushContent && open) {
+    if (content && open) {
       timer = setTimeout(() => {
         setOpen(false);
-        setPushContent(undefined);
-      }, pushContent.duration);
+      }, content?.duration);
     }
 
     return () => {
@@ -53,30 +49,30 @@ const PushNotification = ({ content, text, link }: IPropsPushNotification) => {
         clearTimeout(timer);
       }
     };
-  }, [pushContent, open]);
+  }, [open, content?.duration]);
 
   useEffect(() => {
-    if (pushContent?.status === "failed") {
+    if (content?.status === "failed") {
       setLogo(FailedIcon);
       setBorder("#5A3937");
       setBg("#5A39374D");
     }
-    if (pushContent?.status === "success") {
+    if (content?.status === "success") {
       setLogo(SuccessIcon);
       setBorder("#45583A");
       setBg("#45583A4D");
     }
-    if (pushContent?.status === "warning") {
+    if (content?.status === "warning") {
       setLogo(WarningIcon);
       setBorder("#564E35");
       setBg("#564E354D");
     }
-    if (pushContent?.status === "alert") {
+    if (content?.status === "alert") {
       setLogo(AlertIcon);
       setBorder("#485B61");
       setBg("#485B614D");
     }
-  }, [pushContent?.status]);
+  }, [content?.status]);
 
   return (
     <>
@@ -114,8 +110,8 @@ const PushNotification = ({ content, text, link }: IPropsPushNotification) => {
               </Box>
 
               <Stack direction={"column"} gap={"8px"}>
-                <Box className={"fs-h4 white"}>{content?.title}</Box>
-                <Box className={"fs-16-regular white"}>{text ?? content?.text}</Box>
+                <Box className={"fs-h4 white"}>{t(content?.title)}</Box>
+                <Box className={"fs-16-regular white"}>{text ?? t(content?.text)}</Box>
               </Stack>
             </Stack>
             <Box onClick={() => setOpen(false)}>

@@ -7,13 +7,13 @@ import { isPermissionGranted, requestPermission, sendNotification } from "@tauri
 
 import PushNotification from "../components/home/PushNotification";
 
-import notiIcon from "../assets/main/32x32.png";
+import NotiIcon from "../assets/main/32x32.png";
 
 import { CONST_EVENT_NAMES } from "../const/EventConsts";
 import { INotificationContent, INotificationEventParams } from "../types/NotificationTypes";
 
 interface NotificationContextType {
-  showNotification: (_: string) => void;
+  showNotification: (_: INotificationEventParams) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -24,8 +24,14 @@ export const NotificationProvider = () => {
   const [content, setContent] = useState<INotificationContent>();
   const [customText, setCustormText] = useState<string>("");
   const [customLink, setCustomLink] = useState<string>("");
+  const [open, setOpen] = useState<boolean>(false);
 
-  const showNotification = () => {};
+  const showNotification = (data: INotificationEventParams) => {
+    setContent(data.content);
+    setCustormText(data.text);
+    setCustomLink(data.link);
+    setOpen(true);
+  };
 
   // useEffect(() => {
   //   const init = async () => {
@@ -39,7 +45,7 @@ export const NotificationProvider = () => {
   //       sendNotification({
   //         title: notificationTitle,
   //         body: notificationDetail,
-  //         icon: notiIcon,
+  //         icon: NotiIcon,
   //       });
   //     }
   //   };
@@ -54,6 +60,7 @@ export const NotificationProvider = () => {
       setContent(data.content);
       setCustormText(data.text);
       setCustomLink(data.link);
+      setOpen(true);
     });
 
     return () => {
@@ -68,7 +75,7 @@ export const NotificationProvider = () => {
       }}
     >
       <Outlet />
-      <PushNotification content={content} text={customText} link={customLink} />
+      <PushNotification content={content} text={customText} link={customLink} open={open} setOpen={setOpen} />
     </NotificationContext.Provider>
   );
 };

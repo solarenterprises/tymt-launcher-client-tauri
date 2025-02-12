@@ -9,6 +9,7 @@ import { Grid, Stack, Box, IconButton, Button } from "@mui/material";
 import { CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
 
 import { useWallet } from "../../providers/WalletProvider";
+import { useNotification } from "../../providers/NotificationProvider";
 
 import SwitchComp from "../../components/home/SwitchComp";
 import WalletCard from "../../components/wallet/WalletCard";
@@ -34,6 +35,7 @@ import percentIcon from "../../assets/wallet/PercentIcon.svg";
 import refreshIcon from "../../assets/wallet/RefreshIcon.svg";
 
 import WalletStyle from "../../styles/WalletStyles";
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
 // const order = ["Solar", "Binance", "Ethereum", "Bitcoin", "Solana", "Polygon", "Avalanche", "Arbitrum", "Optimism"];
 
@@ -43,6 +45,7 @@ const Wallet = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { currentSupportChain, currentCurrencySymbol, totalBalance } = useWallet();
+  const { showNotification } = useNotification();
 
   const currentTokenStore: ICurrentToken = useSelector(getCurrentToken);
   const balanceListStore: IBalanceList = useSelector(getBalanceList);
@@ -53,6 +56,7 @@ const Wallet = () => {
 
   const handleRefreshClick = useCallback(
     async () => {
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.DOWNLOAD_START });
       // try {
       //   const asyncAll = [
       //     dispatch(fetchBalanceListAsync(walletStore)),
