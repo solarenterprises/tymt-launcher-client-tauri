@@ -80,4 +80,32 @@ export const CONST_NOTIFICATION_CONTENTS = {
     duration: CONST_NOTIFICATION_DURATION.DEFAULT,
     link: "",
   },
+  PROFILE_UPDATE_SUCCESS: {
+    title: "set-85_success",
+    text: "set-99_profile-updated-successfully",
+    status: CONST_NOTIFICATION_STATUS.SUCCESS,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
+  PROFILE_UPDATE_FAIL: {
+    title: "wal-56_failed",
+    text: "set-100_profile-updated-failed",
+    status: CONST_NOTIFICATION_STATUS.FAILED,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
+  AVATAR_UPDATE_SUCCESS: {
+    title: "alt-32_avatar-saved",
+    text: "alt-33_avatar-saved-intro",
+    status: CONST_NOTIFICATION_STATUS.SUCCESS,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
+  AVATAR_UPDATE_FAIL: {
+    title: "alt-34_avatar-notsaved",
+    text: "alt-35_avatar-notsaved-intro",
+    status: CONST_NOTIFICATION_STATUS.FAILED,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
 };

@@ -209,6 +209,8 @@
     "set-96_chain_address_copied": "Your wallet address has been copied to clipboard. If you would like to switch to the network, please DOUBLE CLICK on it.",
     "set-97_network": "Network",
     "set-98_network-detail": "Ensure a secure connection for transactions within the blockchain network.",
+    "set-99_profile-updated-successfully": "Profile updated successfully",
+    "set-100_profile-updated-failed": "Profile update failed",
     "ncr-1_reset-wallet": "Reset Wallet",
     "ncr-2_please-write-secret": "Please Write Secret Recovery Phrase",
     "ncr-3_restore": "Restore",

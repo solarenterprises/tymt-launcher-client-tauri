@@ -209,6 +209,8 @@
     "set-96_chain_address_copied": "ウォレット アドレスがクリップボードにコピーされました。ネットワークに切り替える場合は、ダブルクリックしてください。",
     "set-97_network": "ネットワーク",
     "set-98_network-detail": "ブロックチェーン ネットワーク内のトランザクションの安全な接続を確保します。",
+    "set-99_profile-updated-successfully": "プロフィールが正常に更新されました",
+    "set-100_profile-updated-failed": "プロフィールの更新に失敗しました",
     "ncr-1_reset-wallet": "ウォレットをリセットする",
     "ncr-2_please-write-secret": "秘密の回復フレーズを書いてください",
     "ncr-3_restore": "復元",
