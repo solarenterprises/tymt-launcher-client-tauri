@@ -21,8 +21,6 @@ import Address from "./Address";
 import Backup from "./Backup";
 import ChooseProfile from "./ChooseProfile";
 
-import SettingStyle from "../../styles/SettingStyle";
-
 import closeImg from "../../assets/setting/CollapsCloseBtn.svg";
 
 type Anchor = "right";
@@ -33,7 +31,6 @@ export interface IPropsSettings {
 }
 
 const Settings = ({ view, setView }: IPropsSettings) => {
-  const classname = SettingStyle();
   const [state, setState] = useState({ right: false });
   const [panel, setPanel] = useState("main");
 
@@ -52,13 +49,25 @@ const Settings = ({ view, setView }: IPropsSettings) => {
       // onClose={toggleDrawer("right", false)}
       onClose={() => setView(false)}
       onOpen={toggleDrawer("right", true)}
-      classes={{ paper: classname.setting_container }}
+      // classes={{ paper: classname.setting_container }}
       slotProps={{
         backdrop: {
           onClick: toggleDrawer("right", false),
         },
       }}
       sx={{
+        "& .MuiPaper-root": {
+          height: "98% !important",
+          minWidth: "550px",
+          display: "flex",
+          borderRadius: "32px",
+          backgroundColor: "#8080804D !important",
+          backgroundBlendMode: "luminosity",
+          backdropFilter: "blur(4px)",
+          margin: "10px",
+          position: "fixed",
+          flexDirection: "row", // No need for "&.MuiPaper-root" here
+        },
         "& .MuiBox-root": {
           overflow: "auto", // Enable scrolling
           scrollbarWidth: "none", // Firefox
@@ -68,10 +77,23 @@ const Settings = ({ view, setView }: IPropsSettings) => {
         },
       }}
     >
-      <Box className={classname.collaps_pan}>
-        <img src={closeImg} className={classname.close_icon} onClick={() => setView(false)} />
+      <Box sx={{ width: "45px", height: "100%", position: "relative" }}>
+        <img src={closeImg} style={{ cursor: "pointer", position: "absolute", bottom: "40px" }} onClick={() => setView(false)} />
       </Box>
-      <Box className={classname.setting_pan}>
+      <Box
+        sx={{
+          maxWidth: "505px",
+          width: "100%",
+          height: "100%",
+          overflow: "scroll",
+          borderRadius: "24px",
+          backgroundColor: "#071516",
+          whiteSpace: "nowrap",
+          overFlowX: "auth",
+          scrollbarWidth: "none",
+          position: "relative",
+        }}
+      >
         <Main view={panel} setView={setPanel} />
         <Chain view={panel} setView={setPanel} />
         <General view={panel} setView={setPanel} />

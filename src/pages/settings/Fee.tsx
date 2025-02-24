@@ -12,8 +12,6 @@ import FeeSwitchButton from "../../components/home/FeeSwitchButton";
 // import { getCurrencyList } from "../../features/wallet/CurrencyListSlice";
 // import { getCurrentCurrency } from "../../features/wallet/CurrentCurrencySlice";
 
-import SettingStyle from "../../styles/SettingStyle";
-
 import backIcon from "../../assets/setting/BackIcon.svg";
 
 // import { IWalletSetting } from "../../types/settingTypes";
@@ -25,7 +23,6 @@ interface IPropsFee {
 }
 
 const Fee: FC<IPropsFee> = ({ view, setView }) => {
-  const classname = SettingStyle();
   const { t } = useTranslation();
 
   // const walletSettingStore: IWalletSetting = useSelector(getWalletSetting);
@@ -60,13 +57,65 @@ const Fee: FC<IPropsFee> = ({ view, setView }) => {
                   placeholder="0.0"
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end" classes={{ root: classname.adornment }}>
+                      <InputAdornment
+                        position="end"
+                        sx={{
+                          "& .MuiBox-root": {
+                            color: "white",
+                          },
+                          "& .MuiTypography-root": {
+                            color: "white",
+                          },
+                        }}
+                      >
                         {/* {symbol} */}
                       </InputAdornment>
                     ),
-                    classes: {
-                      input: classname.input,
-                    },
+                    // classes: {
+                    //   input: {
+                    //     width: "100%",
+                    //     textAlign: "right",
+
+                    //     height: "58px",
+                    //     borderRadius: "16px",
+                    //     border: "1px solid #FFFFFF1A",
+                    //     background: "#8080801A",
+                    //     backgroundBlendMode: "luminosity",
+                    //     color: "white",
+                    //     boxShadow: "none",
+                    //     "& .MuiInputBase-input": {
+                    //       font: "unset",
+                    //       color: "white",
+                    //       fontFamily: "Cobe",
+                    //       fontSize: "18px",
+                    //       fontStyle: "normal",
+                    //       fontWeight: "400",
+                    //       lineHeight: "24px",
+                    //       letterSpacing: "-0.36px",
+                    //       padding: "0px 3px 5px  5px",
+                    //       border: "none",
+                    //       background: "none",
+                    //     },
+                    //     "& .MuiInputBase-root": {
+                    //       font: "unset",
+                    //       height: "58px",
+                    //       borderRadius: "16px",
+                    //       border: "1px solid #FFFFFF1A",
+                    //       background: "#8080801A",
+                    //       backgroundBlendMode: "luminosity",
+                    //       fontFamily: "Cobe",
+                    //       color: "var(--Basic-Light, #AFAFAF)",
+                    //     },
+                    //     "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+                    //       borderColor: "#FFFFFF33",
+                    //       borderWidth: "3px",
+                    //     },
+                    //     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    //       borderColor: "#FFFFFF33",
+                    //       borderWidth: "3px",
+                    //     },
+                    //   },
+                    // },
                   }}
                   // value={numeral(
                   //   Number(walletSettingStore?.fee) * Number(reserve)
@@ -80,7 +129,49 @@ const Fee: FC<IPropsFee> = ({ view, setView }) => {
                     //   })
                     // );
                   }}
-                  className={classname.input}
+                  sx={{
+                    width: "100%",
+                    textAlign: "right",
+
+                    height: "58px",
+                    borderRadius: "16px",
+                    border: "1px solid #FFFFFF1A",
+                    background: "#8080801A",
+                    backgroundBlendMode: "luminosity",
+                    color: "white",
+                    boxShadow: "none",
+                    "& .MuiInputBase-input": {
+                      font: "unset",
+                      color: "white",
+                      fontFamily: "Cobe",
+                      fontSize: "18px",
+                      fontStyle: "normal",
+                      fontWeight: "400",
+                      lineHeight: "24px",
+                      letterSpacing: "-0.36px",
+                      padding: "0px 3px 5px  5px",
+                      border: "none",
+                      background: "none",
+                    },
+                    "& .MuiInputBase-root": {
+                      font: "unset",
+                      height: "58px",
+                      borderRadius: "16px",
+                      border: "1px solid #FFFFFF1A",
+                      background: "#8080801A",
+                      backgroundBlendMode: "luminosity",
+                      fontFamily: "Cobe",
+                      color: "var(--Basic-Light, #AFAFAF)",
+                    },
+                    "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#FFFFFF33",
+                      borderWidth: "3px",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#FFFFFF33",
+                      borderWidth: "3px",
+                    },
+                  }}
                 />
               </Box>
               <Box

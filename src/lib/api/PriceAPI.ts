@@ -56,7 +56,7 @@ export class PriceAPI {
       if (!data) return;
       const res: IPrice[] = data.map((one) => {
         return {
-          cmc: one?.cmc,
+          symbol: one?.symbol,
           price: one?.price,
         };
       });

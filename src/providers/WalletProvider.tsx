@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import tymtCore from "../lib/core/tymtCore";
+
 import { CONST_CURRENCY_SYMBOLS } from "../const/CurrencyConsts";
 import { CONST_CHAIN_NAMES, CONST_SUPPORT_CHAINS } from "../const/ChainConsts";
 import { CONST_FEE_SXP } from "../const/WalletConsts";
@@ -9,11 +11,14 @@ import { getCurrentChain } from "../store/CurrentChainSlice";
 import { getCurrentCurrency } from "../store/CurrentCurrencySlice";
 import { getCurrentToken, setCurrentToken } from "../store/CurrentTokenSlice";
 import { getWallet } from "../store/WalletSlice";
-import { getPriceList } from "../store/PriceListSlice";
-import { getBalanceList } from "../store/BalanceListSlice";
+import { /*appendPriceList,*/ getPriceList } from "../store/PriceListSlice";
+import { /*appendBalanceList,*/ getBalanceList } from "../store/BalanceListSlice";
 import { getReserveList } from "../store/ReserveListSlice";
 import { getWalletSetting, setWalletSetting } from "../store/WalletSettingSlice";
 import { getMnemonic } from "../store/MnemonicSlice";
+// import { getAccount } from "../store/AccountSlice";
+
+import { CryptoAPI } from "../lib/api/CryptoAPI";
 
 import {
   getCurrentChainWalletAddress,
@@ -34,7 +39,6 @@ import { IPriceList } from "../types/PriceTypes";
 import { IAccount, IMnemonic } from "../types/AccountTypes";
 import { IWalletSetting } from "../types/SettingTypes";
 import { IRecipient } from "../types/TransactionTypes";
-import tymtCore from "../lib/core/tymtCore";
 
 interface WalletContextType {
   passphrase: string;
@@ -58,6 +62,8 @@ interface WalletContextType {
   transferCoin: (recipients: IRecipient[], fee: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   setSxpFeeAsInput: (_: number) => void;
   fetchBalanceList: () => void;
+  fetchPriceList: () => void;
+  handleRefreshClick: () => void;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -106,11 +112,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     let total = 0;
     CONST_SUPPORT_CHAINS.forEach((supportChain) => {
       const nativeBalance = balanceListStore.list.find((one) => one.symbol === supportChain.native.symbol)?.balance || 0;
-      const nativePrice = priceListStore.list.find((one) => one.cmc === supportChain.native.cmc)?.price || 0;
+      const nativePrice = priceListStore.list.find((one) => one.symbol === supportChain.native.cmc)?.price || 0;
       total += nativeBalance * nativePrice;
       supportChain.tokens.forEach((token) => {
         const tokenBalance = balanceListStore.list.find((one) => one.symbol === token.symbol)?.balance || 0;
-        const tokenPrice = priceListStore.list.find((one) => one.cmc === token.cmc)?.price || 0;
+        const tokenPrice = priceListStore.list.find((one) => one.symbol === token.cmc)?.price || 0;
         total += tokenBalance * tokenPrice;
       });
     });
@@ -147,10 +153,29 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const fetchBalanceList = useCallback(async () => {
     if (!walletStore || !walletStore?.solar) return;
     console.time("fetchBalanceList");
-    // const balanceList = await window.electronAPI.fetchBalanceList(walletStore);
-    console.timeEnd("fetchBalanceList");
+    const balanceList = await CryptoAPI.getAllBalance({ evmAddress: walletStore?.ethereum, solAddress: walletStore?.solana, btcAddress: walletStore?.bitcoin });
+    console.log("balanceList", balanceList);
     // dispatch(setBalanceList(balanceList));
+    console.timeEnd("fetchBalanceList");
   }, [walletStore, dispatch]);
+
+  const fetchPriceList = async () => {
+    try {
+      const priceList = await CryptoAPI.getAllPrices();
+      console.log("priceList", priceList);
+      // dispatch(setPriceList(priceList));
+    } catch (err) {
+      console.error("Failed to fetchPriceList: ", err);
+    }
+  };
+
+  const handleRefreshClick = useCallback(async () => {
+    try {
+      await Promise.all([fetchPriceList(), fetchBalanceList()]);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  }, [fetchPriceList, fetchBalanceList]);
 
   const getEthPrivateKey = async (passphrase: string) => {
     const privateKey = await tymtCore.Blockchains.eth.wallet.getPrivateKey(passphrase);
@@ -161,8 +186,20 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     getEthPrivateKey(passphrase);
   }, [passphrase]);
 
+  // useEffect(() => {
+  //   let intervalId;
+  //   if (authStore?.isLoggedIn) {
+  //     fetchPriceList();
+  //     intervalId = setInterval(fetchPriceList, 1000 * 60 * 60);
+  //   }
+  //   return () => {
+  //     if (intervalId) clearInterval(intervalId);
+  //   };
+  // }, [authStore?.isLoggedIn]);
+
   useEffect(() => {
-    fetchBalanceList();
+    // fetchBalanceList();
+    // fetchPriceList();
     // const intervalId = setInterval(fetchBalanceList, 10000);
     // return () => clearInterval(intervalId);
   }, [dispatch, walletStore]);
@@ -210,6 +247,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         transferCoin,
         setSxpFeeAsInput,
         fetchBalanceList,
+        fetchPriceList,
+        handleRefreshClick,
       }}
     >
       {children}

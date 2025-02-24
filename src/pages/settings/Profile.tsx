@@ -18,8 +18,6 @@ import { UserAPI } from "../../lib/api/UserAPI";
 
 import { IAccount } from "../../types/AccountTypes";
 
-import SettingStyle from "../../styles/SettingStyle";
-
 import backIcon from "../../assets/setting/BackIcon.svg";
 import editIcon from "../../assets/setting/EditIcon.svg";
 import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
@@ -30,7 +28,6 @@ interface IPropsProfile {
 }
 
 const Profile: FC<IPropsProfile> = ({ view, setView }) => {
-  const classname = SettingStyle();
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { showNotification } = useNotification();
@@ -125,7 +122,10 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
               </Stack>
               <Box className="center-align">
                 <Box sx={{ display: "flex" }} className="common-btn" onClick={launchUploader}>
-                  <Tooltip title={t("set-82_edit")} classes={{ tooltip: classname.tooltip }}>
+                  <Tooltip
+                    title={t("set-82_edit")}
+                    sx={{ padding: "6px 8px 6px 8px", borderRadius: "32px", border: "1px", borderColor: "#FFFFFF1A", backgroundColor: "#8080804D" }}
+                  >
                     <img src={editIcon} style={{ cursor: "pointer" }} />
                   </Tooltip>
                 </Box>

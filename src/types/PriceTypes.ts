@@ -1,5 +1,5 @@
 export interface IPrice {
-  cmc: string;
+  symbol: string;
   price: number;
 }
 

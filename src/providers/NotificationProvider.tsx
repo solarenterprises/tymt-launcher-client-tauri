@@ -1,13 +1,13 @@
-import { createContext, useContext, ReactNode, useEffect, useState } from "react";
-import { useLocation, Outlet } from "react-router-dom";
+import { createContext, useContext, useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 
-import { invoke } from "@tauri-apps/api/core";
+// import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/plugin-notification";
+// import { isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/plugin-notification";
 
 import PushNotification from "../components/home/PushNotification";
 
-import NotiIcon from "../assets/main/32x32.png";
+// import NotiIcon from "../assets/main/32x32.png";
 
 import { CONST_EVENT_NAMES } from "../const/EventConsts";
 import { INotificationContent, INotificationEventParams } from "../types/NotificationTypes";

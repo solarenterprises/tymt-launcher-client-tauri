@@ -9,6 +9,8 @@ export const CONFIG_TYMT_SOCKET_BACKEND_URL =
 export const CONFIG_TYMT_AVATAR_URL =
   import.meta.env.VITE_APP_PRODUCTION_VERSION === "prod" ? import.meta.env.VITE_APP_TYMT_AVATAR_URL : import.meta.env.VITE_APP_TYMT_AVATAR_DEV_URL;
 
+export const CONFIG_NOWNODES_URL = import.meta.env.VITE_APP_NOWNODES_URL;
+
 export const CONFIG_TYMT_RELEASE_DATE = import.meta.env.VITE_APP_TYMT_RELEASE_DATE;
 export const CONFIG_TYMT_VERSION = import.meta.env.VITE_APP_TYMT_VERSION;
 

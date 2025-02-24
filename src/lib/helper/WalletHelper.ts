@@ -148,7 +148,7 @@ export const getSupportTokensByChainName = (chainName: string) => {
 
 export const getTokenPriceByCmc = (priceListStore: IPriceList, cmc: string) => {
   try {
-    const res = priceListStore?.list?.find((one) => one?.cmc === cmc)?.price;
+    const res = priceListStore?.list?.find((one) => one?.symbol === cmc)?.price;
     return res;
   } catch (err) {
     console.error("Failed to getCurrentChainNativeTokenPrice: ", err);

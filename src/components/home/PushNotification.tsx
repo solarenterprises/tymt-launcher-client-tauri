@@ -7,8 +7,6 @@ import Slide from "@mui/material/Slide";
 
 import { INotificationContent } from "../../types/NotificationTypes";
 
-import CommonStyles from "../../styles/commonStyles";
-
 import FailedIcon from "../../assets/alert/FailedIcon.svg";
 import SuccessIcon from "../../assets/alert/SuccessIcon.svg";
 import WarningIcon from "../../assets/alert/WarningIcon.svg";
@@ -29,7 +27,6 @@ export interface IPropsPushNotification {
 
 const PushNotification = ({ content, text, link, open, setOpen }: IPropsPushNotification) => {
   const navigate = useNavigate();
-  const classname = CommonStyles();
   const { t } = useTranslation();
 
   const [border, setBorder] = useState("");
@@ -95,17 +92,26 @@ const PushNotification = ({ content, text, link, open, setOpen }: IPropsPushNoti
         }}
       >
         <Stack
-          className={classname.alert_container}
           direction={"column"}
           sx={{
             border: `2px solid ${border}`,
             backdropFilter: "blur(4px)",
             background: bg,
+            padding: "12px 16px 12px 16px",
+            borderRadius: "24px",
+            gap: "15px",
           }}
         >
           <Stack direction={"row"} justifyContent={"space-between"}>
             <Stack direction={"row"} gap={"12px"} alignItems={"center"}>
-              <Box className={classname.center_align}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  alignItems: "center",
+                }}
+              >
                 <img src={logo} />
               </Box>
 

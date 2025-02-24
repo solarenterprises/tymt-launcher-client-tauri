@@ -1,20 +1,19 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-import { BalanceAPI } from "../lib/api/BalanceAPI";
+import { createSlice } from "@reduxjs/toolkit";
 
 import { compareJSONStructure } from "../lib/helper/JSONHelper";
 import { resetBalanceList } from "../lib/helper/BalanceHelper";
 
 import { IBalance, IBalanceList } from "../types/WalletTypes";
+import tymtStorage from "../lib/storage/tymtStorage";
 
 const init: IBalanceList = {
   list: resetBalanceList(),
 };
 
 const loadBalanceList: () => IBalanceList = () => {
-  const data = sessionStorage.getItem(`balanceList`);
+  const data = tymtStorage.get(`balanceList`);
   if (!data || !compareJSONStructure(JSON.parse(data), init)) {
-    sessionStorage.setItem(`balanceList`, JSON.stringify(init));
+    tymtStorage.set(`balanceList`, JSON.stringify(init));
     return init;
   }
   return JSON.parse(data);
@@ -26,46 +25,23 @@ const initialState = {
   msg: "",
 };
 
-export const fetchBalanceListAsync = createAsyncThunk("balanceList/fetchBalanceListAsync", BalanceAPI.fetchBalanceList);
-export const fetchChainBalanceAsync = createAsyncThunk("balanceList/fetchChainBalanceAsync", BalanceAPI.fetchChainBalance);
-
 export const balanceListSlice = createSlice({
   name: "balanceList",
   initialState,
   reducers: {
     setBalanceList: (state, action) => {
       state.data.list = action.payload;
-      sessionStorage.setItem(`balanceList`, JSON.stringify(state.data));
+      tymtStorage.set(`balanceList`, JSON.stringify(state.data));
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchBalanceListAsync.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchBalanceListAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        const data = action.payload as IBalance[];
-        if (!data) return;
-        const rest = state.data.list.filter((one) => !data?.some((item) => item?.symbol === one?.symbol));
-        state.data.list = [...rest, ...data];
-        sessionStorage.setItem(`balanceList`, JSON.stringify(state.data));
-        state.status = "balanceList";
-      })
-      .addCase(fetchChainBalanceAsync.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchChainBalanceAsync.fulfilled, (state, action: PayloadAction<any>) => {
-        const data = action.payload as IBalance[];
-        if (!data) return;
-        const rest = state.data.list.filter((one) => !data?.some((item) => item?.symbol === one?.symbol));
-        state.data.list = [...rest, ...data];
-        sessionStorage.setItem(`balanceList`, JSON.stringify(state.data));
-        state.status = "balanceList";
-      });
+    appendBalanceList: (state, action) => {
+      const temp = state.data.list.filter((one) => !(action.payload as IBalance[]).some((two) => two.symbol === one.symbol));
+      state.data.list = [...temp, ...action.payload];
+      tymtStorage.set(`balanceList`, JSON.stringify(state.data));
+    },
   },
 });
 
 export const getBalanceList = (state: any) => state.balanceList.data;
-export const { setBalanceList } = balanceListSlice.actions;
+export const { setBalanceList, appendBalanceList } = balanceListSlice.actions;
 
 export default balanceListSlice.reducer;
