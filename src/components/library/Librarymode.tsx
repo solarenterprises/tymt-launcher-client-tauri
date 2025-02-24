@@ -12,15 +12,14 @@ const LibraryModeButton = ({ status, setStatus }: IPropsMode) => {
       alignItems={"center"}
       spacing={"2px"}
       sx={{
-        "&.MuiButtonBase-root, &.MuiBox-root": {
-          display: "block",
-          textTransform: "none",
-          color: "#52E1F21A",
-          minWidth: "unset",
-          boxShadow: "none",
-          padding: "0px",
-          borderRadius: "16px",
-        },
+        padding: "2px",
+        borderRadius: "16px",
+        gap: "2px",
+        border: "1px solid",
+        borderColor: "#FFFFFF1A",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <Button
@@ -29,13 +28,15 @@ const LibraryModeButton = ({ status, setStatus }: IPropsMode) => {
           setMode(0);
         }}
         sx={{
-          padding: "2px",
-          borderRadius: "16px",
-          gap: "2px",
-          border: "1px solid",
-          borderColor: "#FFFFFF1A",
-          background: "#0B1718",
-          alignItems: "center",
+          "&.MuiButtonBase-root, &.MuiBox-root": {
+            display: "block",
+            textTransform: "none",
+            color: "#52E1F21A",
+            minWidth: "unset",
+            boxShadow: "none",
+            padding: "0px",
+            borderRadius: "16px",
+          },
           backgroundColor: mode === 0 ? "rgba(82, 225, 242, 0.10)" : undefined,
           "&:hover": {
             backgroundColor: mode === 0 ? "rgba(82, 225, 242, 0.10)" : undefined,
@@ -64,13 +65,15 @@ const LibraryModeButton = ({ status, setStatus }: IPropsMode) => {
           setMode(2);
         }}
         sx={{
-          padding: "2px",
-          borderRadius: "16px",
-          gap: "2px",
-          border: "1px solid",
-          borderColor: "#FFFFFF1A",
-          background: "#0B1718",
-          alignItems: "center",
+          "&.MuiButtonBase-root, &.MuiBox-root": {
+            display: "block",
+            textTransform: "none",
+            color: "#52E1F21A",
+            minWidth: "unset",
+            boxShadow: "none",
+            padding: "0px",
+            borderRadius: "16px",
+          },
           backgroundColor: mode === 2 ? "rgba(82, 225, 242, 0.10)" : undefined,
           "&:hover": {
             backgroundColor: mode === 2 ? "rgba(82, 225, 242, 0.10)" : undefined,
@@ -99,13 +102,15 @@ const LibraryModeButton = ({ status, setStatus }: IPropsMode) => {
           setMode(3);
         }}
         sx={{
-          padding: "2px",
-          borderRadius: "16px",
-          gap: "2px",
-          border: "1px solid",
-          borderColor: "#FFFFFF1A",
-          background: "#0B1718",
-          alignItems: "center",
+          "&.MuiButtonBase-root, &.MuiBox-root": {
+            display: "block",
+            textTransform: "none",
+            color: "#52E1F21A",
+            minWidth: "unset",
+            boxShadow: "none",
+            padding: "0px",
+            borderRadius: "16px",
+          },
           backgroundColor: mode === 3 ? "rgba(82, 225, 242, 0.10)" : undefined,
           "&:hover": {
             backgroundColor: mode === 3 ? "rgba(82, 225, 242, 0.10)" : undefined,
