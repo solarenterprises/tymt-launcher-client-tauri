@@ -100,15 +100,15 @@ export class Solar {
     }
   }
 
-  static async vote(passphrase: string, addr: string, votesAsset: any, feeUSD: string, sxpPriceUSD: number) {
+  static async vote(passphrase: string, addr: string, votesAsset: any, sxpFee: number) {
     Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
     let nonce = await this.getCurrentNonce(addr);
     let tx = Transactions.BuilderFactory.vote()
       .nonce((nonce + 1).toString())
       .votesAsset(votesAsset)
       .fee(
-        Big(feeUSD)
-          .times((10 ** 8 / Number(sxpPriceUSD)) as number)
+        Big(sxpFee)
+          .times(10 ** 8)
           .toFixed(0)
       )
       .sign(passphrase);

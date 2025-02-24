@@ -58,7 +58,7 @@ interface WalletContextType {
   currentChainNativeBalance: number;
   totalBalance: number;
 
-  sxpVote: (_: IAccount, __: IWalletAddresses, ___: number, ____: string, _____: IVotingData) => Promise<{ success: boolean; error?: string }>;
+  sxpVote: (__: IWalletAddresses, ___: number, _____: IVotingData) => Promise<{ success: boolean; error?: string }>;
   transferCoin: (recipients: IRecipient[], fee: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   setSxpFeeAsInput: (_: number) => void;
   fetchBalanceList: () => void;
@@ -132,10 +132,26 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   );
 
   //@ts-ignore
-  const sxpVote = async (accountStore: IAccount, walletStore: IWalletAddresses, sxpFee: number, password: string, voteAsset: IVotingData) => {
-    // return window.electronAPI.sxpVote(accountStore, walletStore, sxpFee, password, voteAsset);
-    return null;
-  };
+  const sxpVote = useCallback(
+    async (walletStore: IWalletAddresses, sxpFee: number, voteAsset: IVotingData) => {
+      try {
+        const res = await tymtCore.Blockchains.solar.wallet.vote(passphrase, walletStore?.solar, voteAsset, sxpFee);
+        if (res.data.data.invalid[0]) {
+          const temp = res.data.data.invalid[0];
+          const err = res.data.errors[temp].message;
+          throw new Error(err);
+        }
+        return { success: true };
+      } catch (err) {
+        console.error("Failed to sxpVote: ", err);
+        return {
+          success: false,
+          error: err.message,
+        };
+      }
+    },
+    [passphrase]
+  );
 
   const transferCoin = useCallback(
     async (

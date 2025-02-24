@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import numeral from "numeral";
 
 import { Box, Stack, Modal, Button, TextField, InputAdornment, CircularProgress, Fade } from "@mui/material";
 
 import { useWallet } from "../../providers/WalletProvider";
+import { useNotification } from "../../providers/NotificationProvider";
 
 import InputText from "../account/InputText";
 import FeeSwitchButton from "../home/FeeSwitchButton";
@@ -23,6 +23,7 @@ import { IWalletSetting } from "../../types/SettingTypes";
 import closeIcon from "../../assets/setting/XIcon.svg";
 import logo from "../../assets/main/FoxHeadComingSoon.png";
 import solarBlockchainIcon from "../../assets/main/SolarBlockchain.png";
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
 export interface IPropsPasswordModal {
   open: boolean;
@@ -32,7 +33,8 @@ export interface IPropsPasswordModal {
 
 const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
   const { t } = useTranslation();
-  const { currentCurrencySymbol, currentCurrencyReserve, sxpFee, sxpVote } = useWallet();
+  const { sxpFee, setSxpFeeAsInput, sxpVote } = useWallet();
+  const { showNotification } = useNotification();
 
   const accountStore: IAccount = useSelector(getAccount);
   const walletStore: IWalletAddresses = useSelector(getWallet);
@@ -54,12 +56,14 @@ const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
   const handleVoteClick = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await sxpVote(accountStore, walletStore, sxpFee, password, voteAsset);
+      const res = await sxpVote(walletStore, sxpFee, voteAsset);
       if (res.success) {
         setOpen(false);
         setPassword("");
+        showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_SUCCESS });
       } else {
         console.error("Failed to handleVoteClick: ", res.error);
+        showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_FAIL, text: res.error });
       }
       setLoading(false);
     } catch (err) {
@@ -67,6 +71,7 @@ const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
       setOpen(false);
       setPassword("");
       setLoading(false);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_FAIL, text: err.message });
     }
   }, [walletStore, accountStore, walletSettingStore, password]);
 
@@ -101,32 +106,21 @@ const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
                   type="text"
                   id="outlined-adornment-weight"
                   placeholder="0.0"
+                  autoComplete="off"
                   InputProps={{
                     inputMode: "numeric",
                     endAdornment: (
                       <InputAdornment position="end" sx={{ "& .MuiBox-root": { color: "white" }, "& .MuiTypography-root": { color: "white" } }}>
-                        {currentCurrencySymbol}
+                        <Box className={`fs-16-regular`}> {`SXP`}</Box>
                       </InputAdornment>
                     ),
                   }}
-                  value={numeral(Number(sxpFee) * Number(currentCurrencyReserve)).format("0,0.0000")}
-                  // onBlur={(e) => {
-                  //   dispatch(
-                  //     setWallet({
-                  //       ...walletStore,
-                  //       status: "input",
-                  //       fee: Number(e.target.value) / Number(reserve),
-                  //     })
-                  //   );
-                  // }}
-                  onChange={() => {
-                    // dispatch(
-                    //   setWalletSetting({
-                    //     ...walletSettingStore,
-                    //     status: "input",
-                    //     fee: Number(e.target.value) / Number(reserve),
-                    //   })
-                    // );
+                  value={sxpFee}
+                  onBlur={(e) => {
+                    setSxpFeeAsInput(parseFloat(e.target.value));
+                  }}
+                  onChange={(e) => {
+                    setSxpFeeAsInput(parseFloat(e.target.value));
                   }}
                   sx={{
                     width: "100%",
@@ -148,9 +142,10 @@ const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
                       fontWeight: "400",
                       lineHeight: "24px",
                       letterSpacing: "-0.36px",
-                      padding: "0px 3px 5px  5px",
+                      padding: "4px 3px 5px",
                       border: "none",
                       background: "none",
+                      textAlign: "right", // Text alignment inside the input
                     },
                     "& .MuiInputBase-root": {
                       font: "unset",

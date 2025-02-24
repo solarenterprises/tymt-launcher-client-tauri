@@ -122,4 +122,18 @@ export const CONST_NOTIFICATION_CONTENTS = {
     duration: CONST_NOTIFICATION_DURATION.DEFAULT,
     link: "",
   },
+  VOTE_SUCCESS: {
+    title: "set-85_success",
+    text: "wal-48_successfully-voted",
+    status: CONST_NOTIFICATION_STATUS.SUCCESS,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
+  VOTE_FAIL: {
+    title: "wal-56_failed",
+    text: "wal-49_vote-failed",
+    status: CONST_NOTIFICATION_STATUS.FAILED,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
 };
