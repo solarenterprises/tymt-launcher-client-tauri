@@ -2,8 +2,6 @@ import { useMemo } from "react";
 
 import { Grid } from "@mui/material";
 
-import { CONST_GAME_LIST } from "../../const/games/GameConsts";
-
 import { useAppSelector } from "../../store";
 import { getGameList } from "../../store/GameListSlice";
 
@@ -32,7 +30,7 @@ const StoreGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGam
     return res;
   }, [gameListStore]);
 
-  const allGames: IGame[] = useMemo(() => [...CONST_GAME_LIST, ...gameListStore.games], [gameListStore]);
+  const allGames: IGame[] = useMemo(() => [...gameListStore.games], [gameListStore]);
 
   const resultGames: IGame[] = useMemo(() => {
     let data = [...allGames];

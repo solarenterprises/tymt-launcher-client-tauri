@@ -1,14 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { Grid, Button, Box, Stack } from "@mui/material";
 
-import { CONST_GAME_LIST } from "../../const/games/GameConsts";
+import { IGameList } from "../../types/GameTypes";
+import { useSelector } from "react-redux";
+import { getGameList } from "../../store/GameListSlice";
 
 const GameBarSticker = () => {
   const navigate = useNavigate();
 
+  const gameListStore: IGameList = useSelector(getGameList);
+
   return (
     <>
-      {CONST_GAME_LIST?.map((game, index) => (
+      {gameListStore?.games?.slice(0, 4)?.map((game, index) => (
         <Grid item key={index}>
           <Button
             className="button_gamecontent"

@@ -3,8 +3,6 @@ import { useTranslation } from "react-i18next";
 
 import { Grid, Box } from "@mui/material";
 
-import { CONST_GAME_LIST } from "../../const/games/GameConsts";
-
 import AnimatedComponent from "./AnimatedComponent";
 import StoreGameCard from "../game/StoreGameCard";
 
@@ -18,7 +16,7 @@ const RecentlyAddedGames = () => {
   const gameListStore: IGameList = useAppSelector(getGameList);
 
   const activeGameList: IGame[] = useMemo(() => gameListStore?.games?.filter((one) => one?.visibilityState === "active"), [gameListStore]);
-  const displayGameList: IGame[] = useMemo(() => [...CONST_GAME_LIST, ...activeGameList], [activeGameList, CONST_GAME_LIST]);
+  const displayGameList: IGame[] = useMemo(() => [...activeGameList], [activeGameList]);
 
   return (
     <>

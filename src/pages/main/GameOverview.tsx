@@ -2,8 +2,6 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { CONST_GAME_LIST } from "../../const/games/GameConsts";
-
 import { Grid } from "@mui/material";
 
 import AnimatedComponent from "../../components/home/AnimatedComponent";
@@ -48,7 +46,7 @@ const GameOverview = () => {
   }, [gameListStore]);
 
   const game = useMemo(
-    () => [...CONST_GAME_LIST, ...gameListStore.games, ...comingGameListStore.games]?.find((game) => game?._id === gameId),
+    () => [...gameListStore.games, ...comingGameListStore.games]?.find((game) => game?._id === gameId),
     [comingGameListStore, gameListStore]
   );
 

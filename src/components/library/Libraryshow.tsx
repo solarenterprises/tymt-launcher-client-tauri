@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CONST_GAME_LIST } from "../../const/games/GameConsts";
-
 import { Grid, Box, Stack } from "@mui/material";
 
 import AnimatedComponent from "../home/AnimatedComponent";
@@ -26,7 +24,7 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
   const gameListStore: IGameList = useSelector(getGameList);
 
   const activeGameList: IGame[] = useMemo(() => gameListStore?.games?.filter((one) => one?.visibilityState === "active"), [gameListStore]);
-  const displayGameList: IGame[] = useMemo(() => [...CONST_GAME_LIST, ...activeGameList], [activeGameList, CONST_GAME_LIST]);
+  const displayGameList: IGame[] = useMemo(() => [...activeGameList], [activeGameList]);
 
   const [installedList, setInstalledList] = useState<IGame[]>([]);
 
