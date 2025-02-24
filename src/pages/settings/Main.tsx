@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import numeral from "numeral";
 
-import { Box, Button, Divider, Stack, Tooltip } from "@mui/material";
+import { Box, Button, Divider, Stack } from "@mui/material";
 
 import { useWallet } from "../../providers/WalletProvider";
 
@@ -24,6 +24,7 @@ import copyIcon from "../../assets/setting/CopyIcon.svg";
 import searchIcon from "../../assets/setting/SearchIcon.svg";
 import exitIcon from "../../assets/setting/ExitIcon.svg";
 import { setAuth } from "../../store/AuthSlice";
+import TooltipComponent from "../../components/home/TooltipComponent";
 
 export interface IPropsMain {
   view: string;
@@ -169,34 +170,25 @@ const Main = ({ view, setView }: IPropsMain) => {
             <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
             <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center", alignItem: "center", gap: "45px", margin: "20px" }}>
               <Button className="tooltip-btn" onClick={() => navigator.clipboard.writeText(currentChainWalletAddress ?? "")}>
-                <Tooltip
-                  title={t("set-79_copy-address")}
-                  sx={{ padding: "6px 8px 6px 8px", borderRadius: "32px", border: "1px", borderColor: "#FFFFFF1A", backgroundColor: "#8080804D" }}
-                >
+                <TooltipComponent placement="bottom" text={t("set-79_copy-address")}>
                   <Box className="center-align">
                     <img src={copyIcon} data-tooltip-id="copy-tooltip" />
                   </Box>
-                </Tooltip>
+                </TooltipComponent>
               </Button>
               <Button className="tooltip-btn" onClick={handleExplorer}>
-                <Tooltip
-                  title={t("set-80_open-in-explorer")}
-                  sx={{ padding: "6px 8px 6px 8px", borderRadius: "32px", border: "1px", borderColor: "#FFFFFF1A", backgroundColor: "#8080804D" }}
-                >
+                <TooltipComponent placement="bottom" text={t("set-80_open-in-explorer")}>
                   <Box className="center-align">
                     <img src={searchIcon} />
                   </Box>
-                </Tooltip>
+                </TooltipComponent>
               </Button>
               <Button className="tooltip-btn" onClick={handleLogout}>
-                <Tooltip
-                  title={t("set-81_disconnect")}
-                  sx={{ padding: "6px 8px 6px 8px", borderRadius: "32px", border: "1px", borderColor: "#FFFFFF1A", backgroundColor: "#8080804D" }}
-                >
+                <TooltipComponent placement="bottom" text={t("set-81_disconnect")}>
                   <Box className="center-align">
                     <img src={exitIcon} />
                   </Box>
-                </Tooltip>
+                </TooltipComponent>
               </Button>
             </Box>
           </Box>

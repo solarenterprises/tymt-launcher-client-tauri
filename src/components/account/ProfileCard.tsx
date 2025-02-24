@@ -41,7 +41,7 @@ const ProfileCard = ({ account }: IPropsProfileCard) => {
         onClick={handleClick}
         sx={{
           textTransform: "none",
-          width: "100%",
+          // width: "100%",
           border: "1px solid #FFFFFF1A",
           padding: "12px 8px 6px",
           borderRadius: "16px",

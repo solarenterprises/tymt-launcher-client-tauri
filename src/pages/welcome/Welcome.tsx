@@ -99,7 +99,7 @@ const Welcome = () => {
                     <Grid item xs={12} mt={"32px"}>
                       <OrLine />
                     </Grid>
-                    <Grid item xs={12} mt={"32px"}>
+                    <Grid item xs={12} mt={"16px"}>
                       <AuthIconButtons />
                     </Grid>
                   </Grid>

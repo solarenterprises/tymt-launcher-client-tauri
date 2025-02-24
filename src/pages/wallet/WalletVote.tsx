@@ -4,7 +4,7 @@ import numeral from "numeral";
 
 import { CONFIG_SOLAR_SCAN } from "../../config/MainConfig";
 
-import { Grid, Box, Divider, Stack, Button, Pagination, IconButton, Tooltip } from "@mui/material";
+import { Grid, Box, Divider, Stack, Button, Pagination, IconButton, Tooltip, CircularProgress } from "@mui/material";
 
 import { useWallet } from "../../providers/WalletProvider";
 
@@ -37,6 +37,7 @@ const WalletVote = () => {
   const [latestBlock, setLatestBlock] = useState<number>(0);
   const [totalVoted, setTotalVoted] = useState<number>(0);
   const [totalRewards, setTotalRewards] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleRefreshClick = async () => {
     try {
@@ -66,10 +67,16 @@ const WalletVote = () => {
     }
   };
 
-  const handlePageChange = (_event: any, value: number) => {
-    Solar.get53Delegates(value).then((res) => {
+  const handlePageChange = async (_event: any, value: number) => {
+    setCurrentPage(value);
+    setLoading(true);
+    try {
+      const res = await Solar.get53Delegates(value);
       setData(res.data.data);
-    });
+    } catch (err) {
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -168,9 +175,9 @@ const WalletVote = () => {
             <Stack padding={"24px 40px"}>
               <Box className="fs-16-regular light t-center">{t("wal-18_total-voted")}</Box>
               <Box className="fs-34-bold white t-center">{`${numeral(totalVoted).format("0,0")} SXP`}</Box>
-              <Box className="fs-18-regular light t-center">{`${currentCurrencySymbol} ${numeral(
-                totalVoted * Number(sxpPrice) * Number(currentCurrencyReserve)
-              ).format("0,0")}`}</Box>
+              <Box className="fs-18-regular light t-center">{`${currentCurrencySymbol} ${numeral(totalVoted * sxpPrice * currentCurrencyReserve).format(
+                "0,0"
+              )}`}</Box>
             </Stack>
             <Stack padding={"32px 24px"}>
               <Box
@@ -299,7 +306,138 @@ const WalletVote = () => {
                     <Box className="fs-14-regular light">{""}</Box>
                   </Grid>
                 </Grid>
-                {data.map((item, index) => (
+                {loading ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center", // Optional for vertical alignment
+                      width: "100%", // Fill the parent width
+                      padding: "50px 0",
+                    }}
+                  >
+                    <CircularProgress
+                      size="100px"
+                      sx={{
+                        color: "#F5EBFF",
+                        width: "40px",
+                        height: "40px",
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  data.map((item, index) => (
+                    <Button
+                      key={`blockproducer-${item.address}`}
+                      sx={{
+                        height: "74px",
+                        textTransform: "none",
+                        borderLeft: Object.keys(votingData).includes(item.username) && votingData[item.username] !== 0 ? "5px solid #EF4444" : "none",
+                      }}
+                      onDoubleClick={() => {
+                        openLink(`${CONFIG_SOLAR_SCAN}wallet/${item.username}`);
+                      }}
+                    >
+                      <Stack width={"100%"}>
+                        <Grid container>
+                          <Grid item xs={0.3}>
+                            <Stack direction={"row"} alignItems={"center"} height={"74px"}>
+                              <Box className="fs-14-regular light t-left">{(currentPage - 1) * 53 + index + 1}.</Box>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={3.5}>
+                            <Stack direction={"row"} alignItems={"center"} height={"74px"} spacing={"8px"}>
+                              <Box
+                                component={"img"}
+                                src={`https://assets.solarscan.com/avatars/${item.address}.jpg`}
+                                width={"40px"}
+                                height={"40px"}
+                                sx={{
+                                  borderRadius: "20px",
+                                }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = accountIcon;
+                                }}
+                              />
+                              <Stack spacing={"8px"}>
+                                <Box className="fs-18-regular white">{item.username}</Box>
+                                <Stack direction={"row"} alignItems={"center"} spacing={"8px"}>
+                                  {currentPage === 1 && (
+                                    <Box
+                                      className="fs-12-light white"
+                                      sx={{
+                                        borderRadius: "4px",
+                                        border: "1px solid #3A7E52",
+                                        backgroundColor: "rgba(58, 126, 82, 0.20)",
+                                        padding: "4px 8px",
+                                      }}
+                                    >
+                                      {t("wal-58_active")}
+                                    </Box>
+                                  )}
+                                  <Box
+                                    className="fs-12-light white"
+                                    sx={{
+                                      borderRadius: "4px",
+                                      border: "1px solid #EF8244",
+                                      backgroundColor: "rgba(239, 130, 68, 0.20)",
+                                      padding: "4px 8px",
+                                    }}
+                                  >
+                                    {`${item.votesReceived.voters} ${t("wal-59_voters")}`}
+                                  </Box>
+                                </Stack>
+                              </Stack>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={1.5}>
+                            <Stack direction={"row"} alignItems={"center"} height={"74px"}>
+                              <Box className="fs-18-regular white t-left">{item.blocks.produced}</Box>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={2}>
+                            <Stack direction={"row"} alignItems={"center"} height={"74px"}>
+                              <Stack>
+                                <Box className="fs-18-regular white t-left">{`${numeral(item.forged.total ?? 0).format("0,0")} SXP`}</Box>
+                                <Box className="fs-12-regular light t-left">
+                                  {`${numeral((item.forged.total * Number(sxpPrice) * Number(currentCurrencyReserve)) / 1e8).format(
+                                    "0,0.00"
+                                  )} ${currentCurrencySymbol}`}
+                                </Box>
+                              </Stack>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={2.5}>
+                            <Stack direction={"row"} alignItems={"center"} height={"74px"}>
+                              <Stack>
+                                <Box className="fs-18-regular white t-left">{numeral(item.votesReceived.votes ?? 0).format("0,0")}</Box>
+                                <Box className="fs-12-regular light t-left">{item.votesReceived.percent} %</Box>
+                              </Stack>
+                            </Stack>
+                          </Grid>
+                          <Grid item xs={2.2}>
+                            <Stack direction={"row"} alignItems={"center"} height={"74px"}>
+                              <Box className="wallet-form-card-hover br-16 blur" padding={"0px 16px"} height={"54px"}>
+                                <Stack direction={"row"} alignItems={"center"}>
+                                  <InputVoteBox id={item.username} label={""} align="right" value={votingData} onChange={setVotingData} />
+                                  <Box className="fs-18-regular light">%</Box>
+                                </Stack>
+                              </Box>
+                            </Stack>
+                          </Grid>
+                        </Grid>
+                        <Divider
+                          sx={{
+                            backgroundColor: "#FFFFFF1A",
+                          }}
+                        />
+                      </Stack>
+                    </Button>
+                  ))
+                )}
+
+                {/* {data.map((item, index) => (
                   <Button
                     key={`blockproducer-${item.address}`}
                     sx={{
@@ -407,7 +545,7 @@ const WalletVote = () => {
                       />
                     </Stack>
                   </Button>
-                ))}
+                ))} */}
                 <Grid container>
                   <Grid item xs={12} container justifyContent={"center"}>
                     <Pagination
