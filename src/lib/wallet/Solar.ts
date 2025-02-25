@@ -120,7 +120,7 @@ export class Solar {
   static async getBalance(addr: string): Promise<number> {
     try {
       const response = await axios.get(`${CONFIG_SOLAR_API_URL}/wallets/${addr}`);
-      return response.data.data.balance / 1e8;
+      return response.data.data.balance;
     } catch {
       return 0;
     }

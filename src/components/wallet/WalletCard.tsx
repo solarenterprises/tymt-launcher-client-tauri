@@ -50,7 +50,7 @@ const WalletCard = ({ supportChain, index }: IPropsWalletCard) => {
   const priceListStore: IPriceList = useSelector(getPriceList);
 
   const balance = useMemo(() => getTokenBalanceBySymbol(balanceListStore, supportChain?.native?.symbol), [balanceListStore]);
-  const price = useMemo(() => getTokenPriceBySymbol(priceListStore, supportChain?.native?.cmc), [priceListStore]);
+  const price = useMemo(() => getTokenPriceBySymbol(priceListStore, supportChain?.native?.symbol), [priceListStore]);
 
   const [open, setOpen] = useState(false);
 

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import tymtCore from "../lib/core/tymtCore";
 
 import { CONST_CURRENCY_SYMBOLS } from "../const/CurrencyConsts";
-import { CONST_CHAIN_NAMES, CONST_SUPPORT_CHAINS } from "../const/ChainConsts";
+import { CONST_CHAIN_NAMES, CONST_CHAIN_SYMBOLS, CONST_SUPPORT_CHAINS } from "../const/ChainConsts";
 import { CONST_FEE_SXP } from "../const/WalletConsts";
 
 import { getCurrentChain } from "../store/CurrentChainSlice";
@@ -30,6 +30,7 @@ import {
   getTokenBalanceBySymbol,
   getTokenPriceBySymbol,
   getPublicKey,
+  getNativeDecimalsBySymbol,
 } from "../lib/helper/WalletHelper";
 
 import { ICurrentChain, ISupportChain, ISupportNative, ISupportToken } from "../types/ChainTypes";
@@ -114,7 +115,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const totalBalance = useMemo(() => {
     let total = 0;
     CONST_SUPPORT_CHAINS.forEach((supportChain) => {
-      const nativeBalance = balanceListStore.list.find((one) => one.symbol === supportChain.native.symbol)?.balance || 0;
+      const nativeDecimal = getNativeDecimalsBySymbol(supportChain.native.symbol);
+      const nativeBalance =
+        balanceListStore.list.find((one) => one.symbol === supportChain.native.symbol)?.balance / Math.pow(10, nativeDecimal as number) || 0;
       const nativePrice = priceListStore.list.find((one) => one.symbol === supportChain.native.symbol)?.price || 0;
       total += nativeBalance * nativePrice;
       supportChain.tokens.forEach((token) => {
@@ -172,15 +175,29 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const fetchBalanceList = useCallback(async () => {
     if (!walletStore || !walletStore?.solar) return;
     console.time("fetchBalanceList");
-    const balanceList = await CryptoAPI.getAllBalance({ evmAddress: walletStore?.ethereum, solAddress: walletStore?.solana, btcAddress: walletStore?.bitcoin });
-    console.log("balanceList", balanceList);
-    dispatch(setBalanceList(balanceList));
+    const sxpBalance = await tymtCore.Blockchains.solar.wallet.getBalance(walletStore?.solar);
+    const balanceList: Array<{ symbol: string; balance: number }> = await CryptoAPI.getAllBalance({
+      evmAddress: walletStore?.ethereum,
+      solAddress: walletStore?.solana,
+      btcAddress: walletStore?.bitcoin,
+    });
     console.timeEnd("fetchBalanceList");
+    const data = [
+      ...balanceList,
+      {
+        symbol: CONST_CHAIN_SYMBOLS.SOLAR,
+        balance: sxpBalance,
+      },
+    ];
+    console.log("balanceList", data);
+    dispatch(setBalanceList(data));
   }, [walletStore, dispatch]);
 
   const fetchPriceList = async () => {
     try {
+      console.time("fetchPriceList");
       const priceList = await CryptoAPI.getAllPrices();
+      console.timeEnd("fetchPriceList");
       console.log("priceList", priceList);
       dispatch(setPriceList(priceList));
     } catch (err) {

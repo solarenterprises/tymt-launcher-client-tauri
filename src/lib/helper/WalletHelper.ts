@@ -155,9 +155,19 @@ export const getTokenPriceBySymbol = (priceListStore: IPriceList, symbol: string
   }
 };
 
+export const getNativeDecimalsBySymbol = (symbol) => {
+  for (const chain of CONST_SUPPORT_CHAINS) {
+    if (chain.native.symbol === symbol) {
+      return chain.native.decimals; // Return the decimal if the symbol matches
+    }
+  }
+  return null; // Return null if the symbol is not found
+};
+
 export const getTokenBalanceBySymbol = (balanceListStore: IBalanceList, symbol: string) => {
   try {
-    const res = balanceListStore?.list?.find((one) => one?.symbol === symbol)?.balance;
+    const decimal = getNativeDecimalsBySymbol(symbol);
+    const res = balanceListStore?.list?.find((one) => one?.symbol === symbol)?.balance / Math.pow(10, decimal as number) || 0;
     return res;
   } catch (err) {
     console.error("Failed to getTokenBalanceBySymbol: ", err);
