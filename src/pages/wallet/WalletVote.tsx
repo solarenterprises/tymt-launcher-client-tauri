@@ -41,6 +41,7 @@ const WalletVote = () => {
 
   const handleRefreshClick = async () => {
     try {
+      setLoading(true);
       setCurrentPage(1);
       const [res1, res2, res3, res4] = await Promise.all([
         Solar.get53Delegates(1),
@@ -64,6 +65,8 @@ const WalletVote = () => {
       setLatestBlock(res4.data.data.block.height);
     } catch (err) {
       console.error("Failed to refresh voting page: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 

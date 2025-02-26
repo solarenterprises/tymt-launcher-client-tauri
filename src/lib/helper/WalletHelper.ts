@@ -19,6 +19,7 @@ import tymtCore from "../core/tymtCore";
 import { IWalletAddresses, IBalanceList } from "../../types/WalletTypes";
 import { IPriceList } from "../../types/PriceTypes";
 import { ISupportChain } from "../../types/ChainTypes";
+import { ITransaction, txIconMap } from "../../types/TransactionTypes";
 
 export const checkMnemonic = (_mnemonic: string) => {
   if (_mnemonic.split(" ").length == 24) {
@@ -261,4 +262,17 @@ export const getExplorerUrl = (chain: ISupportChain, walletStore: IWalletAddress
 
 export const getPublicKey = (passphrase: string) => {
   return tymtCore.Blockchains.solar.wallet.getPublicKey(passphrase);
+};
+
+export const formatTx = (tx: ITransaction, currentChainWallet: string) => {
+  const displayTxImage = tx.type === "vote" ? txIconMap.get("TX_VOTE") : tx.sender === currentChainWallet ? txIconMap.get("TX_OUT") : txIconMap.get("TX_IN");
+  const displayTxAmount = tx.amount + tx.fee;
+  const displayTxAddress = tx.type === "vote" ? tx.sender : tx.sender === currentChainWallet ? tx.asset[0].recipient : tx.sender;
+  const displayTxTooltip = tx.type === "vote" ? "Vote" : tx.sender === currentChainWallet ? "Transfer Out" : "Transfer In";
+  return {
+    displayTxAddress,
+    displayTxAmount,
+    displayTxImage,
+    displayTxTooltip,
+  };
 };

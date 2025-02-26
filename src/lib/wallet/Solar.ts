@@ -5,7 +5,7 @@ import Big from "big.js";
 
 import { CONFIG_NETWORK_NAME, CONFIG_SOLAR_API_URL } from "../../config/MainConfig";
 
-import { IRecipient } from "../../types/TransactionTypes";
+import { IRecipient, ITransactionPagination, ITransaction } from "../../types/TransactionTypes";
 
 export class Solar {
   static async generateMnemonic(): Promise<string> {
@@ -194,6 +194,37 @@ export class Solar {
           error: res.data.errors[res.data.data.invalid[0]].message as string,
         };
       }
+    }
+  }
+
+  static async getTransactions(addr: string, page: number, pageSize: number): Promise<ITransactionPagination> {
+    try {
+      const response = await axios.get(`${CONFIG_SOLAR_API_URL}/wallets/${addr}/transactions`, {
+        params: {
+          page,
+          limit: pageSize,
+        },
+      });
+      const txList: ITransaction[] = response.data.data.map((one) => ({
+        type: one?.type === 6 ? "transfer" : one?.type === 2 ? "vote" : "",
+        asset: one?.type === 6 ? one?.asset?.transfers?.map((three) => ({ amount: three?.amount / 1e8, recipient: three?.recipientId })) : [],
+        amount: one?.type === 6 ? one?.asset?.transfers?.reduce((sum, two) => sum + two?.amount / 1e8, 0) : 0,
+        sender: one?.sender,
+        fee: one?.fee / 1e8,
+        timestamp: one?.timestamp?.unix,
+      }));
+      const result: ITransactionPagination = {
+        meta: {
+          totalCount: response.data.meta.totalCount,
+          pageCount: response.data.meta.pageCount,
+          count: response.data.meta.count,
+        },
+        data: txList,
+      };
+      return result;
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      return null;
     }
   }
 

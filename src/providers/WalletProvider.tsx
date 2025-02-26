@@ -12,7 +12,7 @@ import { getCurrentCurrency } from "../store/CurrentCurrencySlice";
 import { getCurrentToken, setCurrentToken } from "../store/CurrentTokenSlice";
 import { getWallet } from "../store/WalletSlice";
 import { /*appendPriceList,*/ getPriceList, setPriceList } from "../store/PriceListSlice";
-import { /*appendBalanceList,*/ getBalanceList, setBalanceList } from "../store/BalanceListSlice";
+import { appendBalanceList, getBalanceList, setBalanceList } from "../store/BalanceListSlice";
 import { getReserveList } from "../store/ReserveListSlice";
 import { getWalletSetting, setWalletSetting } from "../store/WalletSettingSlice";
 import { getMnemonic } from "../store/MnemonicSlice";
@@ -63,6 +63,7 @@ interface WalletContextType {
   transferCoin: (recipients: IRecipient[], fee: string) => Promise<{ success: boolean; message?: string; error?: string }>;
   setSxpFeeAsInput: (_: number) => void;
   fetchBalanceList: () => void;
+  fetchSXPBalance: () => void;
   fetchPriceList: () => void;
   handleRefreshClick: () => void;
 }
@@ -137,28 +138,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     [dispatch, walletSettingStore]
   );
 
-  //@ts-ignore
-  const sxpVote = useCallback(
-    async (walletStore: IWalletAddresses, sxpFee: number, voteAsset: IVotingData) => {
-      try {
-        const res = await tymtCore.Blockchains.solar.wallet.vote(passphrase, walletStore?.solar, voteAsset, sxpFee);
-        if (res.data.data.invalid[0]) {
-          const temp = res.data.data.invalid[0];
-          const err = res.data.errors[temp].message;
-          throw new Error(err);
-        }
-        return { success: true };
-      } catch (err) {
-        console.error("Failed to sxpVote: ", err);
-        return {
-          success: false,
-          error: err.message,
-        };
-      }
-    },
-    [passphrase]
-  );
-
   const transferCoin = useCallback(
     async (
       //@ts-ignore
@@ -193,6 +172,19 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     dispatch(setBalanceList(data));
   }, [walletStore, dispatch]);
 
+  const fetchSXPBalance = useCallback(async () => {
+    if (!walletStore || !walletStore?.solar) return;
+    const sxpBalance = await tymtCore.Blockchains.solar.wallet.getBalance(walletStore?.solar);
+    console.log("after vote", sxpBalance);
+    const data = [
+      {
+        symbol: CONST_CHAIN_SYMBOLS.SOLAR,
+        balance: sxpBalance,
+      },
+    ];
+    dispatch(appendBalanceList(data));
+  }, [walletStore]);
+
   const fetchPriceList = async () => {
     try {
       console.time("fetchPriceList");
@@ -217,6 +209,28 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     const privateKey = await tymtCore.Blockchains.eth.wallet.getPrivateKey(passphrase);
     setEthPrivagteKey(privateKey);
   };
+
+  const sxpVote = useCallback(
+    async (walletStore: IWalletAddresses, sxpFee: number, voteAsset: IVotingData) => {
+      try {
+        const res = await tymtCore.Blockchains.solar.wallet.vote(passphrase, walletStore?.solar, voteAsset, sxpFee);
+        if (res.data.data.invalid[0]) {
+          const temp = res.data.data.invalid[0];
+          const err = res.data.errors[temp].message;
+          throw new Error(err);
+        }
+        setTimeout(fetchSXPBalance, 10000);
+        return { success: true };
+      } catch (err) {
+        console.error("Failed to sxpVote: ", err);
+        return {
+          success: false,
+          error: err.message,
+        };
+      }
+    },
+    [passphrase, fetchSXPBalance]
+  );
 
   useEffect(() => {
     getEthPrivateKey(passphrase);
@@ -283,6 +297,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         transferCoin,
         setSxpFeeAsInput,
         fetchBalanceList,
+        fetchSXPBalance,
         fetchPriceList,
         handleRefreshClick,
       }}
