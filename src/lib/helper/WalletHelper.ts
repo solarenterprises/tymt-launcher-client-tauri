@@ -20,6 +20,7 @@ import { IWalletAddresses, IBalanceList } from "../../types/WalletTypes";
 import { IPriceList } from "../../types/PriceTypes";
 import { ISupportChain } from "../../types/ChainTypes";
 import { ITransaction, txIconMap } from "../../types/TransactionTypes";
+import { formatUnixTime } from "./DateHelper";
 
 export const checkMnemonic = (_mnemonic: string) => {
   if (_mnemonic.split(" ").length == 24) {
@@ -269,10 +270,12 @@ export const formatTx = (tx: ITransaction, currentChainWallet: string) => {
   const displayTxAmount = tx.amount + tx.fee;
   const displayTxAddress = tx.type === "vote" ? tx.sender : tx.sender === currentChainWallet ? tx.asset[0].recipient : tx.sender;
   const displayTxTooltip = tx.type === "vote" ? "Vote" : tx.sender === currentChainWallet ? "Transfer Out" : "Transfer In";
+  const displayTimestamp = formatUnixTime(tx.timestamp);
   return {
     displayTxAddress,
     displayTxAmount,
     displayTxImage,
     displayTxTooltip,
+    displayTimestamp,
   };
 };

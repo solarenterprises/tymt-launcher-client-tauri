@@ -49,7 +49,7 @@ const TransCard = ({ loading, txList, currentTxPage, setCurrentTxPage }: IPropsT
       ) : (
         <Box>
           {txList?.data?.map((tx, index) => {
-            const { displayTxImage, displayTxAmount, displayTxAddress, displayTxTooltip } = formatTx(tx, currentChainWalletAddress);
+            const { displayTxImage, displayTxAmount, displayTxAddress, displayTxTooltip, displayTimestamp } = formatTx(tx, currentChainWalletAddress);
             return (
               <TooltipComponent placement="bottom" text={displayTxTooltip}>
                 <Button
@@ -70,7 +70,7 @@ const TransCard = ({ loading, txList, currentTxPage, setCurrentTxPage }: IPropsT
                         </Box>
                         <Stack direction={"row"} alignItems={"center"} spacing={"8px"}>
                           <Box component={"img"} src={timerIcon} width={"12px"} height={"12px"} />
-                          <Box className={"fs-12-regular light"}>{tx?.timestamp}</Box>
+                          <Box className={"fs-12-regular light"}>{displayTimestamp}</Box>
                         </Stack>
                       </Stack>
                     </Stack>
