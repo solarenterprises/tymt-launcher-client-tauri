@@ -16,7 +16,7 @@ import { appendBalanceList, getBalanceList, setBalanceList } from "../store/Bala
 import { getReserveList, setReserveList } from "../store/ReserveListSlice";
 import { getWalletSetting, setWalletSetting } from "../store/WalletSettingSlice";
 import { getMnemonic } from "../store/MnemonicSlice";
-// import { getAccount } from "../store/AccountSlice";
+import { getAuth } from "../store/AuthSlice";
 
 import { CryptoAPI } from "../lib/api/CryptoAPI";
 
@@ -37,7 +37,7 @@ import { ICurrentChain, ISupportChain, ISupportNative, ISupportToken } from "../
 import { ICurrentCurrency, IReserveList } from "../types/CurrencyTypes";
 import { IBalanceList, ICurrentToken, IVotingData, IWalletAddresses } from "../types/WalletTypes";
 import { IPriceList } from "../types/PriceTypes";
-import { IMnemonic } from "../types/AccountTypes";
+import { IAuth, IMnemonic } from "../types/AccountTypes";
 import { IWalletSetting } from "../types/SettingTypes";
 import { IRecipient } from "../types/TransactionTypes";
 
@@ -76,6 +76,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [sxpFee, setSxpFee] = useState<number>(0);
   const [ethPrivateKey, setEthPrivagteKey] = useState<string>("");
 
+  const authStore: IAuth = useSelector(getAuth);
   const mnemonicStore: IMnemonic = useSelector(getMnemonic);
   const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
   const currentCurrencyStore: ICurrentCurrency = useSelector(getCurrentCurrency);
@@ -174,7 +175,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchCurrencyRates = useCallback(async () => {
     const currencyRates = await CryptoAPI.getAllCurrencyRates();
-    console.log(currencyRates);
     dispatch(setReserveList(currencyRates));
   }, []);
 
@@ -256,27 +256,17 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     getEthPrivateKey(passphrase);
   }, [passphrase]);
 
-  // useEffect(() => {
-  //   let intervalId;
-  //   if (authStore?.isLoggedIn) {
-  //     fetchPriceList();
-  //     intervalId = setInterval(fetchPriceList, 1000 * 60 * 60);
-  //   }
-  //   return () => {
-  //     if (intervalId) clearInterval(intervalId);
-  //   };
-  // }, [authStore?.isLoggedIn]);
-
-  useEffect(() => {
-    // fetchBalanceList();
-    // fetchPriceList();
-    // const intervalId = setInterval(fetchBalanceList, 10000);
-    // return () => clearInterval(intervalId);
-  }, [dispatch, walletStore]);
-
   useEffect(() => {
     dispatch(setCurrentToken(currentSupportChain?.native?.symbol));
   }, [currentSupportChain]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([fetchPriceList(), fetchCurrencyRates()]);
+      setTimeout(fetchData, 10 * 60 * 1000); // Call again after 10 minutes
+    };
+    if (authStore?.isLoggedIn) fetchData();
+  }, [authStore]);
 
   useEffect(() => {
     switch (walletSettingStore?.feeLevel) {

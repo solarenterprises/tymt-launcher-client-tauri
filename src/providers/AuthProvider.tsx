@@ -12,7 +12,7 @@ export const AuthProvider = () => {
   const authStore: IAuth = useSelector(getAuth);
 
   useEffect(() => {
-    if (!authStore?.accessToken) {
+    if (!authStore?.accessToken || !authStore?.isLoggedIn) {
       navigate("/");
     }
   }, [authStore]);

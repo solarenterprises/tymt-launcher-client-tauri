@@ -85,7 +85,7 @@ const WalletCard = ({ supportChain, index }: IPropsWalletCard) => {
   return (
     <>
       <TooltipComponent placement="bottom" text={"Click to switch the network"}>
-        <span>
+        <div>
           <Button
             fullWidth
             ref={buttonRef}
@@ -149,7 +149,7 @@ const WalletCard = ({ supportChain, index }: IPropsWalletCard) => {
               </Box>
             </Stack>
           </Button>
-        </span>
+        </div>
       </TooltipComponent>
       <QrModal supportChain={supportChain} open={open} setOpen={setOpen} />
     </>

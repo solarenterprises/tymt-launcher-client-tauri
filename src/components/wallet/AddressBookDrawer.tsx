@@ -110,7 +110,7 @@ const AddressBookDrawer = ({ view, setView, setAddress }: props) => {
           }}
         />
         {addressData.map((data, index) => (
-          <>
+          <div key={`address-contact-${index}`}>
             <Button
               fullWidth
               sx={{
@@ -132,7 +132,7 @@ const AddressBookDrawer = ({ view, setView, setAddress }: props) => {
                 backgroundColor: "#FFFFFF1A",
               }}
             />
-          </>
+          </div>
         ))}
       </Box>
     </SwipeableDrawer>
