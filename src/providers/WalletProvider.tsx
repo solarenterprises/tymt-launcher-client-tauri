@@ -148,8 +148,23 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         case CONST_CHAIN_SYMBOLS.SOLAR:
           res = await tymtCore.Blockchains.solar.wallet.sendTransaction(passphrase, { recipients, fee });
           break;
+        case CONST_CHAIN_SYMBOLS.ETHEREUM:
+          res = await tymtCore.Blockchains.eth.wallet.sendTransaction(ethPrivateKey, walletStore?.ethereum, recipients);
+          break;
         case CONST_CHAIN_SYMBOLS.BINANCE:
           res = await tymtCore.Blockchains.bsc.wallet.sendTransaction(ethPrivateKey, walletStore?.ethereum, recipients);
+          break;
+        case CONST_CHAIN_SYMBOLS.POLYGON:
+          res = await tymtCore.Blockchains.polygon.wallet.sendTransaction(ethPrivateKey, walletStore?.ethereum, recipients);
+          break;
+        case CONST_CHAIN_SYMBOLS.AVALANCHE:
+          res = await tymtCore.Blockchains.avalanche.wallet.sendTransaction(ethPrivateKey, walletStore?.ethereum, recipients);
+          break;
+        case CONST_CHAIN_SYMBOLS.ARBITRUM:
+          res = await tymtCore.Blockchains.arbitrum.wallet.sendTransaction(ethPrivateKey, walletStore?.ethereum, recipients);
+          break;
+        case CONST_CHAIN_SYMBOLS.OPTIMISM:
+          res = await tymtCore.Blockchains.op.wallet.sendTransaction(ethPrivateKey, walletStore?.ethereum, recipients);
           break;
       }
       return res;
