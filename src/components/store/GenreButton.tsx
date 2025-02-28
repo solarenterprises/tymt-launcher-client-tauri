@@ -61,8 +61,6 @@ const Genre = [
   FilterOptionNames.GENRE_SIMULATION,
 ];
 
-const selectedshow = false;
-
 export interface IPropsGenreButton {
   genre: string;
   setGenre: (_: string) => void;
@@ -91,12 +89,10 @@ const GenreButton = ({ genre, setGenre }: IPropsGenreButton) => {
             border: "1px solid rgba(82, 225, 242, 0.40)",
             background: "var(--bg-stroke-card-bg, rgba(27, 53, 56, 0.20))",
             "&:hover": {
-              backgroundColor:
-                "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+              backgroundColor: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
             },
             "&:active": {
-              backgroundColor:
-                "var(--bg-stroke-blue-stroke-default-20, rgba(82, 225, 242, 0.20))",
+              backgroundColor: "var(--bg-stroke-blue-stroke-default-20, rgba(82, 225, 242, 0.20))",
             },
             "& .MuiSelect-icon": {
               color: "var(--Basic-Light, #AFAFAF)",
@@ -110,8 +106,7 @@ const GenreButton = ({ genre, setGenre }: IPropsGenreButton) => {
           IconComponent={ExpandMoreIcon}
           renderValue={(selected) => (
             <>
-              <Box className={"fs-16 white"}>{t("sto-3_genre")}</Box>
-              {selectedshow && <span>{selected}</span>}
+              <Box className={"fs-16 white"}>{t(selected)}</Box>
             </>
           )}
         >
@@ -120,20 +115,16 @@ const GenreButton = ({ genre, setGenre }: IPropsGenreButton) => {
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
-                borderBottom:
-                  "1px solid var(--bg-stroke-white-10-stroke-default, rgba(255, 255, 255, 0.10))",
+                borderBottom: "1px solid var(--bg-stroke-white-10-stroke-default, rgba(255, 255, 255, 0.10))",
                 backdropFilter: "blur(10px)",
                 "&:hover": {
-                  background:
-                    "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                  background: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
                 },
                 "&.Mui-selected": {
-                  background:
-                    "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                  background: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
                   backdropFilter: "blur(10px)",
                   "&:hover": {
-                    background:
-                      "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                    background: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
                   },
                 },
               }}

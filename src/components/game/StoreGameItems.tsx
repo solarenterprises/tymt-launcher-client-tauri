@@ -1,14 +1,19 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
-import { Grid } from "@mui/material";
+import { Box, Grid, Stack } from "@mui/material";
 
 import { useAppSelector } from "../../store";
 import { getGameList } from "../../store/GameListSlice";
 
 import StoreGameCard from "./StoreGameCard";
 import AnimatedComponent from "../home/AnimatedComponent";
-import { IGame, IGameList } from "../../types/GameTypes";
+
 import { filterByPlatform, filterByGenre, filterByRank, filterByType, filterByKeyword } from "../../lib/helper/FilterHelper";
+
+import { IGame, IGameList } from "../../types/GameTypes";
+
+import NoGamePng from "../../assets/main/NoGames.png";
 
 export interface IPropsStoreGameItems {
   platform?: string;
@@ -20,6 +25,7 @@ export interface IPropsStoreGameItems {
 }
 
 const StoreGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGameItems) => {
+  const { t } = useTranslation();
   const gameListStore: IGameList = useAppSelector(getGameList);
 
   const comingGameListStore: IGameList = useMemo(() => {
@@ -52,6 +58,18 @@ const StoreGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGam
           </AnimatedComponent>
         </Grid>
       ))}
+      {resultGames?.length === 0 && (
+        <Grid item xs={12} container justifyContent={"center"} marginTop={"32px"}>
+          <AnimatedComponent>
+            <Stack flexDirection={"column"} justifyContent={"center"}>
+              <Box component={"img"} src={NoGamePng} width={"300px"} height={"300px"} alignSelf={"center"} />
+              <Box className={"fs-18-regular white"} sx={{ alignSelf: "center", marginTop: "24px" }}>
+                {t("sto-36_no-games")}
+              </Box>
+            </Stack>
+          </AnimatedComponent>
+        </Grid>
+      )}
     </Grid>
   );
 };
