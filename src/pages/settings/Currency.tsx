@@ -44,6 +44,7 @@ const Currency = ({ view, setView }: IPropsCurrency) => {
             {CONST_SUPPORT_CURRENCIES?.map((supportCurrency) => (
               <>
                 <Button
+                  key={`currency-list-${supportCurrency?.name}`}
                   className="common-btn"
                   sx={{ padding: "20px" }}
                   onClick={() => {

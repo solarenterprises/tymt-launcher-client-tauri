@@ -4,8 +4,21 @@ import { CONFIG_SOLAR_API_URL, CONFIG_TYMT_BACKEND_URL } from "../../config/Main
 import { CONST_CHAIN_SYMBOLS } from "../../const/ChainConsts";
 import { ITransactionPagination, ITransaction } from "../../types/TransactionTypes";
 import { formatEvmResponseToTxPagination } from "../helper/WalletHelper";
+import { CONST_CURRENCY_NAMES } from "../../const/CurrencyConsts";
 
 export const CryptoAPI = {
+  getAllCurrencyRates: async (): Promise<any> => {
+    try {
+      const currencies = Object.values(CONST_CURRENCY_NAMES).join(",");
+      const res = await axiosAuth.get(`${CONFIG_TYMT_BACKEND_URL}/crypto/currency-rates`, { params: { currencies } });
+      const data = res?.data?.data?.map((one) => ({ currency: one?.currency, reserve: parseFloat(one?.rate) }));
+      return data;
+    } catch (err) {
+      console.error("Failed to getAllCurrencyRates: ", err.response?.data ?? err);
+      throw new Error(err.response?.data?.error ?? "Failed to getAllCurrencyRates");
+    }
+  },
+
   getAllPrices: async (): Promise<any> => {
     try {
       const symbols = Object.values(CONST_CHAIN_SYMBOLS).join(",");

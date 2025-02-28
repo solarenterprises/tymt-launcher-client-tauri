@@ -13,7 +13,7 @@ import { getCurrentToken, setCurrentToken } from "../store/CurrentTokenSlice";
 import { getWallet } from "../store/WalletSlice";
 import { /*appendPriceList,*/ getPriceList, setPriceList } from "../store/PriceListSlice";
 import { appendBalanceList, getBalanceList, setBalanceList } from "../store/BalanceListSlice";
-import { getReserveList } from "../store/ReserveListSlice";
+import { getReserveList, setReserveList } from "../store/ReserveListSlice";
 import { getWalletSetting, setWalletSetting } from "../store/WalletSettingSlice";
 import { getMnemonic } from "../store/MnemonicSlice";
 // import { getAccount } from "../store/AccountSlice";
@@ -172,16 +172,20 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     [passphrase, ethPrivateKey, walletStore]
   );
 
+  const fetchCurrencyRates = useCallback(async () => {
+    const currencyRates = await CryptoAPI.getAllCurrencyRates();
+    console.log(currencyRates);
+    dispatch(setReserveList(currencyRates));
+  }, []);
+
   const fetchBalanceList = useCallback(async () => {
     if (!walletStore || !walletStore?.solar) return;
-    console.time("fetchBalanceList");
     const sxpBalance = await tymtCore.Blockchains.solar.wallet.getBalance(walletStore?.solar);
     const balanceList: Array<{ symbol: string; balance: number }> = await CryptoAPI.getAllBalance({
       evmAddress: walletStore?.ethereum,
       solAddress: walletStore?.solana,
       btcAddress: walletStore?.bitcoin,
     });
-    console.timeEnd("fetchBalanceList");
     const data = [
       ...balanceList,
       {
@@ -189,14 +193,12 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         balance: sxpBalance,
       },
     ];
-    // console.log("balanceList", data);
     dispatch(setBalanceList(data));
   }, [walletStore, dispatch]);
 
   const fetchSXPBalance = useCallback(async () => {
     if (!walletStore || !walletStore?.solar) return;
     const sxpBalance = await tymtCore.Blockchains.solar.wallet.getBalance(walletStore?.solar);
-    console.log("after vote", sxpBalance);
     const data = [
       {
         symbol: CONST_CHAIN_SYMBOLS.SOLAR,
@@ -208,10 +210,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchPriceList = async () => {
     try {
-      console.time("fetchPriceList");
       const priceList = await CryptoAPI.getAllPrices();
-      console.timeEnd("fetchPriceList");
-      // console.log("priceList", priceList);
       dispatch(setPriceList(priceList));
     } catch (err) {
       console.error("Failed to fetchPriceList: ", err);
@@ -220,7 +219,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const handleRefreshClick = useCallback(async () => {
     try {
-      await Promise.all([fetchPriceList(), fetchBalanceList()]);
+      await Promise.all([fetchPriceList(), fetchBalanceList(), fetchCurrencyRates()]);
     } catch (error) {
       console.error("Error refreshing data:", error);
     }

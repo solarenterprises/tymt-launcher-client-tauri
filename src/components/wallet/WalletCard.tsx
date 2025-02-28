@@ -76,80 +76,80 @@ const WalletCard = ({ supportChain, index }: IPropsWalletCard) => {
         }
       });
       observer.observe(buttonRef.current);
-      return () => observer.unobserve(buttonRef.current);
+      return () => {
+        if (buttonRef.current) observer.unobserve(buttonRef.current);
+      };
     }
   }, [buttonRef]);
-
-  useEffect(() => {
-    console.log(buttonWidth);
-  }, [buttonWidth]);
 
   return (
     <>
       <TooltipComponent placement="bottom" text={"Click to switch the network"}>
-        <Button
-          fullWidth
-          ref={buttonRef}
-          sx={{
-            textTransform: "none",
-            borderRadius: "16px",
-            padding: "20px",
-            backgroundSize: "cover",
-            backgroundRepeat: "no-repeat",
-            backgroundImage: `url(${background})`,
-            transition: "transform 0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-            },
-            "&:active": {
-              transform: "scale(0.95)",
-            },
-            filter:
-              supportChain?.native?.name === CONST_CHAIN_NAMES?.BITCOIN || supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLANA ? "grayscale(1.0)" : "",
-          }}
-          onClick={handleWalletCardClick}
-          disabled={supportChain?.native?.name === CONST_CHAIN_NAMES?.BITCOIN || supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLANA}
-        >
-          <Stack direction={"row"} gap={3} justifyContent={"space-between"} width={"100%"}>
-            <Stack direction={"row"} justifyContent={"flex-start"} gap={"16px"} width={"75%"}>
-              <Box component={"img"} src={supportChain?.native?.logo} width={"40px"} height={"40px"} />
-              <Stack gap={1}>
-                <Box
-                  className={"fs-h3 white t-left"}
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    width: `calc(${buttonWidth}px - 120px)`,
-                  }}
-                >
-                  {supportChain?.native?.name}
-                </Box>
-                <Box className={"fs-18-regular white"}>{`${formatBalance(balance, 4)} ${supportChain?.native?.symbol}`}</Box>
-                <Box className={"fs-16-regular light t-left"}>{`${currentCurrencySymbol} ${formatBalance(
-                  Number(price ?? 0) * Number(balance ?? 0) * currentCurrencyReserve
-                )}`}</Box>
+        <span>
+          <Button
+            fullWidth
+            ref={buttonRef}
+            sx={{
+              textTransform: "none",
+              borderRadius: "16px",
+              padding: "20px",
+              backgroundSize: "cover",
+              backgroundRepeat: "no-repeat",
+              backgroundImage: `url(${background})`,
+              transition: "transform 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+              },
+              "&:active": {
+                transform: "scale(0.95)",
+              },
+              filter:
+                supportChain?.native?.name === CONST_CHAIN_NAMES?.BITCOIN || supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLANA ? "grayscale(1.0)" : "",
+            }}
+            onClick={handleWalletCardClick}
+            disabled={supportChain?.native?.name === CONST_CHAIN_NAMES?.BITCOIN || supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLANA}
+          >
+            <Stack direction={"row"} gap={3} justifyContent={"space-between"} width={"100%"}>
+              <Stack direction={"row"} justifyContent={"flex-start"} gap={"16px"} width={"75%"}>
+                <Box component={"img"} src={supportChain?.native?.logo} width={"40px"} height={"40px"} />
+                <Stack gap={1}>
+                  <Box
+                    className={"fs-h3 white t-left"}
+                    sx={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: `calc(${buttonWidth}px - 120px)`,
+                    }}
+                  >
+                    {supportChain?.native?.name}
+                  </Box>
+                  <Box className={"fs-18-regular white"}>{`${formatBalance(balance, 4)} ${supportChain?.native?.symbol}`}</Box>
+                  <Box className={"fs-16-regular light t-left"}>{`${currentCurrencySymbol} ${formatBalance(
+                    Number(price ?? 0) * Number(balance ?? 0) * currentCurrencyReserve
+                  )}`}</Box>
+                </Stack>
               </Stack>
+              <Box
+                className={`qr-btn`}
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  alignItems: "center",
+                  width: "40px",
+                }}
+                onClick={(e: React.MouseEvent<HTMLElement>) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpen(true);
+                }}
+              >
+                <img src={qrIcon} />
+              </Box>
             </Stack>
-            <Box
-              className={`qr-btn`}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                textAlign: "center",
-                alignItems: "center",
-                width: "40px",
-              }}
-              onClick={(e: React.MouseEvent<HTMLElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setOpen(true);
-              }}
-            >
-              <img src={qrIcon} />
-            </Box>
-          </Stack>
-        </Button>
+          </Button>
+        </span>
       </TooltipComponent>
       <QrModal supportChain={supportChain} open={open} setOpen={setOpen} />
     </>
