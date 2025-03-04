@@ -13,6 +13,7 @@ import NoGamePng from "../../assets/main/NoGames.png";
 import { IGame, IGameList } from "../../types/GameTypes";
 import { useSelector } from "react-redux";
 import { getGameList } from "../../store/GameListSlice";
+import { getLibraryList } from "../../store/LibraryListSlice";
 
 export interface IPropsLibraryShow {
   status: number;
@@ -22,6 +23,7 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
   const { t } = useTranslation();
 
   const gameListStore: IGameList = useSelector(getGameList);
+  const libraryListStore: IGameList = useSelector(getLibraryList);
 
   const activeGameList: IGame[] = useMemo(() => gameListStore?.games?.filter((one) => one?.visibilityState === "active"), [gameListStore]);
   const displayGameList: IGame[] = useMemo(() => [...activeGameList], [activeGameList]);
@@ -29,8 +31,8 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
   const [installedList, setInstalledList] = useState<IGame[]>([]);
 
   const uninstalledList: IGame[] = useMemo(
-    () => displayGameList?.filter((game) => !installedList?.some((one) => one?._id === game?._id)),
-    [displayGameList, installedList]
+    () => displayGameList?.filter((game) => ![...libraryListStore?.games, ...installedList]?.some((one) => one?._id === game?._id)),
+    [displayGameList, installedList, libraryListStore]
   );
 
   useEffect(() => {
@@ -59,14 +61,14 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
       </Grid>
       <Grid item xs={12} container spacing={"32px"} mt={"32px"}>
         {status === 0 &&
-          installedList?.map((installedGame, index) => (
+          [...libraryListStore?.games, ...installedList]?.map((installedGame, index) => (
             <Grid item key={index}>
               <AnimatedComponent>
                 <StoreGameCard game={installedGame} />
               </AnimatedComponent>
             </Grid>
           ))}
-        {status === 0 && installedList?.length === 0 && (
+        {status === 0 && [...libraryListStore?.games, ...installedList]?.length === 0 && (
           <Grid item xs={12} container justifyContent={"center"} marginTop={"32px"}>
             <AnimatedComponent>
               <Stack flexDirection={"column"} justifyContent={"center"}>
