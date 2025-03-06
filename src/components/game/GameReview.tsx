@@ -13,8 +13,6 @@ import { FeedbackAPI } from "../../lib/api/FeedbackAPI";
 
 import noreviews from "../../assets/main/NoReviews.png";
 
-import storeStyles from "../../styles/StoreStyles";
-
 import { IFeedback, IGame } from "../../types/GameTypes";
 import { IMetaPagination } from "../../types/APITypes/BasicAPITypes";
 
@@ -23,8 +21,6 @@ export interface IPropsGameReview {
 }
 
 const GameReview = ({ game }: IPropsGameReview) => {
-  const classes = storeStyles();
-
   const { t } = useTranslation();
 
   const [view, setView] = useState(false);
@@ -78,7 +74,36 @@ const GameReview = ({ game }: IPropsGameReview) => {
             </Box>
           )}
         </Box>
-        <Button className={classes.modal_btn_left} onClick={() => setView(true)}>
+        <Button
+          sx={{
+            "&.MuiButtonBase-root": {
+              textTransform: "none",
+              fontSize: "18px",
+              fontStyle: "normal",
+              fontWeight: "400",
+              lineHeight: "24px" /* 133.333% */,
+              letterSpacing: "-0.36px",
+              height: "46px",
+              borderRadius: "16px",
+              backgroundColor: "transparent",
+              color: "#52E1F2",
+              borderColor: "#EF4444",
+              fontFamily: "Cobe",
+              boxShadow: "none",
+              border: "1px solid",
+              paddingTop: "5px",
+              "&:hover": {
+                borderColor: "#EF4444",
+                backgroundColor: "#EF4444",
+              },
+              "&:active": {
+                backgroundColor: "#EF4444",
+                boxShadow: "1px 1px #EF44445F",
+              },
+            },
+          }}
+          onClick={() => setView(true)}
+        >
           <Box className={"fs-18-bold"} color={"var(--Main-Blue, #52E1F2)"}>
             {t("ga-26_leave-review")}
           </Box>

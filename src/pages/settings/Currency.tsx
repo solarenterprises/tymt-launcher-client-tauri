@@ -32,7 +32,7 @@ const Currency = ({ view, setView }: IPropsCurrency) => {
   return (
     <>
       {view === "currency" && (
-        <Stack direction={"column"}>
+        <Stack direction={"column"} width={"100%"}>
           <Stack flexDirection={"row"} justifyContent={"flex-start"} gap={"10px"} alignItems={"center"} textAlign={"center"} padding={"20px"}>
             <Button className={"setting-back-button"} onClick={() => setView("wallet")}>
               <Box component={"img"} src={backIcon}></Box>
@@ -40,12 +40,12 @@ const Currency = ({ view, setView }: IPropsCurrency) => {
             <Box className="fs-h3 white">{t("set-34_currency")}</Box>
           </Stack>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
-          <Stack direction={"column"} justifyContent={""}>
+          <Stack direction={"column"} width={"100%"}>
             {CONST_SUPPORT_CURRENCIES?.map((supportCurrency) => (
-              <>
+              <div style={{ width: "100%" }} key={`currency-list-${supportCurrency?.name}`}>
                 <Button
                   className="common-btn"
-                  sx={{ padding: "20px" }}
+                  sx={{ padding: "20px", width: "100%" }}
                   onClick={() => {
                     handleCurrencyClick(supportCurrency?.name);
                   }}
@@ -68,7 +68,7 @@ const Currency = ({ view, setView }: IPropsCurrency) => {
                   </Stack>
                 </Button>
                 <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
-              </>
+              </div>
             ))}
           </Stack>
         </Stack>

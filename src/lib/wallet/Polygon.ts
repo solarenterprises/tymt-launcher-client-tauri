@@ -6,6 +6,9 @@ import { CONFIG_POL_API_KEY, CONFIG_POL_API_URL, CONFIG_NETWORK_NAME } from "../
 
 import { ISupportToken } from "../../types/ChainTypes";
 import { IBalance } from "../../types/WalletTypes";
+import { IRecipient } from "../../types/TransactionTypes";
+import { CryptoAPI } from "../api/CryptoAPI";
+import { CONST_CHAIN_IDS } from "../../const/ChainConsts";
 
 export class Polygon {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
@@ -62,6 +65,76 @@ export class Polygon {
     } catch (err) {
       console.error("Failed to POLYGON getTokenBalance: ", err);
       return [];
+    }
+  }
+
+  static async sendTransaction(
+    privateKey: string,
+    sender: string,
+    recipients: IRecipient[]
+  ): Promise<{ success: boolean; message?: string; error?: string; data?: any }> {
+    let successfulTransactions: string[] = [];
+    let failedTransactions: string[] = [];
+    const transactionResults: { [address: string]: string } = {};
+
+    try {
+      const gasLimit = 22000;
+      const chainId = CONST_CHAIN_IDS.POLYGON; // Polygon
+      const [gasPrice, initialNonce] = await Promise.all([CryptoAPI.getPolGasPrice(), CryptoAPI.getPolTransactionCount(sender)]);
+
+      for (let i = 0; i < recipients.length; i++) {
+        const recipient = recipients[i];
+        const nonce = initialNonce + i; // Increment nonce for each transaction
+
+        try {
+          // Create transaction
+          const transaction = {
+            to: recipient.address,
+            value: ethers.parseEther(recipient.amount),
+            gasLimit: gasLimit,
+            gasPrice: gasPrice,
+            nonce: nonce,
+            chainId: chainId,
+          };
+
+          // Sign transaction
+          const wallet = new ethers.Wallet(privateKey);
+          const signedTx = await wallet.signTransaction(transaction);
+
+          // Broadcast transaction
+          const res = await CryptoAPI.sendPolRawTransaction([signedTx]);
+          transactionResults[recipient.address] = res; // Store transaction result
+
+          if (res.success) successfulTransactions.push(recipient.address);
+          else failedTransactions.push(recipient.address);
+        } catch (err) {
+          console.error(`Failed to send transaction to ${recipient.address}:`, err);
+          failedTransactions.push(recipient.address);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to POL sendTransaction: ", err);
+    } finally {
+      if (successfulTransactions.length === recipients.length)
+        return {
+          success: true,
+          message: "All transactions broadcasted.",
+          data: {
+            successfulTransactions,
+            failedTransactions,
+            transactionResults,
+          },
+        };
+      else
+        return {
+          success: false,
+          error: `Transactions to ${failedTransactions.join(",")} failed.`,
+          data: {
+            successfulTransactions,
+            failedTransactions,
+            transactionResults,
+          },
+        };
     }
   }
 }

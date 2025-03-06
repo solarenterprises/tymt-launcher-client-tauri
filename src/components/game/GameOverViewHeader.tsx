@@ -20,7 +20,7 @@ const GameOverViewHeader = ({ game }: IPropsGameOverViewHeader) => {
         <Box
           component={"img"}
           src={game?.imageUrl}
-          width={"124px"}
+          width={"82px"}
           height={"82px"}
           sx={{
             borderRadius: "16px",

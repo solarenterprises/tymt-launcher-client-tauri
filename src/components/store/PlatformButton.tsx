@@ -64,8 +64,6 @@ const Platform = [
   { platform: FilterOptionNames.PLATFORM_LINUX, icon: LinuxIcon }, // Linux
 ];
 
-const selectedshow = false;
-
 export interface IPropsPlatformButton {
   platform: string;
   setPlatform: (_: string) => void;
@@ -112,8 +110,10 @@ const PlatformButton = ({ platform, setPlatform }: IPropsPlatformButton) => {
             MenuProps={MenuProps}
             renderValue={(selected) => (
               <>
-                <Box className={"fs-16 white"}>{t("sto-4_platform")}</Box>
-                {selectedshow && <span>{selected}</span>}
+                <Stack flexDirection={"row"} alignItems={"center"} gap={"4px"}>
+                  {selected !== FilterOptionNames.PLATFORM_ALL && <img src={Platform.find((one) => one.platform === selected)?.icon} width={"30px"} />}
+                  <Box className={"fs-16 white"}>{t(selected)}</Box>
+                </Stack>
               </>
             )}
           >
@@ -137,7 +137,7 @@ const PlatformButton = ({ platform, setPlatform }: IPropsPlatformButton) => {
                   backdropFilter: "blur(10px)",
                 }}
                 key={one.platform}
-                value={t(`${one.platform}`)}
+                value={one.platform}
               >
                 <Stack flexDirection={"row"} alignItems={"center"}>
                   {one.icon && <img src={one.icon} width={"30px"} />}

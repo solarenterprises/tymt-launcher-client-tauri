@@ -4,20 +4,25 @@ import { Box } from "@mui/material";
 
 import { IGame } from "../../types/GameTypes";
 
-import storeStyles from "../../styles/StoreStyles";
-
 export interface IPropsGameOverViewNative {
   game: IGame;
 }
 
 const GameOverViewNative = ({ game }: IPropsGameOverViewNative) => {
-  const classes = storeStyles();
-
   const { t } = useTranslation();
 
   return (
     game?.projectMeta?.type && (
-      <Box className={classes.box_gameoption}>
+      <Box
+        sx={{
+          paddingTop: "12px",
+          paddingBottom: "12px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.10)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Box className={"fs-14-regular gray"}>{t("sto-39_type")}</Box>
         <Box className={"fs-14-regular white"}>{game?.projectMeta?.type}</Box>
       </Box>

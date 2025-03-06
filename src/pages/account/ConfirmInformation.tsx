@@ -10,11 +10,13 @@ import AccountNextButton from "../../components/account/AccountNextButton";
 import Stepper from "../../components/account/Stepper";
 import WalletList from "../../components/account/WalletList";
 
+import { useNotification } from "../../providers/NotificationProvider";
+
 import { setAccount } from "../../store/AccountSlice";
 import { addAccountList, getAccountList } from "../../store/AccountListSlice";
 import { setWallet } from "../../store/WalletSlice";
 import { setMnemonic } from "../../store/MnemonicSlice";
-import { login } from "../../store/AuthSlice";
+import { setAuth } from "../../store/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../store";
 
 import { getKeccak256Hash, encrypt } from "../../lib/helper/EncryptHelper";
@@ -24,6 +26,8 @@ import { IWalletAddresses } from "../../types/WalletTypes";
 import { IAccount, IAccountList } from "../../types/AccountTypes";
 
 import tymt2 from "../../assets/account/tymt2.png";
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
+import { useWallet } from "../../providers/WalletProvider";
 
 export interface ILocationStateConfirmInformation {
   passphrase: string;
@@ -38,6 +42,8 @@ const ConfirmInformation = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const { mode } = useParams();
+  const { showNotification } = useNotification();
+  const { handleRefreshClick } = useWallet();
 
   const { passphrase, password, nickname, walletAddresses } = (location.state as ILocationStateConfirmInformation) || {};
 
@@ -52,8 +58,10 @@ const ConfirmInformation = () => {
   const handleSignUp = async () => {
     try {
       await AuthAPI.signup({ nickname, sxpAddress: walletAddresses.solar, passphrase });
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.SIGNUP_SUCCESS });
     } catch (error) {
       console.error("Failed to handleSignUp: ", error);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.SIGNUP_FAIL, text: error.toString() });
     }
   };
 
@@ -79,7 +87,14 @@ const ConfirmInformation = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await dispatch(login({ sxpAddress: walletAddresses.solar, passphrase })).unwrap();
+      const res = await AuthAPI.login({ sxpAddress: walletAddresses.solar, passphrase });
+      dispatch(
+        setAuth({
+          isLoggedIn: true,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        })
+      );
       const newAccount: IAccount = {
         uid: res.user?._id,
         avatar: res.user?.avatar,
@@ -97,8 +112,12 @@ const ConfirmInformation = () => {
       dispatch(setWallet(walletAddresses));
       dispatch(setMnemonic(passphrase));
       navigate("/home");
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_SUCCESS });
+
+      handleRefreshClick();
     } catch (err) {
       console.error("Failed to handleLogin: ", err);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_FAIL, text: err.toString() });
     }
   };
 

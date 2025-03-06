@@ -2,7 +2,6 @@ import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
-import { open } from "@tauri-apps/plugin-shell";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 
 import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
@@ -125,14 +124,6 @@ export async function openDir() {
   });
 }
 
-export async function openLink(url: string) {
-  try {
-    await open(url);
-  } catch (err) {
-    // console.error("Failed to open link:", err);
-  }
-}
-
 export const checkOnline = async (): Promise<boolean> => {
   try {
     await fetch("https://www.google.com", {
@@ -146,23 +137,19 @@ export const checkOnline = async (): Promise<boolean> => {
 
 export const downloadFileToAppDir = async (game: IGame) => {
   try {
-    // console.log("downloadFileToAppDir");
-
     const url: string = await getDownloadLinkNewGame(game);
     const downloadPath: string = await getDownloadFileFullPath(game);
     if (!url || !downloadPath) return false;
 
-    // console.log("url", url);
-    // console.log("downloadPath", downloadPath);
-
     await invoke("download_to_app_dir", {
       url: url,
       fileLocation: downloadPath,
+      game: game?._id,
     });
 
     return true;
   } catch (err) {
-    // console.error("Failed to downloadFileToAppDir: ", err);
+    console.error("Failed to downloadFileToAppDir: ", err);
     return false;
   }
 };
@@ -236,23 +223,17 @@ export const installGame = async (game: IGame) => {
 
     return true;
   } catch (err) {
-    // console.log("Failed to installGame: ", err);
-    return false;
+    throw new Error(err.toString());
   }
 };
 
 export const downloadAndInstallNewGame = async (game: IGame) => {
   try {
-    // console.log("downloadAndInstallNewGame");
-
     await downloadFileToAppDir(game);
     await installGame(game);
     await deleteDownloadFile(game);
-
-    return true;
   } catch (err) {
-    // console.error("Failed to downloadAndInstallNewGame: ", err);
-    return false;
+    throw new Error(err.toString());
   }
 };
 
@@ -590,6 +571,18 @@ export const deleteDownloadFile = async (game: IGame) => {
   } catch (err) {
     // console.log("Failed to deleteDownloadFile: ", err);
     return false;
+  }
+};
+
+export const deleteGameDirectory = async (game: IGame) => {
+  try {
+    const directoryLocation = await getInstallDir(game);
+    await invoke("delete_directory", {
+      dirLocation: directoryLocation,
+    });
+  } catch (err) {
+    console.error("Failed to deleteGameDirectory: ", err);
+    throw new Error(err.toString());
   }
 };
 

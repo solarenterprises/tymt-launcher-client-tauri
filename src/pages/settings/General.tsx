@@ -9,6 +9,7 @@ import { ILanguageSetting } from "../../types/SettingTypes";
 
 import backIcon from "../../assets/setting/BackIcon.svg";
 import arrowImg from "../../assets/setting/ArrowRight.svg";
+import { useNavigate } from "react-router-dom";
 
 export interface IPropsGeneral {
   view: string;
@@ -17,6 +18,7 @@ export interface IPropsGeneral {
 
 const General = ({ view, setView }: IPropsGeneral) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const languageSettingStore: ILanguageSetting = useSelector(getLanguageSetting);
 
   return (
@@ -110,6 +112,21 @@ const General = ({ view, setView }: IPropsGeneral) => {
             >
               <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"15px"}>
                 <Box className="fs-h4 white">{t("set-15_about")}</Box>
+                <Box className="center-align">
+                  <img src={arrowImg} />
+                </Box>
+              </Stack>
+            </Button>
+            <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
+
+            <Button
+              className="common-btn"
+              onClick={() => {
+                navigate("/developer-store");
+              }}
+            >
+              <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"15px"}>
+                <Box className="fs-h4 white">{t("ga-1_developer")}</Box>
                 <Box className="center-align">
                   <img src={arrowImg} />
                 </Box>

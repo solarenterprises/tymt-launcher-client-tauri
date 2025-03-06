@@ -19,6 +19,8 @@ import tymtCore from "../core/tymtCore";
 import { IWalletAddresses, IBalanceList } from "../../types/WalletTypes";
 import { IPriceList } from "../../types/PriceTypes";
 import { ISupportChain } from "../../types/ChainTypes";
+import { ITransaction, ITransactionPagination, txIconMap } from "../../types/TransactionTypes";
+import { formatUnixTime } from "./DateHelper";
 
 export const checkMnemonic = (_mnemonic: string) => {
   if (_mnemonic.split(" ").length == 24) {
@@ -146,18 +148,28 @@ export const getSupportTokensByChainName = (chainName: string) => {
   }
 };
 
-export const getTokenPriceByCmc = (priceListStore: IPriceList, cmc: string) => {
+export const getTokenPriceBySymbol = (priceListStore: IPriceList, symbol: string) => {
   try {
-    const res = priceListStore?.list?.find((one) => one?.cmc === cmc)?.price;
+    const res = priceListStore?.list?.find((one) => one?.symbol === symbol)?.price;
     return res;
   } catch (err) {
     console.error("Failed to getCurrentChainNativeTokenPrice: ", err);
   }
 };
 
+export const getNativeDecimalsBySymbol = (symbol) => {
+  for (const chain of CONST_SUPPORT_CHAINS) {
+    if (chain.native.symbol === symbol) {
+      return chain.native.decimals; // Return the decimal if the symbol matches
+    }
+  }
+  return null; // Return null if the symbol is not found
+};
+
 export const getTokenBalanceBySymbol = (balanceListStore: IBalanceList, symbol: string) => {
   try {
-    const res = balanceListStore?.list?.find((one) => one?.symbol === symbol)?.balance;
+    const decimal = getNativeDecimalsBySymbol(symbol);
+    const res = balanceListStore?.list?.find((one) => one?.symbol === symbol)?.balance / Math.pow(10, decimal as number) || 0;
     return res;
   } catch (err) {
     console.error("Failed to getTokenBalanceBySymbol: ", err);
@@ -167,8 +179,8 @@ export const getTokenBalanceBySymbol = (balanceListStore: IBalanceList, symbol: 
 export const getNativeTokenPriceByChainName = (priceListStore: IPriceList, chainName: string) => {
   try {
     const supportChain = getSupportChainByName(chainName);
-    const cmc = supportChain?.native?.cmc;
-    const res = getTokenPriceByCmc(priceListStore, cmc);
+    const symbol = supportChain?.native?.symbol;
+    const res = getTokenPriceBySymbol(priceListStore, symbol);
     return res;
   } catch (err) {
     console.error("Failed to getNativeSymbolByChainName: ", err);
@@ -251,4 +263,70 @@ export const getExplorerUrl = (chain: ISupportChain, walletStore: IWalletAddress
 
 export const getPublicKey = (passphrase: string) => {
   return tymtCore.Blockchains.solar.wallet.getPublicKey(passphrase);
+};
+
+export const getTxScanLink = (txId: string, currentChainName: string) => {
+  let res: string;
+  switch (currentChainName) {
+    case CONST_CHAIN_NAMES.SOLAR:
+      res = CONFIG_SOLAR_SCAN + "transaction/" + txId;
+      break;
+    case CONST_CHAIN_NAMES.ETHEREUM:
+      res = CONFIG_ETH_SCAN + "tx/" + txId;
+      break;
+    case CONST_CHAIN_NAMES.BINANCE:
+      res = CONFIG_BSC_SCAN + "tx/" + txId;
+      break;
+    case CONST_CHAIN_NAMES.POLYGON:
+      res = CONFIG_POL_SCAN + "tx/" + txId;
+      break;
+    case CONST_CHAIN_NAMES.AVALANCHE:
+      res = CONFIG_AVAX_SCAN + "tx/" + txId;
+      break;
+    case CONST_CHAIN_NAMES.ARBITRUM:
+      res = CONFIG_ARB_SCAN + "tx/" + txId;
+      break;
+    case CONST_CHAIN_NAMES.OPTIMISM:
+      res = CONFIG_OPT_SCAN + "tx/" + txId;
+      break;
+  }
+  return res;
+};
+
+export const formatTx = (tx: ITransaction, currentChainWallet: string, currentChainName: string) => {
+  const displayTxImage = tx.type === "vote" ? txIconMap.get("TX_VOTE") : tx.sender === currentChainWallet ? txIconMap.get("TX_OUT") : txIconMap.get("TX_IN");
+  const displayTxAmount = tx.amount + tx.fee;
+  const displayTxAddress = tx.type === "vote" ? tx.sender : tx.sender === currentChainWallet ? tx.asset[0].recipient : tx.sender;
+  const displayTxTooltip = tx.type === "vote" ? "Vote" : tx.sender === currentChainWallet ? "Transfer Out" : "Transfer In";
+  const displayTimestamp = formatUnixTime(tx.timestamp);
+  const txScanLink = getTxScanLink(tx.txId, currentChainName);
+  return {
+    displayTxAddress,
+    displayTxAmount,
+    displayTxImage,
+    displayTxTooltip,
+    displayTimestamp,
+    txScanLink,
+  };
+};
+
+export const formatEvmResponseToTxPagination = (res: any) => {
+  const txList: ITransaction[] = res?.data?.data?.transactions?.map((one) => ({
+    txId: one?.txid,
+    type: "transfer",
+    asset: one?.vout?.map((two) => ({ amount: two?.value, recipient: two?.addresses[0] })),
+    amount: one?.value / 1e18,
+    sender: one?.vin[0]?.addresses[0],
+    fee: one?.fees / 1e18,
+    timestamp: one?.blockTime,
+  }));
+  const result: ITransactionPagination = {
+    meta: {
+      totalCount: res?.data?.data?.txs,
+      pageCount: res?.data?.data?.totalPages,
+      count: res?.data?.data?.itemsOnPage,
+    },
+    data: txList,
+  };
+  return result;
 };

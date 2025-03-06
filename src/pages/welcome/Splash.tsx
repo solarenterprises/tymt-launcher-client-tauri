@@ -1,21 +1,28 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 
 import { Box, LinearProgress } from "@mui/material";
 
 import { getAccountList } from "../../store/AccountListSlice";
 
-import { IAccountList } from "../../types/AccountTypes";
+import { IAccountList, IAuth } from "../../types/AccountTypes";
 
 import SplashLogo from "../../assets/welcome/SplashLogo.svg";
+import { getAuth, setAuth } from "../../store/AuthSlice";
 
 const Splash = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [progress, setProgress] = useState<number>(0);
 
   const accountListStore: IAccountList = useSelector(getAccountList);
+  const authStore: IAuth = useSelector(getAuth);
+
+  useEffect(() => {
+    dispatch(setAuth({ ...authStore, isLoggedIn: false }));
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {

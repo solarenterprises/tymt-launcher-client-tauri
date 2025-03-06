@@ -6,6 +6,9 @@ import { CONFIG_NETWORK_NAME, CONFIG_OP_API_KEY, CONFIG_OP_API_URL } from "../..
 
 import { ISupportToken } from "../../types/ChainTypes";
 import { IBalance } from "../../types/WalletTypes";
+import { IRecipient } from "../../types/TransactionTypes";
+import { CONST_CHAIN_IDS } from "../../const/ChainConsts";
+import { CryptoAPI } from "../api/CryptoAPI";
 
 export class Optimism {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
@@ -63,6 +66,76 @@ export class Optimism {
     } catch (err) {
       console.error("Failed to OPTIMISM getTokenBalance: ", err);
       return [];
+    }
+  }
+
+  static async sendTransaction(
+    privateKey: string,
+    sender: string,
+    recipients: IRecipient[]
+  ): Promise<{ success: boolean; message?: string; error?: string; data?: any }> {
+    let successfulTransactions: string[] = [];
+    let failedTransactions: string[] = [];
+    const transactionResults: { [address: string]: string } = {};
+
+    try {
+      const gasLimit = 22000;
+      const chainId = CONST_CHAIN_IDS.OPTIMISM;
+      const [gasPrice, initialNonce] = await Promise.all([CryptoAPI.getOpGasPrice(), CryptoAPI.getOpTransactionCount(sender)]);
+
+      for (let i = 0; i < recipients.length; i++) {
+        const recipient = recipients[i];
+        const nonce = initialNonce + i; // Increment nonce for each transaction
+
+        try {
+          // Create transaction
+          const transaction = {
+            to: recipient.address,
+            value: ethers.parseEther(recipient.amount),
+            gasLimit: gasLimit,
+            gasPrice: gasPrice,
+            nonce: nonce,
+            chainId: chainId,
+          };
+
+          // Sign transaction
+          const wallet = new ethers.Wallet(privateKey);
+          const signedTx = await wallet.signTransaction(transaction);
+
+          // Broadcast transaction
+          const res = await CryptoAPI.sendOpRawTransaction([signedTx]);
+          transactionResults[recipient.address] = res; // Store transaction result
+
+          if (res.success) successfulTransactions.push(recipient.address);
+          else failedTransactions.push(recipient.address);
+        } catch (err) {
+          console.error(`Failed to send transaction to ${recipient.address}:`, err);
+          failedTransactions.push(recipient.address);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to OP sendTransaction: ", err);
+    } finally {
+      if (successfulTransactions.length === recipients.length)
+        return {
+          success: true,
+          message: "All transactions broadcasted.",
+          data: {
+            successfulTransactions,
+            failedTransactions,
+            transactionResults,
+          },
+        };
+      else
+        return {
+          success: false,
+          error: `Transactions to ${failedTransactions.join(",")} failed.`,
+          data: {
+            successfulTransactions,
+            failedTransactions,
+            transactionResults,
+          },
+        };
     }
   }
 }

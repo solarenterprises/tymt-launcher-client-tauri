@@ -1,33 +1,47 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { Box, Stack } from "@mui/material";
 
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
+
+import { useNotification } from "../../providers/NotificationProvider";
+import { useWallet } from "../../providers/WalletProvider";
+
 import AccountNextButton from "./AccountNextButton";
 import InputText from "./InputText";
 
-import { getAccount } from "../../store/AccountSlice";
+import { getAccount, setAccount } from "../../store/AccountSlice";
+import { setAuth } from "../../store/AuthSlice";
+import { addAccountList } from "../../store/AccountListSlice";
+import { setWallet } from "../../store/WalletSlice";
+import { setMnemonic } from "../../store/MnemonicSlice";
 
-import { decrypt, getKeccak256Hash } from "../../lib/helper/EncryptHelper";
+import { AuthAPI } from "../../lib/api/AuthAPI";
+import { decrypt, encrypt, getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 import { getWalletAddressesFromPassphrase } from "../../lib/helper/WalletHelper";
 
 import { IAccount } from "../../types/AccountTypes";
+import { IWalletAddresses } from "../../types/WalletTypes";
 
 const LoginAccountForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { showNotification } = useNotification();
+  const { handleRefreshClick } = useWallet();
 
   const accountStore: IAccount = useSelector(getAccount);
-
   const accountStoreRef = useRef(accountStore);
-
   useEffect(() => {
     accountStoreRef.current = accountStore;
   }, [accountStore]);
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const isGuest: boolean = useMemo(() => {
     if (accountStore?.nickname === "Guest" && accountStore?.password === getKeccak256Hash("")) return true;
@@ -51,6 +65,45 @@ const LoginAccountForm = () => {
       console.error("Failed to handleGuestLogin: ", err);
     }
   }, [accountStore]);
+
+  const handleLogin = async (walletAddresses: IWalletAddresses, passphrase: string, password: string) => {
+    try {
+      setLoading(true);
+      const res = await AuthAPI.login({ sxpAddress: walletAddresses.solar, passphrase });
+      dispatch(
+        setAuth({
+          isLoggedIn: true,
+          accessToken: res.accessToken,
+          refreshToken: res.refreshToken,
+        })
+      );
+      const newAccount: IAccount = {
+        uid: res.user?._id,
+        avatar: res.user?.avatar,
+        nickname: res.user?.nickname,
+        password: getKeccak256Hash(password),
+        mnemonic: await encrypt(passphrase, password),
+        sxpAddress: res.user?.sxpAddress,
+        publicKey: res.user?.publicKey,
+        notificationStatus: res.user?.notificationStatus,
+        onlineStatus: res.user?.onlineStatus,
+        status: res.user?.status,
+      };
+      dispatch(setAccount(newAccount));
+      dispatch(addAccountList(newAccount));
+      dispatch(setWallet(walletAddresses));
+      dispatch(setMnemonic(passphrase));
+      navigate("/home");
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_SUCCESS });
+
+      handleRefreshClick();
+    } catch (err) {
+      console.error("Failed to handleLogin: ", err);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_FAIL, text: err.toString() });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -82,14 +135,17 @@ const LoginAccountForm = () => {
         const password = formik.values.password;
         const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
         const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
-        navigate("/confirm-information/login", {
-          state: {
-            password: password,
-            walletAddresses: walletAddresses,
-            nickname: accountStoreRef?.current?.nickname,
-            passphrase: decryptedMnemonic,
-          },
-        });
+
+        await handleLogin(walletAddresses, decryptedMnemonic, password);
+
+        // navigate("/confirm-information/login", {
+        //   state: {
+        //     password: password,
+        //     walletAddresses: walletAddresses,
+        //     nickname: accountStoreRef?.current?.nickname,
+        //     passphrase: decryptedMnemonic,
+        //   },
+        // });
       } catch (err) {
         console.error("Failed to onSubmit at LoginAccountForm:  ", err);
       }
@@ -115,10 +171,15 @@ const LoginAccountForm = () => {
                 />
                 {formik.touched.password && formik.errors.password && <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>}
               </Stack>
-              <AccountNextButton isSubmit={true} text={t("ncca-7_next")} disabled={formik.touched.password && formik.errors.password ? true : false} />
+              <AccountNextButton
+                isSubmit={true}
+                text={t("ncca-7_next")}
+                disabled={(formik.touched.password && formik.errors.password) || loading ? true : false}
+                loading={loading}
+              />
             </>
           )}
-          {isGuest && <AccountNextButton text={t("ncca-7_next")} onClick={handleGuestLogin} />}
+          {isGuest && <AccountNextButton text={t("ncca-7_next")} onClick={handleGuestLogin} loading={loading} disabled={loading} />}
         </Stack>
       </form>
     </>

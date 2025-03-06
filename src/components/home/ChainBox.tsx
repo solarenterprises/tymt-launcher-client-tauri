@@ -11,11 +11,12 @@ import { getBalanceList } from "../../store/BalanceListSlice";
 import { getCurrentChain } from "../../store/CurrentChainSlice";
 
 import { formatBalance } from "../../lib/helper/NumberHelper";
-import { getCurrentChainWalletAddress, getTokenBalanceBySymbol, getTokenPriceByCmc } from "../../lib/helper/WalletHelper";
+import { getCurrentChainWalletAddress, getTokenBalanceBySymbol, getTokenPriceBySymbol } from "../../lib/helper/WalletHelper";
 
 import { IPriceList } from "../../types/PriceTypes";
 import { ICurrentChain, ISupportChain } from "../../types/ChainTypes";
 import { IBalanceList, IWalletAddresses } from "../../types/WalletTypes";
+import { CONST_CHAIN_NAMES } from "../../const/ChainConsts";
 
 export interface IPropsChainBox {
   supportChain: ISupportChain;
@@ -32,7 +33,7 @@ const ChainBox = ({ supportChain, onClick }: IPropsChainBox) => {
 
   const isActive: boolean = useMemo(() => currentChainStore?.chain === supportChain?.native?.name, [currentChainStore]);
   const balance = useMemo(() => getTokenBalanceBySymbol(balanceListStore, supportChain?.native?.symbol) ?? 0, [balanceListStore]);
-  const price = useMemo(() => getTokenPriceByCmc(priceListStore, supportChain?.native?.cmc) ?? 0, [priceListStore]);
+  const price = useMemo(() => getTokenPriceBySymbol(priceListStore, supportChain?.native?.symbol) ?? 0, [priceListStore]);
 
   return (
     <Button
@@ -41,7 +42,9 @@ const ChainBox = ({ supportChain, onClick }: IPropsChainBox) => {
       sx={{
         display: "block",
         textTransform: "none",
+        filter: supportChain?.native?.name === CONST_CHAIN_NAMES?.BITCOIN || supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLANA ? "grayscale(1.0)" : "",
       }}
+      disabled={supportChain?.native?.name === CONST_CHAIN_NAMES?.BITCOIN || supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLANA}
     >
       <Stack direction={"row"} justifyContent={"space-between"} sx={{ padding: "20px" }}>
         <Stack gap={2} direction={"row"} justifyContent={"flex-start"}>

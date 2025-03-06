@@ -71,6 +71,16 @@ export const CONST_GAME_TAVLA: IGame = {
   title: "Tavla",
   visibilityState: "active", // active
   externalStoreId: "",
+
+  heroes: "",
+  developers: "",
+  publisher: "",
+  warning: "",
+  warningLink: "",
+  averageRating: 5,
+  feedbackCount: 100,
+  downloadCount: 100,
+
   createdAt: "",
   updatedAt: "",
   __v: 0,

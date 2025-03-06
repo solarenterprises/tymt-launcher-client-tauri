@@ -15,11 +15,14 @@ import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 
 import { IAccount, IAccountList } from "../../types/AccountTypes";
 
+import closeIcon from "../../assets/setting/XIcon.svg";
+
 export interface IPropsProfileCard {
   account: IAccount;
+  removeAccount: () => void;
 }
 
-const ProfileCard = ({ account }: IPropsProfileCard) => {
+const ProfileCard = ({ account, removeAccount }: IPropsProfileCard) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -40,8 +43,9 @@ const ProfileCard = ({ account }: IPropsProfileCard) => {
       <Box
         onClick={handleClick}
         sx={{
+          position: "relative", // Add this to allow absolute positioning
           textTransform: "none",
-          width: "100%",
+          // width: "100%",
           border: "1px solid #FFFFFF1A",
           padding: "12px 8px 6px",
           borderRadius: "16px",
@@ -55,6 +59,25 @@ const ProfileCard = ({ account }: IPropsProfileCard) => {
           },
         }}
       >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "8px",
+            right: "8px",
+            cursor: "pointer",
+            fontSize: "16px",
+            color: "#FFFFFF",
+            "&:hover": {
+              color: "#7C7C7C",
+            },
+          }}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevents the parent click handler from triggering
+            removeAccount(); // Call your close function here
+          }}
+        >
+          <img src={closeIcon} />
+        </Box>
         <Stack gap={"8px"} width={"100%"}>
           <Stack direction="row" alignItems="center" gap="12px" width={"100%"}>
             <Avatar url={account?.avatar} size={64} onlineStatus={account?.sxpAddress === accountStore?.sxpAddress} status={"active"} />

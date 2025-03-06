@@ -7,5 +7,5 @@ export interface IPriceAPIGetAllTokenPricesResponse {
   contractAddress: string;
   price: number;
   timestamp: string;
-  cmc: string;
+  symbol: string; // cmc
 }

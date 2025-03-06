@@ -5,8 +5,6 @@ import { Box } from "@mui/material";
 
 import { getGameDownloadSize } from "../../lib/helper/GameHelper";
 
-import storeStyles from "../../styles/StoreStyles";
-
 import { IGame } from "../../types/GameTypes";
 import numeral from "numeral";
 
@@ -15,8 +13,6 @@ export interface IPropsGameOverViewDownloadSize {
 }
 
 const GameOverViewDownloadSize = ({ game }: IPropsGameOverViewDownloadSize) => {
-  const classes = storeStyles();
-
   const { t } = useTranslation();
 
   const [downloadSize, setDownloadSize] = useState<number>(0);
@@ -32,7 +28,16 @@ const GameOverViewDownloadSize = ({ game }: IPropsGameOverViewDownloadSize) => {
 
   return (
     downloadSize > 0 && (
-      <Box className={classes.box_gameoption}>
+      <Box
+        sx={{
+          paddingTop: "12px",
+          paddingBottom: "12px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.10)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Box className={"fs-14-regular gray"}>{t("sto-49_download-size")}</Box>
         <Box className={"fs-14-regular white"}>{numeral(downloadSize).format("0,0.[00]")} MB</Box>
       </Box>

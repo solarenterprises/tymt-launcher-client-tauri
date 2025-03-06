@@ -1,10 +1,16 @@
-import { Box, Button, Divider, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
+
+import { Box, Button, Divider, Stack } from "@mui/material";
+
+import { CONST_TYMT_LINKS } from "../../const/tymtConsts";
+
+import { openLink } from "../../lib/helper/TauriHelper";
 
 import backIcon from "../../assets/setting/BackIcon.svg";
 import externalIcon from "../../assets/setting/ExternalLink.svg";
 import twitterIcon from "../../assets/setting/TwitterIcon.svg";
 import discordIcon from "../../assets/setting/DiscordIcon.svg";
+import TooltipComponent from "../../components/home/TooltipComponent";
 
 export interface IPropsAbout {
   view: string;
@@ -27,35 +33,40 @@ const About = ({ view, setView }: IPropsAbout) => {
             </Stack>
             <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
             <Stack direction={"column"} justifyContent={""}>
-              <Button
-                className="common-btn"
-                sx={{ padding: "20px" }}
-                onClick={() => {
-                  // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.documentation);
-                }}
-              >
-                <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
-                  <Box className="fs-h4 white">{t("set-51_documentation")}</Box>
-                  <Box className="center-align">
-                    <img src={externalIcon} />
-                  </Box>
-                </Stack>
-              </Button>
+              <TooltipComponent placement="bottom" text={CONST_TYMT_LINKS.documentation}>
+                <Button
+                  className="common-btn"
+                  sx={{ padding: "20px" }}
+                  onClick={() => {
+                    openLink(CONST_TYMT_LINKS.documentation);
+                  }}
+                >
+                  <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
+                    <Box className="fs-h4 white">{t("set-51_documentation")}</Box>
+                    <Box className="center-align">
+                      <img src={externalIcon} />
+                    </Box>
+                  </Stack>
+                </Button>
+              </TooltipComponent>
+
               <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
-              <Button
-                className="common-btn"
-                sx={{ padding: "20px" }}
-                onClick={() => {
-                  // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.policy);
-                }}
-              >
-                <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
-                  <Box className="fs-h4 white">{t("set-52_privacy-policy")}</Box>
-                  <Box className="center-align">
-                    <img src={externalIcon} />
-                  </Box>
-                </Stack>
-              </Button>
+              <TooltipComponent placement="bottom" text={CONST_TYMT_LINKS.policy}>
+                <Button
+                  className="common-btn"
+                  sx={{ padding: "20px" }}
+                  onClick={() => {
+                    openLink(CONST_TYMT_LINKS.policy);
+                  }}
+                >
+                  <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"}>
+                    <Box className="fs-h4 white">{t("set-52_privacy-policy")}</Box>
+                    <Box className="center-align">
+                      <img src={externalIcon} />
+                    </Box>
+                  </Stack>
+                </Button>
+              </TooltipComponent>
               <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
               {/* <Button
                 className="common-btn"
@@ -75,28 +86,32 @@ const About = ({ view, setView }: IPropsAbout) => {
               <Stack direction={"column"} justifyContent={"flex-start"} textAlign={"left"} gap={"20px"} padding={"20px"}>
                 <Box className="fs-h4 white">{t("set-54_follow-us")}</Box>
                 <Stack direction={"row"} justifyContent={"flex-start"} gap={"10px"}>
-                  <Button
-                    className="button_navbar_common"
-                    sx={{ padding: 0 }}
-                    onClick={() => {
-                      // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.twitter);
-                    }}
-                  >
-                    <Box className="center-align">
-                      <img src={twitterIcon} />
-                    </Box>
-                  </Button>
-                  <Button
-                    className="button_navbar_common"
-                    sx={{ padding: 0 }}
-                    onClick={() => {
-                      // ElectronAPI.openExternalLink(CONST_TYMT_LINKS.discord);
-                    }}
-                  >
-                    <Box className="center-align">
-                      <img src={discordIcon} />
-                    </Box>
-                  </Button>
+                  <TooltipComponent placement="bottom" text={CONST_TYMT_LINKS.twitter}>
+                    <Button
+                      className="button_navbar_common"
+                      sx={{ padding: 0 }}
+                      onClick={() => {
+                        openLink(CONST_TYMT_LINKS.twitter);
+                      }}
+                    >
+                      <Box className="center-align">
+                        <img src={twitterIcon} />
+                      </Box>
+                    </Button>
+                  </TooltipComponent>
+                  <TooltipComponent placement="bottom" text={CONST_TYMT_LINKS.discord}>
+                    <Button
+                      className="button_navbar_common"
+                      sx={{ padding: 0 }}
+                      onClick={() => {
+                        openLink(CONST_TYMT_LINKS.discord);
+                      }}
+                    >
+                      <Box className="center-align">
+                        <img src={discordIcon} />
+                      </Box>
+                    </Button>
+                  </TooltipComponent>
                 </Stack>
               </Stack>
             </Stack>

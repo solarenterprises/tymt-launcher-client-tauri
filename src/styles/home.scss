@@ -510,3 +510,16 @@
   background: radial-gradient(circle at 50% 50%, var(--tymt-blue), #00000000);
   z-index: 1;
 }
+
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-100%, 0);
+  }
+}
+
+.marquee-element {
+  animation: marquee 5s linear infinite;
+}

@@ -4,27 +4,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import numeral from "numeral";
 
-import { Grid, Stack, Box, Tooltip, IconButton, Button } from "@mui/material";
+import { Grid, Stack, Box, IconButton, Button, Pagination } from "@mui/material";
 
-import { CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
+import { CONST_CHAIN_NAMES, CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
 
 import { useWallet } from "../../providers/WalletProvider";
 
 import SwitchComp from "../../components/home/SwitchComp";
 import WalletCard from "../../components/wallet/WalletCard";
 import TransCard from "../../components/wallet/TransCard";
-import Loading from "../../components/home/Loading";
 import ComingModal from "../../components/modal/ComingModal";
 import AnimatedComponent from "../../components/home/AnimatedComponent";
+import TooltipComponent from "../../components/home/TooltipComponent";
 
 import { AppDispatch } from "../../store";
-import { getCurrentToken, setCurrentToken } from "../../store/CurrentTokenSlice";
 import { getBalanceList } from "../../store/BalanceListSlice";
+import { getCurrentToken, setCurrentToken } from "../../store/CurrentTokenSlice";
 import { getWalletSetting, setWalletSetting } from "../../store/WalletSettingSlice";
+import { getWallet } from "../../store/WalletSlice";
+
+import { CryptoAPI } from "../../lib/api/CryptoAPI";
 
 import { getNativeTokenBalanceByChainName } from "../../lib/helper/WalletHelper";
 
-import { IBalanceList, ICurrentToken } from "../../types/WalletTypes";
+import { IBalanceList, ICurrentToken, IWalletAddresses } from "../../types/WalletTypes";
+import { ITransactionPagination } from "../../types/TransactionTypes";
 import { IWalletSetting } from "../../types/SettingTypes";
 
 import sendIcon from "../../assets/wallet/SendIcon.svg";
@@ -32,51 +36,74 @@ import receiveIcon from "../../assets/wallet/ReceiveIcon.svg";
 import percentIcon from "../../assets/wallet/PercentIcon.svg";
 import refreshIcon from "../../assets/wallet/RefreshIcon.svg";
 
-import WalletStyle from "../../styles/WalletStyles";
-import SettingStyle from "../../styles/SettingStyle";
-
 // const order = ["Solar", "Binance", "Ethereum", "Bitcoin", "Solana", "Polygon", "Avalanche", "Arbitrum", "Optimism"];
 
 const Wallet = () => {
-  const classname = WalletStyle();
-  const tooltip = SettingStyle();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { currentSupportChain, currentCurrencySymbol, totalBalance } = useWallet();
+  const { currentSupportChain, currentCurrencySymbol, totalBalance, handleRefreshClick } = useWallet();
 
   const currentTokenStore: ICurrentToken = useSelector(getCurrentToken);
   const balanceListStore: IBalanceList = useSelector(getBalanceList);
   const walletSettingStore: IWalletSetting = useSelector(getWalletSetting);
+  const walletStore: IWalletAddresses = useSelector(getWallet);
 
   const [loading, setLoading] = useState<boolean>(false);
   const [comingSoon, setComingSoon] = useState<boolean>(false);
+  const [txList, setTxList] = useState<ITransactionPagination>();
+  const [currentTxPage, setCurrentTxPage] = useState<number>(1);
 
-  const handleRefreshClick = useCallback(
-    async () => {
-      // try {
-      //   const asyncAll = [
-      //     dispatch(fetchBalanceListAsync(walletStore)),
-      //     dispatch(fetchPriceListAsync()),
-      //     dispatch(fetchCurrencyListAsync()),
-      //     dispatch(
-      //       fetchTransactionListAsync({
-      //         walletStore: walletStore,
-      //         chainName: currentChainStore?.chain,
-      //         tokenSymbol: getNativeSymbolByChainName(currentChainStore?.chain),
-      //         page: 1,
-      //       })
-      //     ),
-      //   ];
-      //   await Promise.all(asyncAll);
-      // } catch (err) {
-      //   console.log("Failed to handleRefreshClick: ", err);
-      // }
+  const fetchTransactionList = useCallback(
+    async (page: number) => {
+      try {
+        setLoading(true);
+        let res;
+        switch (currentSupportChain?.native?.name) {
+          case CONST_CHAIN_NAMES.SOLAR:
+            res = await CryptoAPI.getSxpTransactions(walletStore?.solar, page, 20);
+            break;
+          case CONST_CHAIN_NAMES.ETHEREUM:
+            res = await CryptoAPI.getEthTransactions(walletStore?.ethereum, page, 20);
+            break;
+          case CONST_CHAIN_NAMES.BINANCE:
+            res = await CryptoAPI.getBscTransactions(walletStore?.binance, page, 20);
+            break;
+          case CONST_CHAIN_NAMES.POLYGON:
+            res = await CryptoAPI.getPolTransactions(walletStore?.polygon, page, 20);
+            break;
+          case CONST_CHAIN_NAMES.ARBITRUM:
+            res = await CryptoAPI.getArbTransactions(walletStore?.arbitrum, page, 20);
+            break;
+          case CONST_CHAIN_NAMES.AVALANCHE:
+            res = await CryptoAPI.getAvaxTransactions(walletStore?.avalanche, page, 20);
+            break;
+          case CONST_CHAIN_NAMES.OPTIMISM:
+            res = await CryptoAPI.getOpTransactions(walletStore?.optimism, page, 20);
+            break;
+        }
+        setTxList(res);
+      } catch (err) {
+      } finally {
+        setLoading(false);
+      }
     },
-    [
-      /* walletStore, currentChainStore */
-    ]
+    [walletStore, currentSupportChain]
   );
+
+  const handleWalletRefreshClick = () => {
+    handleRefreshClick();
+    if (currentTxPage === 1) fetchTransactionList(1);
+    setCurrentTxPage(1);
+  };
+
+  const handlePageChange = async (_event: any, value: number) => {
+    setCurrentTxPage(value);
+  };
+
+  useEffect(() => {
+    fetchTransactionList(currentTxPage);
+  }, [currentTxPage, currentSupportChain]);
 
   useEffect(() => {
     handleRefreshClick();
@@ -100,16 +127,16 @@ const Wallet = () => {
 
                         <Box>
                           {CONST_SUPPORT_CHAINS?.map((supportChain, index) => (
-                            <Tooltip title={supportChain?.native?.name} placement="top" key={index} classes={{ tooltip: tooltip.tooltip }}>
+                            <TooltipComponent placement="top" text={supportChain?.native?.name} key={`chain-icon-${index}`}>
                               <img
                                 src={supportChain?.native?.logo}
                                 key={index}
-                                className={classname.wrap_imgs}
                                 style={{
                                   cursor: "pointer",
+                                  marginLeft: "-5px",
                                 }}
                               />
-                            </Tooltip>
+                            </TooltipComponent>
                           ))}
                         </Box>
                       </Stack>
@@ -143,7 +170,7 @@ const Wallet = () => {
                         <Box className="fs-14-regular t-center fw blue">{t("wal-3_vote")}</Box>
                       </Stack>
                       <Stack spacing={"8px"}>
-                        <IconButton className={"wallet-icon-button"} onClick={handleRefreshClick}>
+                        <IconButton className={"wallet-icon-button"} onClick={handleWalletRefreshClick}>
                           <img src={refreshIcon} className="wallet-icon-button-icon" />
                         </IconButton>
                         <Box className="fs-14-regular center fw blue">{t("sto-35_refresh")}</Box>
@@ -152,8 +179,6 @@ const Wallet = () => {
                   </Stack>
                 </Stack>
                 <Stack padding={"30px"} justifyContent={"center"}>
-                  {loading && <Loading />}
-
                   <Stack direction={"row"} justifyContent={"flex-end"} gap={3} padding={"20px"}>
                     <Box className={"fs-18-regular white"}>{t("wal-5_hide-0-balance")}</Box>
                     <Box>
@@ -173,16 +198,16 @@ const Wallet = () => {
                   <Grid container spacing={"32px"}>
                     {CONST_SUPPORT_CHAINS?.map((supportChain, index) => {
                       if (walletSettingStore?.hideZeroBalance) {
-                        if (getNativeTokenBalanceByChainName(balanceListStore, supportChain?.native?.name) !== 0) {
+                        if (getNativeTokenBalanceByChainName(balanceListStore, supportChain?.native?.name) > 0) {
                           return (
-                            <Grid item xs={6} key={index}>
+                            <Grid item xs={6} key={`wallet-card-non-zero-${index}`}>
                               <WalletCard supportChain={supportChain} index={index} setLoading={setLoading} />
                             </Grid>
                           );
                         }
                       } else {
                         return (
-                          <Grid item xs={6} key={index}>
+                          <Grid item xs={6} key={`wallet-card-${index}`}>
                             <WalletCard supportChain={supportChain} index={index} setLoading={setLoading} />
                           </Grid>
                         );
@@ -212,7 +237,7 @@ const Wallet = () => {
                       {currentSupportChain?.tokens?.map((token, index) => (
                         <Button
                           className={`common-btn ${currentTokenStore?.token === token.symbol ? "active" : ""}`}
-                          key={index}
+                          key={`current-chain-tokens-${index}`}
                           onClick={() => {
                             dispatch(setCurrentToken(token?.symbol));
                           }}
@@ -235,7 +260,35 @@ const Wallet = () => {
                     scrollbarWidth: "none",
                   }}
                 >
-                  <TransCard />
+                  <TransCard loading={loading} txList={txList} />
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Pagination
+                    count={txList?.meta?.pageCount}
+                    page={currentTxPage}
+                    onChange={handlePageChange}
+                    shape="rounded"
+                    sx={{
+                      marginTop: "20px",
+                      marginBottom: "30px",
+                      "& .MuiPaginationItem-root": {
+                        borderRadius: "6px",
+                        fontFamily: "Cobe",
+                        color: "#AFAFAF",
+                      },
+                      "& .MuiPaginationItem-root.Mui-selected": {
+                        color: "white",
+                        backgroundColor: "#232B2C",
+                      },
+                    }}
+                  />
                 </Box>
               </Grid>
             </Grid>

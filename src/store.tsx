@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { createStateSyncMiddleware, initMessageListener } from "redux-state-sync";
+import { useDispatch, useSelector } from "react-redux";
 
 // Auth
 import accountReducer from "./store/AccountSlice";
@@ -29,10 +30,14 @@ import addressReducer from "./store/AddressSlice";
 import downloadStatusReducer from "./store/DownloadStatusSlice";
 // ~DownloadStatus
 
-import tymtLogoReducer from "./store/tymtLogoSlice";
+// Game
 import gameListReducer from "./store/GameListSlice";
+import libraryListReducer from "./store/LibraryListSlice";
+import developerGameListReducer from "./store/DeveloperGameListSlice";
+// ~Game
+
+import tymtLogoReducer from "./store/tymtLogoSlice";
 import renderTimeReducer from "./store/RenderTimeSlice";
-import { useDispatch, useSelector } from "react-redux";
 
 // const blacklistActionTypes = ["intercomsupport/setChatMounted", "intercomsupport/setMountedTrue", "intercomsupport/setMountedFalse"];
 const blacklistActionTypes: string[] = [];
@@ -72,8 +77,13 @@ const store = configureStore({
     downloadStatus: downloadStatusReducer,
     // ~DownloadStatus
 
-    tymtLogo: tymtLogoReducer,
+    // Game
     gameList: gameListReducer,
+    libraryList: libraryListReducer,
+    developerGameList: developerGameListReducer,
+    // ~Game
+
+    tymtLogo: tymtLogoReducer,
     renderTime: renderTimeReducer,
 
     address: addressReducer,

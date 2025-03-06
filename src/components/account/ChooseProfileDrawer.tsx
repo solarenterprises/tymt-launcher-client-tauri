@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { SwipeableDrawer, Box, Stack, IconButton, Divider } from "@mui/material";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
@@ -8,13 +8,12 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import RedStrokeButton from "./RedStrokeButton";
 import ProfileCard from "./ProfileCard";
 
-import { getAccountList } from "../../store/AccountListSlice";
+import { getAccountList, setAccountList } from "../../store/AccountListSlice";
+import { getAccount, setAccount } from "../../store/AccountSlice";
 
-import { IAccountList } from "../../types/AccountTypes";
+import { IAccount, IAccountList } from "../../types/AccountTypes";
 
 import closeImg from "../../assets/setting/CollapsCloseBtn.svg";
-
-import SettingStyle from "../../styles/SettingStyle";
 
 type Anchor = "right";
 
@@ -24,10 +23,11 @@ interface props {
 }
 
 const ChooseProfileDrawer = ({ view, setView }: props) => {
-  const classname = SettingStyle();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const accountListStore: IAccountList = useSelector(getAccountList);
+  const accountStore: IAccount = useSelector(getAccount);
 
   const [state, setState] = useState({ right: false });
 
@@ -43,19 +43,48 @@ const ChooseProfileDrawer = ({ view, setView }: props) => {
     navigate("/welcome");
   };
 
+  const handleRemoveAccount = useCallback(
+    (account: IAccount) => {
+      try {
+        const newAccountList = accountListStore?.list?.filter((one) => one?.sxpAddress !== account?.sxpAddress);
+        dispatch(setAccountList(newAccountList));
+        if (accountStore?.sxpAddress === account?.sxpAddress) {
+          if (newAccountList?.length === 0) navigate("/");
+          else {
+            dispatch(setAccount(newAccountList[0]));
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [accountStore, accountListStore]
+  );
+
   return (
     <SwipeableDrawer
       anchor="right"
       open={view}
       onClose={() => setView(false)}
       onOpen={toggleDrawer("right", true)}
-      classes={{ paper: classname.setting_container }}
       slotProps={{
         backdrop: {
           onClick: toggleDrawer("right", false),
         },
       }}
       sx={{
+        "& .MuiPaper-root": {
+          height: "98% !important",
+          minWidth: "550px",
+          display: "flex",
+          borderRadius: "32px",
+          backgroundColor: "#8080804D !important",
+          backgroundBlendMode: "luminosity",
+          backdropFilter: "blur(4px)",
+          margin: "10px",
+          position: "fixed",
+          flexDirection: "row", // No need for "&.MuiPaper-root" here
+        },
         "& .MuiBox-root": {
           overflow: "auto", // Enable scrolling
           scrollbarWidth: "none", // Firefox
@@ -65,10 +94,23 @@ const ChooseProfileDrawer = ({ view, setView }: props) => {
         },
       }}
     >
-      <Box className={classname.collaps_pan}>
-        <img src={closeImg} className={classname.close_icon} onClick={() => setView(false)} />
+      <Box sx={{ width: "45px", height: "100%", position: "relative" }}>
+        <img src={closeImg} style={{ cursor: "pointer", position: "absolute", bottom: "40px" }} onClick={() => setView(false)} />
       </Box>
-      <Box className={classname.setting_pan}>
+      <Box
+        sx={{
+          maxWidth: "505px",
+          width: "100%",
+          height: "100%",
+          overflow: "scroll",
+          borderRadius: "24px",
+          backgroundColor: "#071516",
+          whiteSpace: "nowrap",
+          overFlowX: "auth",
+          scrollbarWidth: "none",
+          position: "relative",
+        }}
+      >
         <Stack direction={"row"} alignItems={"center"} spacing={"16px"} padding={"18px 16px"}>
           <IconButton
             className="icon-button"
@@ -92,7 +134,7 @@ const ChooseProfileDrawer = ({ view, setView }: props) => {
         <Stack direction={"column"} justifyContent={"space-between"} padding={"0px 16px"} minHeight={"calc(100% - 110px)"}>
           <Stack direction={"column"} gap={"16px"}>
             {accountListStore?.list?.map((one, index) => (
-              <ProfileCard account={one} key={index} />
+              <ProfileCard account={one} key={index} removeAccount={() => handleRemoveAccount(one)} />
             ))}
           </Stack>
           <Stack mt={"16px"} mb={"16px"}>

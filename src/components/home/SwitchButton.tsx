@@ -1,7 +1,5 @@
 import { Stack, Box, Button } from "@mui/material";
 
-import storeStyles from "../../styles/StoreStyles";
-
 export interface IPropsSwitchButton {
   currentIndex: number;
   setCurrentIndex: (_: number) => void;
@@ -9,8 +7,6 @@ export interface IPropsSwitchButton {
 }
 
 const SwitchButton = ({ currentIndex, setCurrentIndex, texts }: IPropsSwitchButton) => {
-  const classes = storeStyles();
-
   return (
     <Stack
       direction={"row"}
@@ -28,18 +24,38 @@ const SwitchButton = ({ currentIndex, setCurrentIndex, texts }: IPropsSwitchButt
       {texts?.map((text, index) => (
         <Button
           key={`${index}-${text}`}
-          className={classes.library_switch_button}
           onClick={() => {
             setCurrentIndex(index);
           }}
           sx={{
+            "&.MuiButtonBase-root, &.MuiBox-root": {
+              display: "block",
+              textTransform: "none",
+              color: "#52E1F21A",
+              minWidth: "unset",
+              boxShadow: "none",
+              padding: "0px",
+              borderRadius: "16px",
+            },
             backgroundColor: currentIndex === index ? "rgba(82, 225, 242, 0.10)" : undefined,
             "&:hover": {
               backgroundColor: currentIndex === index ? "rgba(82, 225, 242, 0.10)" : undefined,
             },
           }}
         >
-          <Box className={classes.switch_btn} sx={{ color: currentIndex === index ? "#52E1F2" : "white" }}>
+          <Box
+            sx={{
+              color: currentIndex === index ? "#52E1F2" : "white",
+              padding: "8px 16px 8px 16px",
+              fontFeatureSettings: "'calt' off",
+              fontFamily: "Cobe",
+              fontSize: "18px",
+              fontStyle: "normal",
+              fontWeight: "400",
+              lineHeight: "24px" /* 133.333% */,
+              letterSpacing: "-0.36px",
+            }}
+          >
             {text}
           </Box>
         </Button>

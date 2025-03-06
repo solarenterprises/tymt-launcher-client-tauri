@@ -27,14 +27,15 @@ const TooltipComponent = ({ children, text, placement }: IPropsTooltipComponent)
         <Stack
           spacing={"10px"}
           sx={{
-            marginBottom: "-20px",
+            marginBottom: `-10px`,
+            marginTop: `-10px`,
             backgroundColor: "rgb(49, 53, 53)",
             padding: "6px 8px",
             borderRadius: "32px",
             border: "1px solid rgb(71, 76, 76)",
           }}
         >
-          <Box className="fs-16-regular white">{text}</Box>
+          <Box className="fs-14-regular white">{text}</Box>
         </Stack>
       }
       PopperProps={{

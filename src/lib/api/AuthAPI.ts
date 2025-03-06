@@ -25,7 +25,6 @@ export const AuthAPI = {
       const res = await axios.post<{ data: IUser }>(`${CONFIG_TYMT_BACKEND_URL}/auth/signup`, { nickname, sxpAddress, publicKey, signedMessage });
       return res?.data?.data;
     } catch (err) {
-      console.error("Failed to signup: ", err.response?.data ?? err);
       throw new Error(err.response?.data?.error ?? "Failed to signup");
     }
   },

@@ -1,20 +1,21 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import numeral from "numeral";
 
-import { Box, Button, Divider, Stack, Tooltip } from "@mui/material";
+import { Box, Button, Divider, Stack } from "@mui/material";
 
 import { useWallet } from "../../providers/WalletProvider";
 
 import Avatar from "../../components/home/Avatar";
 
 import { getAccount } from "../../store/AccountSlice";
+import { getAccountList } from "../../store/AccountListSlice";
 
-import { IAccount } from "../../types/AccountTypes";
+import { IAccount, IAccountList } from "../../types/AccountTypes";
 
-import SettingStyle from "../../styles/SettingStyle";
+import { openLink } from "../../lib/helper/TauriHelper";
 
 import settingImg from "../../assets/setting/SettingIcon1.svg";
 import walletImg from "../../assets/setting/WalletIcon.svg";
@@ -22,6 +23,8 @@ import arrowImg from "../../assets/setting/ArrowRight.svg";
 import copyIcon from "../../assets/setting/CopyIcon.svg";
 import searchIcon from "../../assets/setting/SearchIcon.svg";
 import exitIcon from "../../assets/setting/ExitIcon.svg";
+import { setAuth } from "../../store/AuthSlice";
+import TooltipComponent from "../../components/home/TooltipComponent";
 
 export interface IPropsMain {
   view: string;
@@ -29,9 +32,9 @@ export interface IPropsMain {
 }
 
 const Main = ({ view, setView }: IPropsMain) => {
-  const classname = SettingStyle();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     currentSupportChain,
     currentChainWalletAddress,
@@ -43,19 +46,35 @@ const Main = ({ view, setView }: IPropsMain) => {
   } = useWallet();
 
   const accountStore: IAccount = useSelector(getAccount);
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
   const handleExplorer = useCallback(() => {
-    // ElectronAPI.openExternalLink(currentChainExplorerUrl);
+    openLink(currentChainExplorerUrl);
   }, [currentChainExplorerUrl]);
+
+  const handleLogout = useCallback(() => {
+    dispatch(
+      setAuth({
+        isLoggedIn: false,
+        accessToken: "",
+        refreshToken: "",
+      })
+    );
+    accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
+  }, [accountListStore]);
 
   return (
     <>
       {view === "main" && (
-        <Box className={classname.main_container}>
+        <Box sx={{ display: "flex", borderRadius: "24px", margin: "16px", flexDirection: "column", border: "solid 1px #FFFFFF1A" }}>
           <Box
             onClick={() => setView("chooseProfile")}
-            className={classname.user_pad}
             sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              textAlign: "center",
+              alignItems: "center",
+              padding: "32px 16px",
               transition: "all 0.3s ease",
               cursor: "pointer",
               borderRadius: "22px 22px 0px 0px",
@@ -128,8 +147,8 @@ const Main = ({ view, setView }: IPropsMain) => {
             </Stack>
           </Button>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
-          <Box className={classname.addresss_pad}>
-            <Box className={classname.wallet_add_panel} sx={{ justifyContent: "space-between" }}>
+          <Box sx={{ backgroundColor: "#0f2727", margin: "15px", borderRadius: "16px", display: "flex", flexDirection: "column" }}>
+            <Box sx={{ justifyContent: "space-between", margin: "15px", paddingBottom: "15px", display: "flex" }}>
               <Box
                 sx={{
                   textAlign: "left",
@@ -149,27 +168,27 @@ const Main = ({ view, setView }: IPropsMain) => {
               </Box>
             </Box>
             <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
-            <Box className={classname.icon_pad}>
+            <Box sx={{ display: "flex", justifyContent: "center", textAlign: "center", alignItem: "center", gap: "45px", margin: "20px" }}>
               <Button className="tooltip-btn" onClick={() => navigator.clipboard.writeText(currentChainWalletAddress ?? "")}>
-                <Tooltip title={t("set-79_copy-address")} classes={{ tooltip: classname.tooltip }}>
+                <TooltipComponent placement="bottom" text={t("set-79_copy-address")}>
                   <Box className="center-align">
                     <img src={copyIcon} data-tooltip-id="copy-tooltip" />
                   </Box>
-                </Tooltip>
+                </TooltipComponent>
               </Button>
               <Button className="tooltip-btn" onClick={handleExplorer}>
-                <Tooltip title={t("set-80_open-in-explorer")} classes={{ tooltip: classname.tooltip }}>
+                <TooltipComponent placement="bottom" text={t("set-80_open-in-explorer")}>
                   <Box className="center-align">
                     <img src={searchIcon} />
                   </Box>
-                </Tooltip>
+                </TooltipComponent>
               </Button>
-              <Button className="tooltip-btn" onClick={() => navigate("/welcome")}>
-                <Tooltip title={t("set-81_disconnect")} classes={{ tooltip: classname.tooltip }}>
+              <Button className="tooltip-btn" onClick={handleLogout}>
+                <TooltipComponent placement="bottom" text={t("set-81_disconnect")}>
                   <Box className="center-align">
                     <img src={exitIcon} />
                   </Box>
-                </Tooltip>
+                </TooltipComponent>
               </Button>
             </Box>
           </Box>

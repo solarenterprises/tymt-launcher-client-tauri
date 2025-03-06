@@ -2,11 +2,13 @@ import { ethers } from "ethers";
 import * as ethereumjsWallet from "ethereumjs-wallet";
 import * as bip39 from "bip39";
 
-import { CONFIG_ARB_API_KEY, CONFIG_ARB_API_URL, CONFIG_ARB_RPC_URL } from "../../config/MainConfig";
-import { CONFIG_NETWORK_NAME } from "../../config/MainConfig";
+import { CONFIG_ARB_API_KEY, CONFIG_ARB_API_URL, CONFIG_NETWORK_NAME } from "../../config/MainConfig";
 
 import { ISupportToken } from "../../types/ChainTypes";
 import { IBalance } from "../../types/WalletTypes";
+import { IRecipient } from "../../types/TransactionTypes";
+import { CONST_CHAIN_IDS } from "../../const/ChainConsts";
+import { CryptoAPI } from "../api/CryptoAPI";
 
 export class Arbitrum {
   static async getWalletFromMnemonic(mnemonic: string): Promise<any> {
@@ -80,32 +82,73 @@ export class Arbitrum {
     }
   }
 
-  static async sendTransaction(passphrase: string, tx: { recipients: any[]; fee: string; vendorField?: string }) {
-    if (tx.recipients.length > 0) {
-      try {
-        let wallet = await Arbitrum.getWalletFromMnemonic(passphrase);
-        const customProvider = new ethers.JsonRpcProvider(CONFIG_ARB_RPC_URL);
-        wallet = wallet.connect(customProvider);
-        tx.recipients.map(async (recipient) => {
-          const response = await wallet.sendTransaction({
+  static async sendTransaction(
+    privateKey: string,
+    sender: string,
+    recipients: IRecipient[]
+  ): Promise<{ success: boolean; message?: string; error?: string; data?: any }> {
+    let successfulTransactions: string[] = [];
+    let failedTransactions: string[] = [];
+    const transactionResults: { [address: string]: string } = {};
+
+    try {
+      const gasLimit = 22000;
+      const chainId = CONST_CHAIN_IDS.ARBITRUM; // Arbitrum
+      const [gasPrice, initialNonce] = await Promise.all([CryptoAPI.getArbGasPrice(), CryptoAPI.getArbTransactionCount(sender)]);
+
+      for (let i = 0; i < recipients.length; i++) {
+        const recipient = recipients[i];
+        const nonce = initialNonce + i; // Increment nonce for each transaction
+
+        try {
+          // Create transaction
+          const transaction = {
             to: recipient.address,
             value: ethers.parseEther(recipient.amount),
-          });
-          //@ts-ignore
-          const receipt = await response.wait(1); // wait for 1 confirmation
-          // const hash = receipt.transactionHash;
-          // const block = receipt.blockNumber;
-          // const status = receipt.status ? "Success" : "Failure";
-          // const gas = receipt.gasUsed.toString();
-          // console.log(`Transaction: [${hash}](^5^${hash})`);
-          // console.log(`Block: ${block}`);
-          // console.log(`Status: ${status}`);
-          // console.log(`Gas Used: ${gas}`);
-        });
-        return true;
-      } catch {
-        return false;
+            gasLimit: gasLimit,
+            gasPrice: gasPrice,
+            nonce: nonce,
+            chainId: chainId,
+          };
+
+          // Sign transaction
+          const wallet = new ethers.Wallet(privateKey);
+          const signedTx = await wallet.signTransaction(transaction);
+
+          // Broadcast transaction
+          const res = await CryptoAPI.sendArbRawTransaction([signedTx]);
+          transactionResults[recipient.address] = res; // Store transaction result
+
+          if (res.success) successfulTransactions.push(recipient.address);
+          else failedTransactions.push(recipient.address);
+        } catch (err) {
+          console.error(`Failed to send transaction to ${recipient.address}:`, err);
+          failedTransactions.push(recipient.address);
+        }
       }
+    } catch (err) {
+      console.error("Failed to ARB sendTransaction: ", err);
+    } finally {
+      if (successfulTransactions.length === recipients.length)
+        return {
+          success: true,
+          message: "All transactions broadcasted.",
+          data: {
+            successfulTransactions,
+            failedTransactions,
+            transactionResults,
+          },
+        };
+      else
+        return {
+          success: false,
+          error: `Transactions to ${failedTransactions.join(",")} failed.`,
+          data: {
+            successfulTransactions,
+            failedTransactions,
+            transactionResults,
+          },
+        };
     }
   }
 }

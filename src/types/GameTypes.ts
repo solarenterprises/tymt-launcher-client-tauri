@@ -91,6 +91,15 @@ export interface IGame {
   title: string;
   visibilityState: string; // active
   externalStoreId: string;
+
+  heroes: string;
+  developers: string;
+  publisher: string;
+  warning: string;
+  warningLink: string;
+  averageRating: number;
+  feedbackCount: number;
+  downloadCount: number;
   createdAt: string;
   updatedAt: string;
   __v: number;

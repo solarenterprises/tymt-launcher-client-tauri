@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 
 import { Box, Stack, Modal, Button, Fade } from "@mui/material";
 
-import useNotification from "../../providers/NotificationProvider";
-
 import InputText from "../account/InputText";
 
 // import { runD53 } from "../../lib/helper/DownloadHelper";
@@ -27,7 +25,6 @@ interface IServer {
 }
 
 const D53Modal = ({ open, setOpen }: props) => {
-  const { showNotification } = useNotification();
   const { t } = useTranslation();
   //@ts-ignore
   const [serverList, setServerList] = useState<IServer[]>([]);
@@ -44,7 +41,7 @@ const D53Modal = ({ open, setOpen }: props) => {
   //@ts-ignore
   const handlePlayClick = async (autoMode: boolean) => {
     if (!serverIp) {
-      showNotification(t("alt-36_server-required"), t("alt-37_please-fill-server"));
+      // showNotification(t("alt-36_server-required"), t("alt-37_please-fill-server"));
       // setNotificationStatus("failed");
       // setNotificationTitle(t("alt-36_server-required"));
       // setNotificationDetail(t("alt-37_please-fill-server"));
@@ -56,7 +53,7 @@ const D53Modal = ({ open, setOpen }: props) => {
         // await runD53(serverIp, autoMode);
       } else {
         if (selectedServer?.clients >= selectedServer?.clients_max) {
-          showNotification(t("alt-9_run-failed"), t("alt-38_sorry-server-full"));
+          // showNotification(t("alt-9_run-failed"), t("alt-38_sorry-server-full"));
           // setNotificationStatus("failed");
           // setNotificationTitle(t("alt-9_run-failed"));
           // setNotificationDetail(t("alt-38_sorry-server-full"));

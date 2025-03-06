@@ -2,10 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { IDownloadStatus } from "../types/HomeTypes";
 
 const init: IDownloadStatus = {
-  progress: 0,
+  downloaded: 0,
   speed: 0,
   total: 0,
-  isDownloading: false,
+  duration: 0,
+  expectation: 0,
   game: null,
 };
 
@@ -26,6 +27,9 @@ const downloadStatusSlice = createSlice({
     setDownloadStatus(state, action) {
       state.data = action.payload;
     },
+    resetDownloadStatus(state) {
+      state.data = init;
+    },
   },
 });
 
@@ -33,4 +37,4 @@ export const getDownloadStatus = (state: any) => state.downloadStatus.data;
 
 export default downloadStatusSlice.reducer;
 
-export const { setDownloadStatus } = downloadStatusSlice.actions;
+export const { setDownloadStatus, resetDownloadStatus } = downloadStatusSlice.actions;

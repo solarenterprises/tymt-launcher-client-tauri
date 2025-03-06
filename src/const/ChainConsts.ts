@@ -9,54 +9,137 @@ import PolygonIcon from "../assets/chain/Polygon.svg";
 import SolanaIcon from "../assets/chain/Solana.svg";
 
 import { ISupportChain } from "../types/ChainTypes";
+import {
+  CONFIG_ARB_RPC_URL,
+  CONFIG_ARB_SCAN,
+  CONFIG_AVAX_RPC_URL,
+  CONFIG_AVAX_SCAN,
+  CONFIG_BSC_RPC_URL,
+  CONFIG_BSC_SCAN,
+  CONFIG_ETH_RPC_URL,
+  CONFIG_ETH_SCAN,
+  CONFIG_OP_RPC_URL,
+  CONFIG_OPT_SCAN,
+  CONFIG_POL_RPC_URL,
+  CONFIG_POL_SCAN,
+} from "../config/MainConfig";
 
-export class CONST_CHAIN_IDS {
-  static ETHEREUM = 1;
-  static BINANCE = 56;
-  static POLYGON = 137;
-  static AVALANCHE = 43114;
-  static ARBITRUM = 42161;
-  static OPTIMISM = 10;
-  static BITCOIN = 0;
-  static SOLANA = 0;
-  static SOLAR = 0;
-}
+export const CONST_CHAIN_IDS = {
+  ETHEREUM: 1,
+  BINANCE: 56,
+  POLYGON: 137,
+  AVALANCHE: 43114,
+  ARBITRUM: 42161,
+  OPTIMISM: 10,
+  BITCOIN: 0,
+  SOLANA: 0,
+  SOLAR: 0,
+};
 
-export class CONST_CHAIN_ICONS {
-  static ETHEREUM = EthereumIcon;
-  static BINANCE = BinanceIcon;
-  static POLYGON = PolygonIcon;
-  static AVALANCHE = AvalancheIcon;
-  static ARBITRUM = ArbitrumIcon;
-  static OPTIMISM = OptimismIcon;
-  static BITCOIN = BitcoinIcon;
-  static SOLANA = SolanaIcon;
-  static SOLAR = SolarIcon;
-}
+export const CONST_CHAIN_HEX_IDS = {
+  ETHEREUM: "0x01",
+  BINANCE: "0x38",
+  POLYGON: "0x89",
+  AVALANCHE: "0xA86A",
+  ARBITRUM: "0xA4B1",
+  OPTIMISM: "0xA",
+};
 
-export class CONST_CHAIN_NAMES {
-  static ETHEREUM = "Ethereum";
-  static BINANCE = "Binance Smart Chain";
-  static POLYGON = "Polygon";
-  static AVALANCHE = "Avalanche C-Chain";
-  static ARBITRUM = "Arbitrum One";
-  static OPTIMISM = "Optimism";
-  static BITCOIN = "Bitcoin";
-  static SOLANA = "Solana";
-  static SOLAR = "Solar Blockchain";
-}
+export const CONST_CHAIN_NAMES = {
+  ETHEREUM: "Ethereum",
+  BINANCE: "Binance Smart Chain",
+  POLYGON: "Polygon",
+  AVALANCHE: "Avalanche C-Chain",
+  ARBITRUM: "Arbitrum One",
+  OPTIMISM: "Optimism",
+  BITCOIN: "Bitcoin",
+  SOLANA: "Solana",
+  SOLAR: "Solar Blockchain",
+};
 
-export class CONST_CHAIN_SYMBOLS {
-  static ETHEREUM = "ETH";
-  static BINANCE = "BNB";
-  static POLYGON = "MATIC";
-  static AVALANCHE = "AVAX";
-  static ARBITRUM = "ARBETH";
-  static OPTIMISM = "OETH";
-  static BITCOIN = "BTC";
-  static SOLANA = "SOL";
-  static SOLAR = "SXP";
-}
+export const CONST_CHAIN_ID_TO_NAME = new Map([
+  ["1", "ETHEREUM"],
+  ["56", "BINANCE"],
+  ["137", "POLYGON"],
+  ["43114", "AVALANCHE"],
+  ["42161", "ARBITRUM"],
+  ["10", "OPTIMISM"],
+]);
+
+export const CONST_CHAIN_NATIVE_CURRENCY = {
+  ETHEREUM: {
+    name: "Ether",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  BINANCE: {
+    name: "Binance Coin",
+    symbol: "BNB",
+    decimals: 18,
+  },
+  POLYGON: {
+    name: "Polygon (formerly MATIC)",
+    symbol: "MATIC",
+    decimals: 18,
+  },
+  AVALANCHE: {
+    name: "Ether (on Optimism)",
+    symbol: "ETH",
+    decimals: 18,
+  },
+  ARBITRUM: {
+    name: "Avalanche",
+    symbol: "AVAX",
+    decimals: 18,
+  },
+  OPTIMISM: {
+    name: "Ether (on Arbitrum)",
+    symbol: "ETH",
+    decimals: 18,
+  },
+};
+
+export const CONST_CHAIN_RPC_URLS = {
+  ETHEREUM: CONFIG_ETH_RPC_URL,
+  BINANCE: CONFIG_BSC_RPC_URL,
+  POLYGON: CONFIG_POL_RPC_URL,
+  AVALANCHE: CONFIG_AVAX_RPC_URL,
+  ARBITRUM: CONFIG_ARB_RPC_URL,
+  OPTIMISM: CONFIG_OP_RPC_URL,
+};
+
+export const CONST_CHAIN_BLOCK_EXPLORER = {
+  ETHEREUM: CONFIG_ETH_SCAN,
+  BINANCE: CONFIG_BSC_SCAN,
+  POLYGON: CONFIG_POL_SCAN,
+  AVALANCHE: CONFIG_AVAX_SCAN,
+  ARBITRUM: CONFIG_ARB_SCAN,
+  OPTIMISM: CONFIG_OPT_SCAN,
+};
+
+export const CONST_CHAIN_ICONS = {
+  ETHEREUM: EthereumIcon,
+  BINANCE: BinanceIcon,
+  POLYGON: PolygonIcon,
+  AVALANCHE: AvalancheIcon,
+  ARBITRUM: ArbitrumIcon,
+  OPTIMISM: OptimismIcon,
+  BITCOIN: BitcoinIcon,
+  SOLANA: SolanaIcon,
+  SOLAR: SolarIcon,
+};
+
+export const CONST_CHAIN_SYMBOLS = {
+  ETHEREUM: "ETH",
+  BINANCE: "BNB",
+  POLYGON: "MATIC",
+  AVALANCHE: "AVAX",
+  ARBITRUM: "ARBETH",
+  OPTIMISM: "OETH",
+  BITCOIN: "BTC",
+  SOLANA: "SOL",
+  SOLAR: "SXP",
+};
 
 export const CONST_SUPPORT_CHAINS: ISupportChain[] = [
   {
@@ -166,7 +249,7 @@ export const CONST_SUPPORT_CHAINS: ISupportChain[] = [
   {
     native: {
       address: "",
-      symbol: CONST_CHAIN_SYMBOLS.ARBITRUM,
+      symbol: CONST_CHAIN_SYMBOLS.ETHEREUM, // ARBETH is not correct for cmc symbol
       name: CONST_CHAIN_NAMES.ARBITRUM,
       key: "arbitrum",
       decimals: 18,

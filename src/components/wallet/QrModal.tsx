@@ -1,10 +1,9 @@
-// import { useSelector } from "react-redux";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import QRCode from "react-qr-code";
+import { QRCodeSVG } from "qrcode.react";
 
-import { Box, Stack, Modal, Tooltip, Button, Fade } from "@mui/material";
+import { Box, Stack, Modal, Button, Fade } from "@mui/material";
 
 import { getWallet } from "../../store/WalletSlice";
 
@@ -15,8 +14,7 @@ import { ISupportChain } from "../../types/ChainTypes";
 
 import closeIcon from "../../assets/setting/XIcon.svg";
 import copyIcon from "../../assets/setting/CopyIcon.svg";
-
-import SettingStyle from "../../styles/SettingStyle";
+import TooltipComponent from "../home/TooltipComponent";
 
 export interface IPropsQrModal {
   supportChain: ISupportChain;
@@ -26,7 +24,8 @@ export interface IPropsQrModal {
 
 const QrModal = ({ supportChain, open, setOpen }: IPropsQrModal) => {
   const { t } = useTranslation();
-  const classnames = SettingStyle();
+
+  const [copied, setCopied] = useState<boolean>(false);
 
   const walletStore: IWalletAddresses = useSelector(getWallet);
 
@@ -37,6 +36,12 @@ const QrModal = ({ supportChain, open, setOpen }: IPropsQrModal) => {
     alignItems: "center",
     justifyContent: "center",
   };
+
+  const handleCopyClicked = useCallback(() => {
+    setCopied(true);
+    navigator.clipboard.writeText(currentWallet);
+    setTimeout(() => setCopied(false), 1000);
+  }, [currentWallet]);
 
   return (
     <Modal
@@ -60,22 +65,31 @@ const QrModal = ({ supportChain, open, setOpen }: IPropsQrModal) => {
           </Stack>
           <Stack className="qr-container" direction={"column"} alignItems={"center"} textAlign={"center"}>
             <Box className="center-align" sx={{ width: "150px" }}>
-              <QRCode size={50} style={{ height: "auto", maxWidth: "100%", width: "100%" }} value={currentWallet} viewBox={`transparent`} />
+              <QRCodeSVG
+                value={currentWallet}
+                size={150}
+                level={"L"}
+                marginSize={1}
+                imageSettings={{
+                  src: supportChain?.native?.logo,
+                  x: undefined,
+                  y: undefined,
+                  height: 20,
+                  width: 20,
+                  excavate: true,
+                }}
+              />
             </Box>
             <Stack direction={"row"} className="qr-container" gap={"10px"}>
               <Stack direction={"column"} textAlign={"left"}>
                 <Box className="fs-14-light light">{t("set-67_address")}</Box>
-                <Box className="fs-14-regular qr-address">{currentWallet}</Box>
+                <Box className="fs-14-regular qr-address"> {currentWallet.substring(0, 10) + "..." + currentWallet.substring(currentWallet.length - 10)}</Box>
               </Stack>
 
-              <Button
-                className="center-align tooltip-btn"
-                sx={{ cursor: "pointer", display: "flex" }}
-                onClick={() => navigator.clipboard.writeText(currentWallet)}
-              >
-                <Tooltip title={t("set-79_copy-address")} classes={{ tooltip: classnames.tooltip }}>
+              <Button className="center-align tooltip-btn" sx={{ cursor: "pointer", display: "flex" }} onClick={handleCopyClicked}>
+                <TooltipComponent placement="bottom" text={copied ? "Copied" : t("set-79_copy-address")}>
                   <img src={copyIcon} />
-                </Tooltip>
+                </TooltipComponent>
               </Button>
             </Stack>
           </Stack>

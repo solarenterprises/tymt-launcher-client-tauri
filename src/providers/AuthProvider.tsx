@@ -12,8 +12,8 @@ export const AuthProvider = () => {
   const authStore: IAuth = useSelector(getAuth);
 
   useEffect(() => {
-    if (!authStore?.accessToken) {
-      navigate("/start");
+    if (!authStore?.accessToken || !authStore?.isLoggedIn) {
+      navigate("/");
     }
   }, [authStore]);
 

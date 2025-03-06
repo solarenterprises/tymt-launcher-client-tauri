@@ -8,7 +8,6 @@ import library from "../../assets/main/Library.svg";
 import store from "../../assets/main/Store.svg";
 import chevronleftdouble from "../../assets/main/ChevronLeftDouble.svg";
 import chevronrightdouble from "../../assets/main/ChevronRightDouble.svg";
-import homeStyles from "../../styles/homeStyles";
 // import { getCurrentPage, setCurrentPage } from "../../features/home/Navigation";
 import { getCurrentLogo, setCurrentLogo } from "../../store/tymtLogoSlice";
 // import { PaginationType } from "../../types/homeTypes";
@@ -18,7 +17,6 @@ import InstallingProcess from "./InstallingProcess";
 const Menu = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const homeclasses = homeStyles();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // const currentpage: PaginationType = useSelector(getCurrentPage);
@@ -64,10 +62,19 @@ const Menu = () => {
 
   return (
     <Grid
-      className={homeclasses.menu_bar}
       container
       sx={{
         width: isDrawerExpanded ? `203px` : "95px",
+        position: "fixed",
+        marginLeft: "0%",
+        height: "600px",
+        whiteSpace: "nowrap",
+        transition: "width 0.1s ease-in-out",
+        borderRadius: "var(--Angle-Number, 32px)",
+        background: "var(--bg-stroke-side-menu-bg, rgba(29, 29, 29, 0.30))",
+        backgroundBlendMode: "luminosity",
+        backdropFilter: "blur(50px)",
+        zIndex: 10,
       }}
     >
       <Grid item xs={12}>
@@ -118,18 +125,26 @@ const Menu = () => {
                 }}
               >
                 <ListItem
-                  className={homeclasses.menu_listitem}
                   key={text}
                   disablePadding
                   sx={{
                     background: selectedItem === index ? "linear-gradient(112deg, rgba(255, 255, 255, 0.24) 0%,rgba(255, 255, 255, 0.00) 100%)" : "transparent",
                     borderLeft: selectedItem === index ? "solid white 3px" : "transparent",
+                    marginBottom: "25px",
+                    display: "block",
+                    borderTopRightRadius: "20px",
+                    borderBottomRightRadius: "20px",
                   }}
                 >
                   <ListItemButton
-                    className={homeclasses.menu_listbutton}
                     sx={{
+                      marginBottom: "25px",
+                      justifyContent: "initial",
+                      height: "40px",
+                      px: 2.5,
                       "&:hover": {
+                        borderTopRightRadius: "20px",
+                        borderBottomRightRadius: "20px",
                         background:
                           selectedItem === index
                             ? "transparent"

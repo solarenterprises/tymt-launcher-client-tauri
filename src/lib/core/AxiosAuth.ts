@@ -45,10 +45,10 @@ axiosAuth.interceptors.response.use(
 
         const response = await axios.post(`${CONFIG_TYMT_BACKEND_URL}/auth/refresh-token`, { refreshToken });
 
-        const { accessToken: newAccessToken } = response.data;
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data?.data;
 
         // Update the access token in local storage and headers
-        tymtStorage.set("auth", JSON.stringify({ ...JSON.parse(auth), accessToken: newAccessToken }));
+        tymtStorage.set("auth", JSON.stringify({ ...JSON.parse(auth), accessToken: newAccessToken, refreshToken: newRefreshToken }));
 
         // Retry the original request with the new access token
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;

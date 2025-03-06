@@ -4,7 +4,9 @@ import { useDispatch } from "react-redux";
 import { Box, Button, Divider, Stack } from "@mui/material";
 
 import { CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
+import { useNotification } from "../../providers/NotificationProvider";
 import ChainBox from "../../components/home/ChainBox";
 
 import { AppDispatch } from "../../store";
@@ -22,10 +24,16 @@ export interface IPropsChain {
 const Chain = ({ view, setView }: IPropsChain) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
+  const { showNotification } = useNotification();
 
   const handleChainBoxClick = (one: ISupportChain) => {
-    dispatch(setCurrentChain(one?.native?.name));
-    handleBackClick();
+    try {
+      dispatch(setCurrentChain(one?.native?.name));
+      handleBackClick();
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.CHAIN_SELECT_SUCCESS, text: one?.native?.name });
+    } catch (err) {
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.CHAIN_SELECT_FAIL, text: one?.native?.name });
+    }
   };
 
   const handleBackClick = () => {

@@ -8,7 +8,6 @@ import { IGame } from "../../types/GameTypes";
 
 import closeIcon from "../../assets/setting/XIcon.svg";
 import logo from "../../assets/main/FoxHeadComingSoon.png";
-import useNotification from "../../providers/NotificationProvider";
 
 export interface IPropsWarningModalNewGame {
   open: boolean;
@@ -18,7 +17,6 @@ export interface IPropsWarningModalNewGame {
 
 const WarningModalNewGame = ({ open, setOpen, game }: IPropsWarningModalNewGame) => {
   const { t } = useTranslation();
-  const { showNotification } = useNotification();
 
   const modalStyle = {
     display: "flex",
@@ -52,7 +50,7 @@ const WarningModalNewGame = ({ open, setOpen, game }: IPropsWarningModalNewGame)
                     setOpen(false);
                     return;
                   }
-                  showNotification(t("alt-9_run-failed"), t("alt-10_run-failed-intro"));
+                  // showNotification(t("alt-9_run-failed"), t("alt-10_run-failed-intro"));
                   // const noti: INotificationParams = {
                   //   status: "failed",
                   //   title: t("alt-9_run-failed"),

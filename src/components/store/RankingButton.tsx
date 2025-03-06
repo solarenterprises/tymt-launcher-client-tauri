@@ -53,14 +53,7 @@ const theme = createTheme({
   },
 });
 
-const Ranking = [
-  FilterOptionNames.RANK_ALL,
-  FilterOptionNames.RANK_10,
-  FilterOptionNames.RANK_50,
-  FilterOptionNames.RANK_100,
-];
-
-const selectedshow = false;
+const Ranking = [FilterOptionNames.RANK_ALL, FilterOptionNames.RANK_10, FilterOptionNames.RANK_50, FilterOptionNames.RANK_100];
 
 export interface IPropsRankingButton {
   rank: string;
@@ -93,12 +86,10 @@ const RankingButton = ({ rank, setRank }: IPropsRankingButton) => {
               border: "1px solid rgba(82, 225, 242, 0.40)",
               background: "var(--bg-stroke-card-bg, rgba(27, 53, 56, 0.20))",
               "&:hover": {
-                backgroundColor:
-                  "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                backgroundColor: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
               },
               "&:active": {
-                backgroundColor:
-                  "var(--bg-stroke-blue-stroke-default-20, rgba(82, 225, 242, 0.20))",
+                backgroundColor: "var(--bg-stroke-blue-stroke-default-20, rgba(82, 225, 242, 0.20))",
               },
               "& .MuiSelect-icon": {
                 color: "var(--Basic-Light, #AFAFAF)",
@@ -112,8 +103,7 @@ const RankingButton = ({ rank, setRank }: IPropsRankingButton) => {
             IconComponent={ExpandMoreIcon}
             renderValue={(selected) => (
               <>
-                <Box className={"fs-16 white"}>{t("sto-5_ranking")}</Box>
-                {selectedshow && <span>{selected}</span>}
+                <Box className={"fs-16 white"}>{t(selected)}</Box>
               </>
             )}
           >
@@ -122,20 +112,16 @@ const RankingButton = ({ rank, setRank }: IPropsRankingButton) => {
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  borderBottom:
-                    "1px solid var(--bg-stroke-white-10-stroke-default, rgba(255, 255, 255, 0.10))",
+                  borderBottom: "1px solid var(--bg-stroke-white-10-stroke-default, rgba(255, 255, 255, 0.10))",
                   backdropFilter: "blur(10px)",
                   "&:hover": {
-                    background:
-                      "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                    background: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
                   },
                   "&.Mui-selected": {
-                    background:
-                      "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                    background: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
                     backdropFilter: "blur(10px)",
                     "&:hover": {
-                      background:
-                        "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
+                      background: "var(--bg-stroke-blue-stroke-default-10, rgba(82, 225, 242, 0.10))",
                     },
                   },
                 }}

@@ -7,21 +7,30 @@ import { Grid } from "@mui/material";
 import Navbar from "../components/home/Navbar";
 import Menu from "../components/home/Menu";
 
+import { useNotification } from "../providers/NotificationProvider";
+
 import { setGameList } from "../store/GameListSlice";
 
 import GameAPI from "../lib/api/GameAPI";
 
 import bgblur from "../assets/main/BGblur.svg";
+import { CONST_NOTIFICATION_CONTENTS } from "../const/NotificationConsts";
 
 const HomeLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const { showNotification } = useNotification();
   const [background, setBackground] = useState(location.pathname);
   const [display, setDisplay] = useState(location.pathname);
 
   const fetchGameList = async () => {
-    const res = await GameAPI.fetchGameList({ page: 1, limit: 200 });
-    dispatch(setGameList(res.data));
+    try {
+      const res = await GameAPI.fetchGameList({ page: 1, limit: 200 });
+      dispatch(setGameList(res.data));
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.GAME_REFRESH_SUCCESS });
+    } catch (err) {
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.GAME_REFRESH_FAIL, text: err.toString() });
+    }
   };
 
   useEffect(() => {
@@ -104,6 +113,7 @@ const HomeLayout = () => {
                 position: "sticky",
                 top: "0",
                 zIndex: 0,
+                marginBottom: "40px",
               }}
             >
               <Outlet />

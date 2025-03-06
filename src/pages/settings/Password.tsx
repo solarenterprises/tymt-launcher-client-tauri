@@ -14,8 +14,6 @@ import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 import { IAccount } from "../../types/AccountTypes";
 import { addAccountList } from "../../store/AccountListSlice";
 
-import SettingStyle from "../../styles/SettingStyle";
-
 import backIcon from "../../assets/setting/BackIcon.svg";
 
 export interface IPropsPassword {
@@ -24,7 +22,6 @@ export interface IPropsPassword {
 }
 
 const Password = ({ view, setView }: IPropsPassword) => {
-  const classname = SettingStyle();
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
@@ -93,7 +90,42 @@ const Password = ({ view, setView }: IPropsPassword) => {
               </Box>
             </Stack>
             <Box padding={"20px"} width={"90%"} sx={{ position: "absolute", bottom: "30px" }}>
-              <Button fullWidth className={classname.action_button} onClick={updatePassword}>
+              <Button
+                fullWidth
+                sx={{
+                  "&.MuiButtonBase-root": {
+                    textTransform: "none",
+                    fontSize: "18px",
+                    fontStyle: "normal",
+                    fontWeight: "400",
+                    lineHeight: "24px" /* 133.333% */,
+                    letterSpacing: "-0.36px",
+                    height: "46px",
+                    borderRadius: "16px",
+                    backgroundColor: "transparent",
+                    color: "#52E1F2",
+                    borderColor: "#EF4444",
+                    fontFamily: "Cobe",
+                    boxShadow: "none",
+                    border: "1px solid",
+                    paddingTop: "5px",
+                    "&:hover": {
+                      borderColor: "#EF4444",
+                      backgroundColor: "#EF4444",
+                    },
+                    "&:active": {
+                      backgroundColor: "#EF4444",
+                      boxShadow: "1px 1px #EF44445F",
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#222222", // Example: light gray background
+                      color: "#A0A0A0", // Example: gray text color
+                      borderColor: "#222222", // Example: gray border color
+                    },
+                  },
+                }}
+                onClick={updatePassword}
+              >
                 {t("set-57_save")}
               </Button>
             </Box>

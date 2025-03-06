@@ -5,7 +5,7 @@ import Big from "big.js";
 
 import { CONFIG_NETWORK_NAME, CONFIG_SOLAR_API_URL } from "../../config/MainConfig";
 
-import { IRecipient } from "../../types/TransactionTypes";
+import { IRecipient, ITransactionPagination, ITransaction } from "../../types/TransactionTypes";
 
 export class Solar {
   static async generateMnemonic(): Promise<string> {
@@ -100,15 +100,15 @@ export class Solar {
     }
   }
 
-  static async vote(passphrase: string, addr: string, votesAsset: any, feeUSD: string, sxpPriceUSD: number) {
+  static async vote(passphrase: string, addr: string, votesAsset: any, sxpFee: number) {
     Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
     let nonce = await this.getCurrentNonce(addr);
     let tx = Transactions.BuilderFactory.vote()
       .nonce((nonce + 1).toString())
       .votesAsset(votesAsset)
       .fee(
-        Big(feeUSD)
-          .times((10 ** 8 / Number(sxpPriceUSD)) as number)
+        Big(sxpFee)
+          .times(10 ** 8)
           .toFixed(0)
       )
       .sign(passphrase);
@@ -120,7 +120,7 @@ export class Solar {
   static async getBalance(addr: string): Promise<number> {
     try {
       const response = await axios.get(`${CONFIG_SOLAR_API_URL}/wallets/${addr}`);
-      return response.data.data.balance / 1e8;
+      return response.data.data.balance;
     } catch {
       return 0;
     }
@@ -135,65 +135,104 @@ export class Solar {
     passphrase: string,
     tx: { recipients: IRecipient[]; fee: string; vendorField?: string }, // fee in SXP
     secondPassphrase?: string
-  ): Promise<{ success: boolean; message?: string; error?: string }> {
-    const addr = await Solar.getAddress(passphrase);
-    let nonce: number = await Solar.getCurrentNonce(addr);
-    if (tx.recipients.length === 0) {
-      return {
-        success: false,
-        error: "No recipients provided",
-      };
-    }
-
-    Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
-    let transaction = Transactions.BuilderFactory.transfer();
-
-    tx.recipients.forEach((recipient) => {
-      transaction.addTransfer(
-        recipient.address,
-        Big(recipient.amount)
-          .times(10 ** 8)
-          .toFixed(0)
-      );
-    });
-
-    let itransaction = transaction
-      .fee(
-        Big(tx.fee)
-          .times(10 ** 8)
-          .toFixed(0)
-      )
-      .nonce((nonce + 1).toString());
-
-    if (tx.vendorField && tx.vendorField.length > 0) {
-      itransaction = itransaction.memo(tx.vendorField);
-    }
-
-    let txJson = itransaction.sign(passphrase);
-
-    if (secondPassphrase && secondPassphrase.length > 0) {
-      txJson = itransaction.secondSign(secondPassphrase);
-    }
-
-    let res = await Solar.addTxToQueue(JSON.stringify({ transactions: [txJson.build().toJson()] }), CONFIG_SOLAR_API_URL ?? "");
-
-    if (res.status !== 200) {
-      return {
-        success: false,
-        error: "Request failed",
-      };
-    } else {
-      if (res.data.errors === undefined) {
-        return {
-          success: true,
-          message: res.data.data.accept[0],
-        };
-      } else {
+  ): Promise<{ success: boolean; message?: string; error?: string; data?: any }> {
+    try {
+      const addr = await Solar.getAddress(passphrase);
+      let nonce: number = await Solar.getCurrentNonce(addr);
+      if (tx.recipients.length === 0) {
         return {
           success: false,
-          error: res.data.errors[res.data.data.invalid[0]].message as string,
+          error: "No recipients provided",
         };
       }
+
+      Managers.configManager.setFromPreset(CONFIG_NETWORK_NAME === "mainnet" ? "mainnet" : "testnet");
+      let transaction = Transactions.BuilderFactory.transfer();
+
+      tx.recipients.forEach((recipient) => {
+        transaction.addTransfer(
+          recipient.address,
+          Big(recipient.amount)
+            .times(10 ** 8)
+            .toFixed(0)
+        );
+      });
+
+      let itransaction = transaction
+        .fee(
+          Big(tx.fee)
+            .times(10 ** 8)
+            .toFixed(0)
+        )
+        .nonce((nonce + 1).toString());
+
+      if (tx.vendorField && tx.vendorField.length > 0) {
+        itransaction = itransaction.memo(tx.vendorField);
+      }
+
+      let txJson = itransaction.sign(passphrase);
+
+      if (secondPassphrase && secondPassphrase.length > 0) {
+        txJson = itransaction.secondSign(secondPassphrase);
+      }
+
+      let res = await Solar.addTxToQueue(JSON.stringify({ transactions: [txJson.build().toJson()] }), CONFIG_SOLAR_API_URL ?? "");
+
+      if (res.status !== 200) {
+        return {
+          success: false,
+          error: "Request failed",
+        };
+      } else {
+        if (res.data.errors === undefined) {
+          return {
+            success: true,
+            message: res.data.data.accept[0],
+          };
+        } else {
+          return {
+            success: false,
+            error: res.data.errors[res.data.data.invalid[0]].message as string,
+          };
+        }
+      }
+    } catch (err) {
+      return {
+        success: false,
+        error: err.message as string,
+      };
+    }
+  }
+
+  static async getTransactions(addr: string, page: number, pageSize: number): Promise<ITransactionPagination> {
+    try {
+      const response = await axios.get(`${CONFIG_SOLAR_API_URL}/wallets/${addr}/transactions`, {
+        params: {
+          page,
+          limit: pageSize,
+        },
+      });
+      const txList: ITransaction[] = response.data.data.map((one) => ({
+        txId: one?.id,
+        type: one?.type === 6 ? "transfer" : one?.type === 2 ? "vote" : "",
+        asset: one?.type === 6 ? one?.asset?.transfers?.map((three) => ({ amount: three?.amount / 1e8, recipient: three?.recipientId })) : [],
+        amount: one?.type === 6 ? one?.asset?.transfers?.reduce((sum, two) => sum + two?.amount / 1e8, 0) : 0,
+        sender: one?.sender,
+        fee: one?.fee / 1e8,
+        timestamp: one?.timestamp?.unix,
+      }));
+      const result: ITransactionPagination = {
+        meta: {
+          totalCount: response.data.meta.totalCount,
+          pageCount: response.data.meta.pageCount,
+          count: response.data.meta.count,
+        },
+        data: txList,
+      };
+      return result;
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      return null;
     }
   }
 

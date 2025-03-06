@@ -3,11 +3,12 @@ import { FC, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 
-import { Box, Button, Divider, Stack, Tooltip } from "@mui/material";
+import { Box, Button, CircularProgress, Divider, Stack, Tooltip } from "@mui/material";
 
-import useNotification from "../../providers/NotificationProvider";
 import Avatar from "../../components/home/Avatar";
 import InputText from "../../components/account/InputText";
+
+import { useNotification } from "../../providers/NotificationProvider";
 
 import { AppDispatch } from "../../store";
 import { addAccountList } from "../../store/AccountListSlice";
@@ -17,10 +18,9 @@ import { UserAPI } from "../../lib/api/UserAPI";
 
 import { IAccount } from "../../types/AccountTypes";
 
-import SettingStyle from "../../styles/SettingStyle";
-
 import backIcon from "../../assets/setting/BackIcon.svg";
 import editIcon from "../../assets/setting/EditIcon.svg";
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
 interface IPropsProfile {
   view: string;
@@ -28,15 +28,15 @@ interface IPropsProfile {
 }
 
 const Profile: FC<IPropsProfile> = ({ view, setView }) => {
-  const classname = SettingStyle();
   const { t } = useTranslation();
-  const { showNotification } = useNotification();
   const dispatch = useDispatch<AppDispatch>();
+  const { showNotification } = useNotification();
 
   const accountStore: IAccount = useSelector(getAccount);
 
   const [nickname, setNickname] = useState(accountStore?.nickname);
   const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const validationSchema = Yup.string()
     .required(t("cca-63_required"))
@@ -46,9 +46,9 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
 
   const updateAccount = useCallback(async () => {
     try {
+      setLoading(true);
       await validationSchema.validate(nickname);
       setError("");
-
       const updatedUser = await UserAPI.updateProfile({ nickname });
       const updatedAccount = {
         ...updatedUser,
@@ -57,13 +57,15 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
       };
       dispatch(setAccount(updatedAccount));
       dispatch(addAccountList(updatedAccount));
-
-      showNotification(t("alt-1_nickname-saved"), t("alt-2_nickname-saved-intro"));
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.PROFILE_UPDATE_SUCCESS });
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         setError(err.message);
+      } else {
+        showNotification({ content: CONST_NOTIFICATION_CONTENTS.PROFILE_UPDATE_FAIL, text: err.toString() });
       }
-      showNotification(t("alt-3_nickname-notsaved"), t("alt-4_nickname-notsaved-intro"));
+    } finally {
+      setLoading(false);
     }
   }, [nickname, accountStore]);
 
@@ -76,6 +78,7 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
 
   const uploadImage = useCallback(async () => {
     try {
+      setLoading(true);
       const fileInput = document.getElementById("file-input") as HTMLInputElement;
       const file = fileInput.files ? fileInput.files[0] : null;
       const formData = new FormData();
@@ -88,8 +91,12 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
       };
       dispatch(setAccount(updatedAccount));
       dispatch(addAccountList(updatedAccount));
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.AVATAR_UPDATE_SUCCESS });
     } catch (err) {
-      console.log(err);
+      console.error("Failed to uploadImage: ", err);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.AVATAR_UPDATE_FAIL, text: err.toString() });
+    } finally {
+      setLoading(false);
     }
   }, [accountStore]);
 
@@ -109,14 +116,16 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
             <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"30px"}>
               <Stack direction={"row"} justifyContent={"center"} textAlign={"right"} alignItems={"center"} gap={"10px"}>
                 <Box className="center-align">
-                  {/* <img src={avatar} /> */}
                   <Avatar onlineStatus={true} url={accountStore?.avatar} size={92} status="active" />
                 </Box>
                 <Box className="fs-h5 white">{t("set-68_change-avatar")}</Box>
               </Stack>
               <Box className="center-align">
                 <Box sx={{ display: "flex" }} className="common-btn" onClick={launchUploader}>
-                  <Tooltip title={t("set-82_edit")} classes={{ tooltip: classname.tooltip }}>
+                  <Tooltip
+                    title={t("set-82_edit")}
+                    sx={{ padding: "6px 8px 6px 8px", borderRadius: "32px", border: "1px", borderColor: "#FFFFFF1A", backgroundColor: "#8080804D" }}
+                  >
                     <img src={editIcon} style={{ cursor: "pointer" }} />
                   </Tooltip>
                 </Box>
@@ -137,8 +146,16 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
               </Box>
             </Stack>
             <Box padding={"20px"} width={"90%"} sx={{ position: "absolute", bottom: "30px" }}>
-              <Button fullWidth className={classname.action_button} onClick={updateAccount}>
-                {t("set-57_save")}
+              <Button fullWidth className={"red-border-button"} onClick={updateAccount} disabled={loading}>
+                {loading ? (
+                  <CircularProgress
+                    sx={{
+                      color: "#F5EBFF",
+                    }}
+                  />
+                ) : (
+                  t("set-57_save")
+                )}
               </Button>
             </Box>
           </Stack>
