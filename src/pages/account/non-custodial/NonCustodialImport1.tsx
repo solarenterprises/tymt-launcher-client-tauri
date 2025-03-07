@@ -69,7 +69,7 @@ const NonCustodialImport1 = () => {
     onSubmit: async () => {
       try {
         const newPassword = formik.values.password;
-        navigate(`/non-custodial-signup-4/${mode === "guest" ? "/guest" : "signup"}`, { state: { passphrase: passphrase, password: newPassword } });
+        navigate(`/non-custodial-signup-4/${mode === "guest" ? "guest" : "signup"}`, { state: { passphrase: passphrase, password: newPassword } });
       } catch (err) {
         console.error("Failed to onSubmit at NonCustodialImport1: ", err);
       }

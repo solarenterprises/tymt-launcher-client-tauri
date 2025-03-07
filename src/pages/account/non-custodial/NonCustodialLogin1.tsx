@@ -15,14 +15,16 @@ import OrLine from "../../../components/account/OrLine";
 
 import { getAccount } from "../../../store/AccountSlice";
 
-import { IAccount } from "../../../types/AccountTypes";
+import { IAccount, IAccountList } from "../../../types/AccountTypes";
 
 import tymt1 from "../../../assets/account/tymt1.png";
+import { getAccountList } from "../../../store/AccountListSlice";
 
 const NonCustodialLogin1 = () => {
   const { t } = useTranslation();
 
   const accountStore: IAccount = useSelector(getAccount);
+  const accountListStore: IAccountList = useSelector(getAccountList);
 
   const [drawer, setDrawer] = useState<boolean>(false);
 
@@ -53,7 +55,7 @@ const NonCustodialLogin1 = () => {
                       <AccountHeader title={t("ncca-63_hello")} />
                     </Grid>
                     <Grid item xs={12} mt={"48px"}>
-                      <ChooseProfileButton account={accountStore} onClick={() => setDrawer(true)} />
+                      <ChooseProfileButton account={accountStore?.nickname ? accountStore : accountListStore?.list[0]} onClick={() => setDrawer(true)} />
                     </Grid>
                     <Grid item xs={12} mt={"32px"}>
                       <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />

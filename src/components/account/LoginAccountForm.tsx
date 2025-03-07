@@ -48,24 +48,6 @@ const LoginAccountForm = () => {
     return false;
   }, [accountStore]);
 
-  const handleGuestLogin = useCallback(async () => {
-    try {
-      const password = "";
-      const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
-      const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
-      navigate("/confirm-information/login", {
-        state: {
-          password: password,
-          walletAddresses: walletAddresses,
-          nickname: "Guest",
-          passphrase: decryptedMnemonic,
-        },
-      });
-    } catch (err) {
-      console.error("Failed to handleGuestLogin: ", err);
-    }
-  }, [accountStore]);
-
   const handleLogin = async (walletAddresses: IWalletAddresses, passphrase: string, password: string) => {
     try {
       setLoading(true);
@@ -104,6 +86,30 @@ const LoginAccountForm = () => {
       setLoading(false);
     }
   };
+
+  const handleGuestLogin = useCallback(async () => {
+    try {
+      setLoading(true);
+      const password = "";
+      const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
+      const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
+      // navigate("/confirm-information/login", {
+      //   state: {
+      //     password: password,
+      //     walletAddresses: walletAddresses,
+      //     nickname: "Guest",
+      //     passphrase: decryptedMnemonic,
+      //   },
+      // });
+      await handleLogin(walletAddresses, decryptedMnemonic, password);
+      
+    } catch (err) {
+      console.error("Failed to handleGuestLogin: ", err);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_FAIL, text: err.toString() });
+    } finally {
+      setLoading(false);
+    }
+  }, [accountStore, handleLogin]);
 
   const formik = useFormik({
     initialValues: {

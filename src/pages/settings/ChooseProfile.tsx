@@ -9,7 +9,7 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import RedStrokeButton from "../../components/account/RedStrokeButton";
 import ProfileCard from "../../components/account/ProfileCard";
 
-import { getAccount } from "../../store/AccountSlice";
+import { getAccount, setAccount } from "../../store/AccountSlice";
 import { getAccountList, setAccountList } from "../../store/AccountListSlice";
 
 import { IAccount, IAccountList } from "../../types/AccountTypes";
@@ -46,6 +46,7 @@ const ChooseProfile = ({ view, setView }: IPropsChooseProfile) => {
       try {
         const newAccountList = accountListStore?.list?.filter((one) => one?.sxpAddress !== account?.sxpAddress);
         dispatch(setAccountList(newAccountList));
+        dispatch(setAccount(newAccountList?.length > 0 ? newAccountList[0] : undefined));
         if (accountStore?.sxpAddress === account?.sxpAddress) {
           handleLogout();
           navigate("/");

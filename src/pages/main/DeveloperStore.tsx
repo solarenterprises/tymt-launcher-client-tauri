@@ -11,7 +11,7 @@ const DeveloperStore = () => {
   const { t } = useTranslation();
 
   const [status, setStatus] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <>

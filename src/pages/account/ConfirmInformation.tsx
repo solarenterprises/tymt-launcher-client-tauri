@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -12,7 +12,7 @@ import WalletList from "../../components/account/WalletList";
 
 import { useNotification } from "../../providers/NotificationProvider";
 
-import { setAccount } from "../../store/AccountSlice";
+import { getAccount, setAccount } from "../../store/AccountSlice";
 import { addAccountList, getAccountList } from "../../store/AccountListSlice";
 import { setWallet } from "../../store/WalletSlice";
 import { setMnemonic } from "../../store/MnemonicSlice";
@@ -28,6 +28,8 @@ import { IAccount, IAccountList } from "../../types/AccountTypes";
 import tymt2 from "../../assets/account/tymt2.png";
 import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 import { useWallet } from "../../providers/WalletProvider";
+import { UserAPI } from "../../lib/api/UserAPI";
+import { useSelector } from "react-redux";
 
 export interface ILocationStateConfirmInformation {
   passphrase: string;
@@ -48,6 +50,11 @@ const ConfirmInformation = () => {
   const { passphrase, password, nickname, walletAddresses } = (location.state as ILocationStateConfirmInformation) || {};
 
   const accountListStore: IAccountList = useAppSelector(getAccountList);
+  const accountStore: IAccount = useSelector(getAccount);
+  const accountStoreRef = useRef(accountStore);
+  useEffect(() => {
+    accountStoreRef.current = accountStore;
+  }, [accountStore]);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -126,6 +133,16 @@ const ConfirmInformation = () => {
     if (mode === "signup") await handleSignUp();
     else if (mode === "guest") await handleGuestComplete();
     await handleLogin();
+    if (mode === "guest") {
+      const updatedUser = await UserAPI.updateProfile({ nickname });
+      const updatedAccount = {
+        ...updatedUser,
+        password: accountStoreRef?.current?.password,
+        mnemonic: accountStoreRef?.current?.mnemonic,
+      };
+      dispatch(setAccount(updatedAccount));
+      dispatch(addAccountList(updatedAccount));
+    }
     setLoading(false);
   };
 

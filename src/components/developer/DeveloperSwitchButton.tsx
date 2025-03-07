@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Stack, Box, Button } from "@mui/material";
 import { IPropsMode } from "../../types/HomeTypes";
