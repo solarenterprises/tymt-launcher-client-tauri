@@ -39,6 +39,17 @@ export const GameAPI = {
     }
   },
 
+  fetchTrendingGameList: async (
+    query: IPaginationQuery = { page: 1, limit: 5, sort: '{"downloadCount":-1}' }
+  ): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchTrendingGameList");
+    }
+  },
+
   // fetchComingGameList: async (page: number): Promise<any> => {
   //   const res = await axiosAuth.get<{ data: any }>(`/store/by-visibility-state/coming%20soon?page=${page}`);
   //   return res.data.data;

@@ -51,6 +51,7 @@ const Homepage = () => {
         </Grid>
       </AnimatedComponent>
       <Grid container sx={{ marginTop: "80px" }}>
+        <GameSwiperComponent mode="trending" />
         <GameSwiperComponent mode="free" />
         <GameSwiperComponent mode="recently-added" />
         <GameSwiperComponent mode="coming-soon" />

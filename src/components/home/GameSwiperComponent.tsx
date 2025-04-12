@@ -62,7 +62,7 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
           setGamePagination(res);
         })
         .catch((err) => {
-          console.error("Error fetching game list:", err);
+          console.error("Error fetching free game list:", err);
         });
     } else if (mode === "recently-added") {
       GameAPI.fetchRecentlyAddedGameList()
@@ -70,7 +70,7 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
           setGamePagination(res);
         })
         .catch((err) => {
-          console.error("Error fetching game list:", err);
+          console.error("Error fetching recently added game list:", err);
         });
     } else if (mode === "coming-soon") {
       GameAPI.fetchComingSoonGameList()
@@ -78,7 +78,15 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
           setGamePagination(res);
         })
         .catch((err) => {
-          console.error("Error fetching game list:", err);
+          console.error("Error fetching coming soon game list:", err);
+        });
+    } else if (mode === "trending") {
+      GameAPI.fetchTrendingGameList()
+        .then((res) => {
+          setGamePagination(res);
+        })
+        .catch((err) => {
+          console.error("Error fetching trending game list:", err);
         });
     } else {
       setGamePagination(null);
@@ -90,7 +98,13 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
       <Box className="card_coming_container">
         <Grid container sx={{ justifyContent: "space-between", alignItems: "center" }}>
           <Box className={"fs-40-bold"} color={"white"} textTransform={"none"}>
-            {mode === "free" ? t("hom-9_free-games") : mode === "recently-added" ? t("hom-10_recently-added") : t("hom-11_coming-soon")}
+            {mode === "trending"
+              ? t("hom-8_trending-games")
+              : mode === "free"
+              ? t("hom-9_free-games")
+              : mode === "recently-added"
+              ? t("hom-10_recently-added")
+              : t("hom-11_coming-soon")}
           </Box>
         </Grid>
         {!gamePagination?.data?.length ? (
