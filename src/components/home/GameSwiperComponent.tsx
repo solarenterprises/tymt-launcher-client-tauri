@@ -44,7 +44,7 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
       const totalSlides = swiperRef.current.swiper.slides.length;
       const nextIndex = swiperRef.current.swiper.activeIndex + 3;
 
-      if (nextIndex >= totalSlides - 1) {
+      if (nextIndex >= totalSlides - 3) {
         swiperRef.current.swiper.slideTo(0);
       } else {
         swiperRef.current.swiper.slideTo(nextIndex);
@@ -95,7 +95,7 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
 
   return (
     <Grid item xs={12} container sx={{ margin: "40px 0px" }}>
-      <Box className="card_coming_container">
+      <Box className={mode === "trending" ? `card_trending_container` : `card_coming_container`}>
         <Grid container sx={{ justifyContent: "space-between", alignItems: "center" }}>
           <Box className={"fs-40-bold"} color={"white"} textTransform={"none"}>
             {mode === "trending"
@@ -131,12 +131,13 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
               loop={false}
               style={{
                 marginTop: "32px",
+                ...(mode === "trending" && { padding: "0px 32px" }),
               }}
             >
               {gamePagination?.data?.map((game, index) => (
                 <SwiperSlide style={{ width: "200px" }} key={index}>
                   {/* <ComingGameCard key={game?._id} game={game} /> */}
-                  <StoreGameCard game={game} isComing={false} />
+                  <StoreGameCard game={game} isComing={false} mode={mode} index={index} />
                 </SwiperSlide>
               ))}
             </Swiper>

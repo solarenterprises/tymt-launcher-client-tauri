@@ -363,6 +363,21 @@
   position: relative;
 }
 
+.card_trending_container {
+  width: 94%;
+  // height: 297px;
+  padding: 32px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  border: 1px solid #f6e27acc;
+  background: radial-gradient(ellipse at 50% 0%, #f6e27a55 0%, #00000000 70% 50%);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(50px);
+  z-index: 1;
+  overflow: hidden;
+  position: relative;
+}
+
 .card_coming_slide {
   width: 276px;
   height: 225px;

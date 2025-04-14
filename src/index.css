@@ -9,6 +9,11 @@
 }
 
 @font-face {
+  font-family: "Cobe-Bold-Italic";
+  src: url("./fonts/Cobe/Cobe-Bold-Italic.ttf") format("truetype");
+}
+
+@font-face {
   font-family: "Cobe-Extra-Bold-Italic";
   src: url("./fonts/Cobe/Cobe-Extra-Bold-Italic.ttf") format("truetype");
 }

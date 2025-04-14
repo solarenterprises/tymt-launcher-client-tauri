@@ -40,7 +40,7 @@ export const GameAPI = {
   },
 
   fetchTrendingGameList: async (
-    query: IPaginationQuery = { page: 1, limit: 5, sort: '{"downloadCount":-1}' }
+    query: IPaginationQuery = { page: 1, limit: 10, sort: '{"downloadCount":-1}' }
   ): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
