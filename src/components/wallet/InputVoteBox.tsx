@@ -8,7 +8,7 @@ import { Box, FormControl, InputLabel, OutlinedInput } from "@mui/material";
 
 // import { getBalanceList } from "../../features/wallet/BalanceListSlice";
 
-// import { IBalanceList, IVotingData } from "../../types/walletTypes";
+// import { IBalanceList, IVotingData } from "../../types/wWalletTypes";
 type IVotingData = any;
 
 interface props {

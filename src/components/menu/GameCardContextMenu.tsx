@@ -84,7 +84,7 @@ const GameCardContextMenu = ({ view, setView, contextMenuPosition, game }: IProp
         return;
       }
       setModalView(true);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   useEffect(() => {

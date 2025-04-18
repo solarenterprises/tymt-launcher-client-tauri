@@ -133,9 +133,7 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
             </Stack>
             <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
             <Stack direction={"column"} justifyContent={"flex-start"} textAlign={"center"} padding={"20px"}>
-              <Box className="fs-h4 white">
-                <InputText id="change-nickname" label={t("set-69_change-nickname")} type="text" value={nickname} setValue={setNickname} />
-              </Box>
+              <InputText id="change-nickname" label={t("set-69_change-nickname")} type="text" value={nickname} setValue={setNickname} />
               {error && (
                 <Stack mt={"8px"} padding={"0px 6px"} width={"100%"}>
                   <Box className={"fs-16-regular red"}>{error}</Box>

@@ -12,9 +12,11 @@ import GameCardContextMenu from "../menu/GameCardContextMenu";
 export interface IPropsStoreGameCard {
   game: IGame;
   isComing?: boolean;
+  mode?: string;
+  index?: number;
 }
 
-const StoreGameCard = ({ game, isComing }: IPropsStoreGameCard) => {
+const StoreGameCard = ({ game, isComing, mode, index }: IPropsStoreGameCard) => {
   const navigate = useNavigate();
 
   const containerRef = useRef(null);
@@ -105,6 +107,24 @@ const StoreGameCard = ({ game, isComing }: IPropsStoreGameCard) => {
                 navigate(`/game/${game?._id}`);
               }}
             >
+              {mode === "trending" && (
+                <Box
+                  className={"fs-12-regular white"}
+                  sx={{
+                    position: "absolute",
+                    top: "48px",
+                    left: "-36px",
+                    padding: "4px",
+                    fontSize: "124px", // Adjusted font size
+                    fontFamily: "Cobe-Bold-Italic",
+                    WebkitTextFillColor: "#0B0B0B", // Fill color
+                    WebkitTextStrokeWidth: "0.5px", // Stroke width
+                    WebkitTextStrokeColor: "#F6E27A", // Stroke color
+                  }}
+                >
+                  {index + 1}
+                </Box>
+              )}
               {isComing && (
                 <Box
                   className={"fs-12-regular white"}

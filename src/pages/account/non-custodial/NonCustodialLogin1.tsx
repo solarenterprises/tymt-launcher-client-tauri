@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
@@ -13,7 +13,7 @@ import LoginAccountForm from "../../../components/account/LoginAccountForm";
 import DontHaveAccount from "../../../components/account/DontHaveAccount";
 import OrLine from "../../../components/account/OrLine";
 
-import { getAccount } from "../../../store/AccountSlice";
+import { getAccount, setAccount } from "../../../store/AccountSlice";
 
 import { IAccount, IAccountList } from "../../../types/AccountTypes";
 
@@ -22,11 +22,18 @@ import { getAccountList } from "../../../store/AccountListSlice";
 
 const NonCustodialLogin1 = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
 
   const accountStore: IAccount = useSelector(getAccount);
   const accountListStore: IAccountList = useSelector(getAccountList);
 
   const [drawer, setDrawer] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!accountStore?.nickname) {
+      dispatch(setAccount(accountListStore?.list[0]));
+    }
+  }, [accountStore?.nickname, accountListStore]);
 
   return (
     <>
@@ -55,7 +62,7 @@ const NonCustodialLogin1 = () => {
                       <AccountHeader title={t("ncca-63_hello")} />
                     </Grid>
                     <Grid item xs={12} mt={"48px"}>
-                      <ChooseProfileButton account={accountStore?.nickname ? accountStore : accountListStore?.list[0]} onClick={() => setDrawer(true)} />
+                      <ChooseProfileButton account={accountStore} onClick={() => setDrawer(true)} />
                     </Grid>
                     <Grid item xs={12} mt={"32px"}>
                       <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />

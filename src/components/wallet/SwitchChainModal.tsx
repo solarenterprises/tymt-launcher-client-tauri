@@ -13,7 +13,7 @@ import { Box, Stack, Modal, CircularProgress, Button, Tooltip, Fade } from "@mui
 import arrowIcon from "../../assets/account/BlueArrowRight.svg";
 import closeIcon from "../../assets/setting/XIcon.svg";
 
-// import { ICurrentChain, ISupportChain } from "../../types/walletTypes";
+// import { ICurrentChain, ISupportChain } from "../../types/wWalletTypes";
 
 export interface IPropsSwitchChainModal {
   open: boolean;

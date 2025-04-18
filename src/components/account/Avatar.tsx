@@ -20,7 +20,7 @@
 // import mask from "../../assets/account/mask.png";
 // import accountIcon from "../../assets/wallet/account.svg";
 
-// // import { ICurrentChain, ISupportChain } from "../../types/walletTypes";
+// // import { ICurrentChain, ISupportChain } from "../../types/wWalletTypes";
 
 // const Avatar = ({ size, url, userid, onlineStatus, ischain, status }: any) => {
 //   const { t } = useTranslation();

@@ -6,11 +6,12 @@ import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 
 import GameBarSticker from "../../components/home/GameBarSticker";
 import Bottom from "../../components/home/Bottom";
-import ComingsoonD53 from "../../components/home/ComingSoon-D53";
+// import ComingsoonD53 from "../../components/home/ComingSoon-D53";
 import District53Intro from "../../components/home/District53Intro";
-import RecentlyAddedGames from "../../components/home/RecentlyAddedGames";
+// import RecentlyAddedGames from "../../components/home/RecentlyAddedGames";
 import UpdateModal from "../../components/home/UpdateModal";
 import AnimatedComponent from "../../components/home/AnimatedComponent";
+import GameSwiperComponent from "../../components/home/GameSwiperComponent";
 
 const Homepage = () => {
   const [image, setImage] = useState<string>(CONST_GAME_DISTRICT53?.imageUrl);
@@ -50,10 +51,22 @@ const Homepage = () => {
         </Grid>
       </AnimatedComponent>
       <Grid container sx={{ marginTop: "80px" }}>
-        <RecentlyAddedGames />
         <AnimatedComponent>
-          <ComingsoonD53 />
+          <GameSwiperComponent mode="trending" />
         </AnimatedComponent>
+        <AnimatedComponent>
+          <GameSwiperComponent mode="free" />
+        </AnimatedComponent>
+        <AnimatedComponent>
+          <GameSwiperComponent mode="recently-added" />
+        </AnimatedComponent>
+        <AnimatedComponent>
+          <GameSwiperComponent mode="coming-soon" />
+        </AnimatedComponent>
+        {/* <RecentlyAddedGames /> */}
+        {/* <AnimatedComponent>
+          <ComingsoonD53 />
+        </AnimatedComponent> */}
         <AnimatedComponent>
           <Bottom />
         </AnimatedComponent>
