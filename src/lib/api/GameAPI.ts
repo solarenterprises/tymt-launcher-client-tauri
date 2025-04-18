@@ -12,6 +12,44 @@ export const GameAPI = {
     }
   },
 
+  fetchFreeGameList: async (query: IPaginationQuery = { page: 1, limit: 20, price: 0 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchFreeGameList");
+    }
+  },
+
+  fetchRecentlyAddedGameList: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/recent`, { params: query });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchRecentlyAddedGameList");
+    }
+  },
+
+  fetchComingSoonGameList: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/coming-soon`, { params: query });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchComingSoonGameList");
+    }
+  },
+
+  fetchTrendingGameList: async (
+    query: IPaginationQuery = { page: 1, limit: 10, sort: '{"downloadCount":-1}' }
+  ): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchTrendingGameList");
+    }
+  },
+
   // fetchComingGameList: async (page: number): Promise<any> => {
   //   const res = await axiosAuth.get<{ data: any }>(`/store/by-visibility-state/coming%20soon?page=${page}`);
   //   return res.data.data;

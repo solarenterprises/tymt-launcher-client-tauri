@@ -5,6 +5,7 @@
 
 use actix_cors::Cors;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
+use futures_util::stream::StreamExt;
 use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
 use reqwest::header::ACCEPT;
 use reqwest::{header, Client};
@@ -14,7 +15,7 @@ use std::cmp::min;
 use std::fs::File;
 use std::io::prelude::*;
 #[cfg(target_family = "unix")]
-use std::os::unix::fs::PermissionsExt; // For Unix-specific permissions
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::Mutex;
@@ -27,8 +28,7 @@ use tauri::{
 };
 use tauri::{Builder, Emitter, Listener, Manager};
 use tauri_plugin_http::reqwest;
-
-use futures_util::stream::StreamExt;
+use zip::read::ZipArchive; // For Unix-specific permissions
 
 // use dotenv::dotenv;
 // use std::env;
@@ -63,7 +63,8 @@ fn create_named_mutex(name: &str) -> std::io::Result<()> {
     use winapi::um::synchapi::CreateMutexA;
 
     let mutex_name = std::ffi::CString::new(name).expect("CString::new failed");
-    let handle = unsafe { CreateMutexA(std::ptr::null_mut(), 0, mutex_name.as_ptr()) };
+    let handle: *mut std::ffi::c_void =
+        unsafe { CreateMutexA(std::ptr::null_mut(), 0, mutex_name.as_ptr()) };
 
     if handle.is_null() {
         return Err(std::io::Error::last_os_error());
@@ -88,7 +89,8 @@ fn show_window(app: &tauri::AppHandle) {
     windows
         .values()
         .next()
-        .expect("Sorry, no window found")
+        .expect("Sorry, no wind
+        ow found")
         .set_focus()
         .expect("Can't Bring Window to Focus");
 }
@@ -266,9 +268,7 @@ pub fn main() -> std::io::Result<()> {
                     } = event
                     {
                         let apphandle = tray.app_handle();
-                        if let Some(webview_window) =
-                            apphandle.get_webview_window("tymtLauncher")
-                        {
+                        if let Some(webview_window) = apphandle.get_webview_window("tymtLauncher") {
                             let _ = webview_window.show();
                             let _ = webview_window.set_focus();
                         }
@@ -276,7 +276,6 @@ pub fn main() -> std::io::Result<()> {
                 })
                 .build(app)?;
 
-      
             async fn rpc_request(
                 request: HttpRequest,
                 request_param: web::Json<serde_json::Value>,
@@ -302,8 +301,7 @@ pub fn main() -> std::io::Result<()> {
                         println!("!!!----> res POST /rpc_request");
                         println!("{}", payload);
                         match tx.send(payload) {
-                            Ok(()) => {
-                            }
+                            Ok(()) => {}
                             Err(err) => {
                                 println!("Error sending message: {:?}", err);
                             }
@@ -528,7 +526,7 @@ struct DownloadProgress {
     total: u64,
     duration: f64,
     expectation: f64,
-    game: String
+    game: String,
 }
 
 #[tauri::command]
@@ -536,7 +534,7 @@ async fn download_to_app_dir(
     app_handle: tauri::AppHandle,
     url: String,
     file_location: String,
-    game: String
+    game: String,
 ) -> Result<(), String> {
     let path = Path::new(&file_location);
 
@@ -555,9 +553,10 @@ async fn download_to_app_dir(
     let res = client
         .get(&url)
         .header(ACCEPT, "application/octet-stream")
+        .header(reqwest::header::USER_AGENT, "tymtLauncher/1.0")
         .send()
         .await
-        .or(Err(format!("Failed to GET from '{}'", &url)))?;
+        .map_err(|e| format!("Failed to GET from '{}': {}", &url, e))?;
     let total = res
         .content_length()
         .ok_or(format!("Failed to get content length from '{}'", &url))?;
@@ -602,7 +601,6 @@ async fn download_to_app_dir(
                 .map_err(|e| format!("Failed to emit progress event: {}", e))?;
 
             last_emit_time = Instant::now();
-         
         }
 
         // println!("downloaded => {}", downloaded);
@@ -622,8 +620,36 @@ async fn unzip_windows(
     let zip_path = PathBuf::from(file_location);
     let extract_path = PathBuf::from(install_dir);
 
-    let _ = zip_extensions::read::zip_extract(&zip_path, &extract_path)
-        .map_err(|e| format!("Failed to unzip file: {}", e))?;
+    // Open the zip file
+    let file = File::open(&zip_path).map_err(|e| format!("Failed to open zip file: {}", e))?;
+    let mut archive =
+        ZipArchive::new(file).map_err(|e| format!("Failed to read zip archive: {}", e))?;
+
+    // Extract each file in the archive
+    for i in 0..archive.len() {
+        let mut file = archive
+            .by_index(i)
+            .map_err(|e| format!("Failed to access file in zip: {}", e))?;
+        let out_path = extract_path.join(file.name());
+
+        if file.is_dir() {
+            // Create directories
+            fs::create_dir_all(&out_path)
+                .map_err(|e| format!("Failed to create directory: {}", e))?;
+        } else {
+            // Create parent directories if necessary
+            if let Some(parent) = out_path.parent() {
+                fs::create_dir_all(parent)
+                    .map_err(|e| format!("Failed to create parent directory: {}", e))?;
+            }
+
+            // Write the file
+            let mut outfile =
+                File::create(&out_path).map_err(|e| format!("Failed to create file: {}", e))?;
+            std::io::copy(&mut file, &mut outfile)
+                .map_err(|e| format!("Failed to write file: {}", e))?;
+        }
+    }
 
     Ok(())
 }
@@ -637,11 +663,69 @@ async fn unzip_linux(
     let zip_path = PathBuf::from(file_location);
     let extract_path = PathBuf::from(install_dir);
 
-    let _ = zip_extensions::read::zip_extract(&zip_path, &extract_path)
-        .map_err(|e| format!("Failed to unzip file: {}", e))?;
+    // Open the zip file
+    let file = File::open(&zip_path).map_err(|e| format!("Failed to open zip file: {}", e))?;
+    let mut archive =
+        ZipArchive::new(file).map_err(|e| format!("Failed to read zip archive: {}", e))?;
+
+    // Extract each file in the archive
+    for i in 0..archive.len() {
+        let mut file = archive
+            .by_index(i)
+            .map_err(|e| format!("Failed to access file in zip: {}", e))?;
+        let out_path = extract_path.join(file.name());
+
+        if file.is_dir() {
+            // Create directories
+            fs::create_dir_all(&out_path)
+                .map_err(|e| format!("Failed to create directory: {}", e))?;
+        } else {
+            // Create parent directories if necessary
+            if let Some(parent) = out_path.parent() {
+                fs::create_dir_all(parent)
+                    .map_err(|e| format!("Failed to create parent directory: {}", e))?;
+            }
+
+            // Write the file
+            let mut outfile =
+                File::create(&out_path).map_err(|e| format!("Failed to create file: {}", e))?;
+            std::io::copy(&mut file, &mut outfile)
+                .map_err(|e| format!("Failed to write file: {}", e))?;
+        }
+    }
 
     Ok(())
 }
+
+// #[tauri::command]
+// async fn unzip_windows(
+//     app_handle: tauri::AppHandle,
+//     file_location: String,
+//     install_dir: String,
+// ) -> Result<(), String> {
+//     let zip_path = PathBuf::from(file_location);
+//     let extract_path = PathBuf::from(install_dir);
+
+//     let _ = zip_extensions::read::zip_extract(&zip_path, &extract_path)
+//         .map_err(|e| format!("Failed to unzip file: {}", e))?;
+
+//     Ok(())
+// }
+
+// #[tauri::command]
+// async fn unzip_linux(
+//     app_handle: tauri::AppHandle,
+//     file_location: String,
+//     install_dir: String,
+// ) -> Result<(), String> {
+//     let zip_path = PathBuf::from(file_location);
+//     let extract_path = PathBuf::from(install_dir);
+
+//     let _ = zip_extensions::read::zip_extract(&zip_path, &extract_path)
+//         .map_err(|e| format!("Failed to unzip file: {}", e))?;
+
+//     Ok(())
+// }
 
 #[tauri::command]
 async fn move_appimage_linux(
@@ -759,7 +843,10 @@ async fn delete_file(app_handle: tauri::AppHandle, file_location: String) -> Res
 }
 
 #[tauri::command]
-async fn delete_directory(app_handle: tauri::AppHandle, dir_location: String) -> Result<(), String> {
+async fn delete_directory(
+    app_handle: tauri::AppHandle,
+    dir_location: String,
+) -> Result<(), String> {
     let path = PathBuf::from(dir_location);
 
     // Attempt to remove the directory and all its contents recursively

@@ -15,7 +15,7 @@ import FeeSwitchButton from "../../components/home/FeeSwitchButton";
 import backIcon from "../../assets/setting/BackIcon.svg";
 
 // import { IWalletSetting } from "../../types/settingTypes";
-// import { ICurrencyList, ICurrentCurrency } from "../../types/walletTypes";
+// import { ICurrencyList, ICurrentCurrency } from "../../types/wWalletTypes";
 
 interface IPropsFee {
   view: string;

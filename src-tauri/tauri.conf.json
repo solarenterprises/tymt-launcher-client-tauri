@@ -1,6 +1,6 @@
 {
   "build": {
-    "beforeDevCommand": "yarn dev",
+    "beforeDevCommand": "yarn dev --host",
     "beforeBuildCommand": "yarn build",
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420"
@@ -10,7 +10,13 @@
     "targets": "all",
     "longDescription": "tymt is a multi-chain game launcher and an environment for creating and publishing games. \n tymt is a gaming environment and platform, built using the Solar Core blockchain solutions, enabling a new world of game economy - empowering Developers and Publishers!",
     "publisher": "hello@solarenterprises.com",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "category": "Game",
     "shortDescription": "A multi-chain game launcher and an environment for creating and publishing games",
     "createUpdaterArtifacts": "v1Compatible"
@@ -22,7 +28,9 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFFN0I1MzY0RDYyNThGRjYKUldUMmp5WFdaRk43cmxnMExMNlk4WHhaalR4TVI3amFMbnJESXhiNDcxZUpFZ1pTUDNRbVZmMTUK",
-      "endpoints": ["https://dev.tymt.com/public/upload/latest.json"]
+      "endpoints": [
+        "https://dev.tymt.com/public/upload/latest.json"
+      ]
     }
   },
   "app": {
@@ -63,7 +71,9 @@
     ],
     "security": {
       "csp": null,
-      "capabilities": ["main-capability"]
+      "capabilities": [
+        "main-capability"
+      ]
     },
     "macOSPrivateApi": true
   }

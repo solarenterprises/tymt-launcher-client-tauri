@@ -102,7 +102,7 @@ const LoginAccountForm = () => {
       //   },
       // });
       await handleLogin(walletAddresses, decryptedMnemonic, password);
-      
+
     } catch (err) {
       console.error("Failed to handleGuestLogin: ", err);
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_FAIL, text: err.toString() });

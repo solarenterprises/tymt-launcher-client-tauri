@@ -71,7 +71,7 @@ const DeveloperGameCardContextMenu = ({ view, setView, contextMenuPosition, game
         return;
       }
       setModalView(true);
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const handleRemoveGameFromDeveloperGameList = async (currentGame: IGame) => {

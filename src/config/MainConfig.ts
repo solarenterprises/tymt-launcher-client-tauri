@@ -55,6 +55,12 @@ export const CONFIG_BTC_API_URL =
 
 export const CONFIG_ALCHEMY_KEY = import.meta.env.VITE_APP_ALCHEMY_KEY;
 
+export const CONFIG_BSC_API_KEY = import.meta.env.VITE_APP_BSC_API_KEY;
+export const CONFIG_ETH_API_KEY = import.meta.env.VITE_APP_ETH_API_KEY;
+export const CONFIG_POL_API_KEY = import.meta.env.VITE_APP_POL_API_KEY;
+export const CONFIG_OP_API_KEY = import.meta.env.VITE_APP_OP_API_KEY;
+export const CONFIG_ARB_API_KEY = import.meta.env.VITE_APP_ARB_API_KEY;
+
 export const CONFIG_BSC_RPC_URL =
   import.meta.env.VITE_APP_NETWORK_NAME === "mainnet" ? import.meta.env.VITE_APP_MAINNET_BSC_RPC_URL : import.meta.env.VITE_APP_TESTNET_BSC_RPC_URL;
 export const CONFIG_ETH_RPC_URL =
@@ -75,9 +81,3 @@ export const CONFIG_ARB_RPC_URL =
     : import.meta.env.VITE_APP_TESTNET_ARB_RPC_URL + CONFIG_ALCHEMY_KEY;
 export const CONFIG_AVAX_RPC_URL =
   CONFIG_NETWORK_NAME === "mainnet" ? import.meta.env.VITE_APP_MAINNET_AVAX_PROVIDER : import.meta.env.VITE_APP_TESTNET_AVAX_PROVIDER;
-
-export const CONFIG_BSC_API_KEY = import.meta.env.VITE_APP_BSC_API_KEY;
-export const CONFIG_ETH_API_KEY = import.meta.env.VITE_APP_ETH_API_KEY;
-export const CONFIG_POL_API_KEY = import.meta.env.VITE_APP_POL_API_KEY;
-export const CONFIG_OP_API_KEY = import.meta.env.VITE_APP_OP_API_KEY;
-export const CONFIG_ARB_API_KEY = import.meta.env.VITE_APP_ARB_API_KEY;
