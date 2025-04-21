@@ -27,7 +27,7 @@
   "identifier": "tymtLauncher",
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEFFN0I1MzY0RDYyNThGRjYKUldUMmp5WFdaRk43cmxnMExMNlk4WHhaalR4TVI3amFMbnJESXhiNDcxZUpFZ1pTUDNRbVZmMTUK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI3M0I1Mzc1RUM4NDAxMDQKUldRRUFZVHNkVk03SnhrVnRrbDJKYnpnTWFTZEYvSHJZejZNcHJyd1h2SngwMGR0b1BOek9vTUIK",
       "endpoints": [
         "https://dev.tymt.com/public/upload/latest.json"
       ]
