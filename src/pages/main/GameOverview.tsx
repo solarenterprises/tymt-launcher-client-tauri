@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Grid } from "@mui/material";
@@ -22,33 +21,19 @@ import GameOverViewDescription from "../../components/game/GameOverViewDescripti
 import GameReview from "../../components/game/GameReview";
 
 import gradient1 from "../../assets/main/GradientGameOverview.svg";
-import { IGameList } from "../../types/GameTypes";
-import { getGameList } from "../../store/GameListSlice";
-import { useAppSelector } from "../../store";
+import { IGame } from "../../types/GameTypes";
 
-const GameOverview = () => {
+export interface IPropsGameOverview {
+  game: IGame;
+}
+
+const GameOverview = ({ game }: IPropsGameOverview) => {
   const { t } = useTranslation();
-  const { gameId } = useParams();
 
   const [src, setSrc] = useState<string>("");
   const [type, setType] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [currentSwitchIndex, setCurrentSwitchIndex] = useState<number>(0);
-
-  const gameListStore: IGameList = useAppSelector(getGameList);
-
-  const comingGameListStore: IGameList = useMemo(() => {
-    const data = gameListStore?.games?.filter((one) => one?.visibilityState === "coming soon");
-    const res: IGameList = {
-      games: data,
-    };
-    return res;
-  }, [gameListStore]);
-
-  const game = useMemo(
-    () => [...gameListStore.games, ...comingGameListStore.games]?.find((game) => game?._id === gameId),
-    [comingGameListStore, gameListStore]
-  );
 
   const textList: string[] = [t("ga-10_overview"), t("ga-11_review")];
 

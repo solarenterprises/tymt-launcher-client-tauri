@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
 import { debounce } from "lodash";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -28,7 +29,6 @@ import { tymtLogoType } from "../../types/HomeTypes";
 import newlogo from "../../assets/main/NewLogo.png";
 import newlogohead from "../../assets/main/NewLogoHead.png";
 import searchlg from "../../assets/main/SearchLg.svg";
-import { invoke } from "@tauri-apps/api/core";
 
 const theme = createTheme({
   palette: {

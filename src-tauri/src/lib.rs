@@ -161,7 +161,8 @@ pub fn main() -> std::io::Result<()> {
             set_tray_items_enabled,
             write_file,
             minecraft::get_system_info,
-            window::create_child_window
+            window::create_child_window,
+            window::destroy_child_window
         ])
         .setup(|app| {
             app.manage(AppData {

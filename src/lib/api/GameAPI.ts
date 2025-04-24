@@ -3,6 +3,15 @@ import { IGame } from "../../types/GameTypes";
 import { IMetaPagination, IPaginationQuery } from "../../types/APITypes/BasicAPITypes";
 
 export const GameAPI = {
+  fetchGame: async (gameId: string): Promise<IGame> => {
+    try {
+      const res = await axiosAuth.get<{ data: IGame }>(`/game/id/${gameId}`);
+      return res.data.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchGame");
+    }
+  },
+
   fetchGameList: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
