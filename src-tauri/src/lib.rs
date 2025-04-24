@@ -4,6 +4,7 @@
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
 mod minecraft;
+mod window;
 
 use actix_cors::Cors;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
@@ -160,6 +161,7 @@ pub fn main() -> std::io::Result<()> {
             set_tray_items_enabled,
             write_file,
             minecraft::get_system_info,
+            window::create_child_window
         ])
         .setup(|app| {
             app.manage(AppData {
