@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { Skeleton } from "@mui/material";
 
-import GameSiteViewer from "./GameSiteViewer";
+import GameSiteViewer from "../../components/game/GameSiteViewer";
 import GameOverview from "./GameOverview";
 import ErrorComponent from "../../components/common/ErrorComponent";
 

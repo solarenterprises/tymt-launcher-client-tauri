@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, Skeleton } from "@mui/material";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -23,6 +23,7 @@ export interface IPropsGameSwiperComponent {
 const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
   const { t } = useTranslation();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [gamePagination, setGamePagination] = useState<{ data: IGame[]; meta: IMetaPagination } | null>(null);
 
   const swiperRef = useRef<any | null>(null);
@@ -56,41 +57,36 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
 
   // Fetch games when mode changes
   useEffect(() => {
-    if (mode === "free") {
-      GameAPI.fetchFreeGameList()
-        .then((res) => {
-          setGamePagination(res);
-        })
-        .catch((err) => {
-          console.error("Error fetching free game list:", err);
-        });
-    } else if (mode === "recently-added") {
-      GameAPI.fetchRecentlyAddedGameList()
-        .then((res) => {
-          setGamePagination(res);
-        })
-        .catch((err) => {
-          console.error("Error fetching recently added game list:", err);
-        });
-    } else if (mode === "coming-soon") {
-      GameAPI.fetchComingSoonGameList()
-        .then((res) => {
-          setGamePagination(res);
-        })
-        .catch((err) => {
-          console.error("Error fetching coming soon game list:", err);
-        });
-    } else if (mode === "trending") {
-      GameAPI.fetchTrendingGameList()
-        .then((res) => {
-          setGamePagination(res);
-        })
-        .catch((err) => {
-          console.error("Error fetching trending game list:", err);
-        });
-    } else {
-      setGamePagination(null);
-    }
+    const fetchGameList = async () => {
+      setLoading(true);
+      try {
+        let response = null;
+        switch (mode) {
+          case "free":
+            response = await GameAPI.fetchFreeGameList();
+            break;
+          case "recently-added":
+            response = await GameAPI.fetchRecentlyAddedGameList();
+            break;
+          case "coming-soon":
+            response = await GameAPI.fetchComingSoonGameList();
+            break;
+          case "trending":
+            response = await GameAPI.fetchTrendingGameList();
+            break;
+          default:
+            setGamePagination(null);
+            return;
+        }
+        setGamePagination(response);
+      } catch (err) {
+        console.error(`Error fetching ${mode} game list:`, err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGameList();
   }, [mode]);
 
   return (
@@ -107,7 +103,34 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
               : t("hom-11_coming-soon")}
           </Box>
         </Grid>
-        {!gamePagination?.data?.length ? (
+        {loading ? (
+          <Swiper
+            ref={swiperRef}
+            spaceBetween={15}
+            slidesPerView={"auto"}
+            loop={false}
+            style={{
+              marginTop: "32px",
+              ...(mode === "trending" && { padding: "0px 32px" }),
+            }}
+          >
+            {loading &&
+              Array.from({ length: 10 }).map((_, index) => (
+                <SwiperSlide style={{ width: "200px" }} key={`skeleton-${index}`}>
+                  <Skeleton
+                    variant="rectangular"
+                    sx={{
+                      width: "182px",
+                      height: "302px !important", // Ensure height is enforced
+                      minHeight: "302px",
+                      borderRadius: "16px",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    }}
+                  />
+                </SwiperSlide>
+              ))}
+          </Swiper>
+        ) : !gamePagination?.data?.length ? (
           <>
             <Box
               sx={{

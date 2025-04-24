@@ -10,17 +10,9 @@ const GameSiteViewer = ({ game }: IPropsGameSiteViewer) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      console.log("Width:", rect.width);
-      console.log("Height:", rect.height);
-      console.log("Position (x, y):", rect.x, rect.y);
-    }
-
     if (game?.external_url) {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        console.log(rect.width, rect.height, rect.x, rect.y);
         invoke("create_child_window", {
           url: game?.external_url,
           width: rect.width,
