@@ -31,7 +31,7 @@ const DeveloperStoreGameCards = () => {
       {developerGameListStore?.games?.map((game, index) => (
         <Grid key={index} item>
           <AnimatedComponent>
-            <DeveloperStoreGameCard key={`${game?._id}-${index}`} game={game} isComing={false} />
+            <DeveloperStoreGameCard key={`${game?._id}-${index}`} game={game} />
           </AnimatedComponent>
         </Grid>
       ))}

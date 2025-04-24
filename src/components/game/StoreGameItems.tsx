@@ -54,7 +54,7 @@ const StoreGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGam
       {resultGames?.map((game, index) => (
         <Grid key={index} item>
           <AnimatedComponent>
-            <StoreGameCard key={`${game?._id}-${index}`} game={game} isComing={comingGameListStore.games.some((element) => element._id === game._id)} />
+            <StoreGameCard key={`${game?._id}-${index}`} game={game} />
           </AnimatedComponent>
         </Grid>
       ))}

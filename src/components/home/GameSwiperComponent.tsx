@@ -160,7 +160,7 @@ const GameSwiperComponent = ({ mode }: IPropsGameSwiperComponent) => {
               {gamePagination?.data?.map((game, index) => (
                 <SwiperSlide style={{ width: "200px" }} key={index}>
                   {/* <ComingGameCard key={game?._id} game={game} /> */}
-                  <StoreGameCard game={game} isComing={false} mode={mode} index={index} />
+                  <StoreGameCard game={game} mode={mode} index={index} />
                 </SwiperSlide>
               ))}
             </Swiper>

@@ -11,12 +11,11 @@ import GameCardContextMenu from "../menu/GameCardContextMenu";
 
 export interface IPropsStoreGameCard {
   game: IGame;
-  isComing?: boolean;
   mode?: string;
   index?: number;
 }
 
-const StoreGameCard = ({ game, isComing, mode, index }: IPropsStoreGameCard) => {
+const StoreGameCard = ({ game, mode, index }: IPropsStoreGameCard) => {
   const navigate = useNavigate();
 
   const containerRef = useRef(null);
@@ -152,40 +151,6 @@ const StoreGameCard = ({ game, isComing, mode, index }: IPropsStoreGameCard) => 
               />
 
               <Stack padding="16px 2px" gap={"16px"}>
-                {/* <Box
-              className="fs-20-regular white"
-              sx={{
-                color: "white",
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                WebkitLineClamp: 7,
-                WebkitBoxOrient: "vertical",
-                display: "-webkit-box",
-              }}
-            >
-              {game?.title}
-            </Box> */}
-
-                {/* <Box
-                className="fs-20-regular white"
-                sx={{
-                  color: "white",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  width: "100%",
-                }}
-              >
-                <div
-                  className="marquee-element"
-                  style={{
-                    display: "inline-block",
-                    paddingLeft: "100%",
-                  }}
-                >
-                  {game?.title}
-                </div>
-              </Box> */}
-
                 <Box
                   className="fs-20-regular white"
                   ref={titleContainerRef}
@@ -210,21 +175,6 @@ const StoreGameCard = ({ game, isComing, mode, index }: IPropsStoreGameCard) => 
                     {`${game?.title} • ${game?.title} • ${game?.title} • ${game?.title} • ${game?.title}`}
                   </div>
                 </Box>
-
-                {/* <Swiper
-                spaceBetween={"4px"}
-                slidesPerView={"auto"}
-                loop={false}
-                style={{
-                  width: "100%",
-                }}
-              >
-                {game?.projectMeta?.tags?.map((tag, index) => (
-                  <SwiperSlide style={{ width: "auto" }} key={index}>
-                    <Box className="fs-14-regular white card_genre_label">{tag}</Box>
-                  </SwiperSlide>
-                ))}
-              </Swiper> */}
 
                 <Box
                   ref={containerRef}
@@ -269,11 +219,6 @@ const StoreGameCard = ({ game, isComing, mode, index }: IPropsStoreGameCard) => 
                 ) : (
                   <Box className={"fs-12-regular light"} pl={`15px`}>{`browser game`}</Box>
                 )}
-
-                {/* <Stack direction={"row"} alignItems={"center"} spacing={1}>
-              <Box component={"img"} width={"20px"} height={"20px"} src={solar} />
-              <Box className={"fs-16-regular white"}>0.0</Box>
-            </Stack> */}
               </Stack>
             </Box>
           </TooltipComponent>
