@@ -70,18 +70,6 @@ struct AppData {
     welcome_message: &'static str,
 }
 
-fn show_window(app: &tauri::AppHandle) {
-    let windows = app.webview_windows();
-
-    windows
-        .values()
-        .next()
-        .expect("Sorry, no wind
-        ow found")
-        .set_focus()
-        .expect("Can't Bring Window to Focus");
-}
-
 pub fn main() -> std::io::Result<()> {
     // let mutex_name = "tauri_single_instance";
 
@@ -108,7 +96,7 @@ pub fn main() -> std::io::Result<()> {
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-            let _ = show_window(app);
+            let _ = window::show_window(app);
         }));
     }
 

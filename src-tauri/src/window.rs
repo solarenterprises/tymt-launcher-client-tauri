@@ -121,3 +121,15 @@ async fn set_tray_items_enabled(
             .set_visible(enabled);
     }
 }
+
+pub fn show_window(app: &tauri::AppHandle) {
+    let windows = app.webview_windows();
+
+    windows
+        .values()
+        .next()
+        .expect("Sorry, no wind
+        ow found")
+        .set_focus()
+        .expect("Can't Bring Window to Focus");
+}
