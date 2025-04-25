@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { invoke } from "@tauri-apps/api/core";
 import { debounce } from "lodash";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";

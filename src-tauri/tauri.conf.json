@@ -63,9 +63,17 @@
     ],
     "security": {
       "csp": {
-        "default-src": ["'self'"],
-        "frame-src": ["*"]
+        "default-src": "*",
+        "script-src": "* 'unsafe-inline' 'unsafe-eval'",
+        "style-src": "* 'unsafe-inline'",
+        "img-src": "* data: blob:",
+        "font-src": "* data:",
+        "connect-src": "*",
+        "frame-src": "*",
+        "object-src": "*",
+        "base-uri": "*"
       },
+      "dangerousDisableAssetCspModification": false,
       "capabilities": ["main-capability"]
     },
     "macOSPrivateApi": true
