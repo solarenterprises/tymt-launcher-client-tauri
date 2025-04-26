@@ -184,7 +184,7 @@ const Navbar = () => {
           <TooltipComponent placement="top" text={t("tol-1_wallet")}>
             <Button
               className="button_navbar_common"
-              onClick={() => {
+              onClick={async () => {
                 navigate("/wallet");
               }}
             >

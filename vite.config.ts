@@ -11,7 +11,7 @@ export default defineConfig({
     wasm(),
     topLevelAwait(),
     legacy({
-      targets: ["defaults", "not IE 11"],
+      modernTargets: ["chrome >= 87", "edge >= 88", "firefox >= 78", "safari >= 14"],
     }),
     nodePolyfills({
       include: ["crypto", "vm", "process", "os", "stream"], // Include the required polyfills
@@ -26,13 +26,14 @@ export default defineConfig({
     port: 1420,
     watch: {
       ignored: ["**/src-tauri/**"],
-    }
+    },
   },
   build: {
     chunkSizeWarningLimit: 8192,
     rollupOptions: {
       plugins: [],
     },
+    target: "es2020", // Explicitly set to ES2020+ environment
   },
   optimizeDeps: {
     esbuildOptions: {

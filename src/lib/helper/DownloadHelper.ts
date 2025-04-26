@@ -198,6 +198,8 @@ export const installGame = async (game: IGame) => {
               installDir: installDir,
             });
             break;
+          case "exe":
+            break;
         }
         break;
       case "macos":

@@ -12,6 +12,7 @@ import District53Intro from "../../components/home/District53Intro";
 import UpdateModal from "../../components/home/UpdateModal";
 import AnimatedComponent from "../../components/home/AnimatedComponent";
 import GameSwiperComponent from "../../components/home/GameSwiperComponent";
+// import EmbeddedWebview from "../../components/home/EmbeddedWebview";
 
 const Homepage = () => {
   const [image, setImage] = useState<string>(CONST_GAME_DISTRICT53?.imageUrl);

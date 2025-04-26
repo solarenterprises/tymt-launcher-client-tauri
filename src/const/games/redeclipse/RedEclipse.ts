@@ -133,6 +133,7 @@ export const CONST_GAME_REDECLIPSE: IGame = {
   averageRating: 5,
   feedbackCount: 100,
   downloadCount: 100,
+  external_url: "",
 
   createdAt: "",
   updatedAt: "",
