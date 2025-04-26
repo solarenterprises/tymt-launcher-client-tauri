@@ -354,7 +354,7 @@
   padding: 32px;
   flex-shrink: 0;
   border-radius: 16px;
- border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   background: radial-gradient(ellipse at 50% 100%, #ef444455 0%, #00000000 70% 50%);
   background-blend-mode: luminosity;
   backdrop-filter: blur(50px);
@@ -552,4 +552,27 @@
 
 .marquee-element {
   animation: marquee 5s linear infinite;
+}
+
+/* Global styles for webview container */
+.embedded-webview {
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  background-color: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.embedded-webview.webview-focused {
+  border-color: #4d90fe;
+  box-shadow: 0 0 0 1px #4d90fe;
+}
+
+/* Platform-specific tweaks */
+.platform-windows .embedded-webview {
+  border: 1px solid #e5e5e5;
+}
+
+.platform-mac .embedded-webview {
+  border-radius: 6px;
+  border-color: #c8c8c8;
 }

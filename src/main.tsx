@@ -28,7 +28,7 @@ import ConfirmInformation from "./pages/account/ConfirmInformation";
 
 // Home
 import Homepage from "./pages/main/Homepage";
-import GameOverview from "./pages/main/GameOverview";
+import GameDetailPage from "./pages/main/GameDetailPage";
 // ~Home
 
 //Store
@@ -93,7 +93,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                       <Route element={<AuthProvider />}>
                         <Route path="/" element={<HomeLayout />}>
                           <Route path="/home" element={<Homepage />} />
-                          <Route path="/game/:gameId" element={<GameOverview />} />
+                          <Route path="/game/:gameId" element={<GameDetailPage />} />
                           <Route path="/wallet" element={<Wallet />} />
                           <Route path="/wallet-vote" element={<WalletVote />} />
                           <Route path="/wallet-send" element={<WalletSend />} />

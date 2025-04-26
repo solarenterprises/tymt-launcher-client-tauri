@@ -1,0 +1,93 @@
+# Tauri App Publisher Workflow
+# 
+# Builds and publishes the Tauri desktop application for all supported 
+# platforms. Triggered on push to 'prod' branch, creating GitHub draft
+# releases with platform-specific binaries:
+#   - macOS (ARM64)
+#   - macOS (x64)
+#   - Ubuntu (x64)
+#   - Windows (x64)
+#
+# Requirements:
+#   - GITHUB_TOKEN with 'contents: write' permission
+#   - TAURI_SIGNING_* secrets configured in CI environment
+#
+# Output: Platform-specific installers attached to GitHub draft release
+
+name: 'publish'
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  publish-tauri:
+    name: Tauri Publish (${{ matrix.name }})
+    environment: CI
+    env:
+      CI: true
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: 'macOS-arm64'
+            platform: 'macos-15'
+            args: '--target aarch64-apple-darwin'
+          - name: 'macOS-x64'
+            platform: 'macos-15'
+            args: '--target x86_64-apple-darwin'
+          - name: 'ubuntu-x64'
+            platform: 'ubuntu-22.04'
+            args: ''
+          - name: 'windows-x64'
+            platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1  # v1
+        with:
+          toolchain: stable
+          targets: ${{ matrix.platform == 'macos-15' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: ${{ matrix.name == 'ubuntu-x64' && 'Install' || 'Skip' }} Ubuntu dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Tauri build
+        uses: tauri-apps/tauri-action@42e9df6c59070d114bf90dcd3943a1b8f138b113  # v0.5.20
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        with:
+          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
+          releaseName: 'App v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

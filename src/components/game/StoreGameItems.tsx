@@ -28,14 +28,6 @@ const StoreGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGam
   const { t } = useTranslation();
   const gameListStore: IGameList = useAppSelector(getGameList);
 
-  const comingGameListStore: IGameList = useMemo(() => {
-    const data = gameListStore?.games?.filter((one) => one?.visibilityState === "coming soon");
-    const res: IGameList = {
-      games: data,
-    };
-    return res;
-  }, [gameListStore]);
-
   const allGames: IGame[] = useMemo(() => [...gameListStore.games], [gameListStore]);
 
   const resultGames: IGame[] = useMemo(() => {
@@ -54,7 +46,7 @@ const StoreGameItems = ({ platform, genre, rank, type, keyword }: IPropsStoreGam
       {resultGames?.map((game, index) => (
         <Grid key={index} item>
           <AnimatedComponent>
-            <StoreGameCard key={`${game?._id}-${index}`} game={game} isComing={comingGameListStore.games.some((element) => element._id === game._id)} />
+            <StoreGameCard key={`${game?._id}-${index}`} game={game} />
           </AnimatedComponent>
         </Grid>
       ))}

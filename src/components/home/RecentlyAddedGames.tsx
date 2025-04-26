@@ -30,7 +30,7 @@ const RecentlyAddedGames = () => {
           {displayGameList?.map((game, index) => (
             <Grid item key={index}>
               <AnimatedComponent>
-                <StoreGameCard game={game} isComing={false} />
+                <StoreGameCard game={game} />
               </AnimatedComponent>
             </Grid>
           ))}

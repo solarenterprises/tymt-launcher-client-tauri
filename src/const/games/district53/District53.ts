@@ -152,6 +152,7 @@ export const CONST_GAME_DISTRICT53: IGame = {
   averageRating: 5,
   feedbackCount: 100,
   downloadCount: 100,
+  external_url: "",
 
   createdAt: "",
   updatedAt: "",

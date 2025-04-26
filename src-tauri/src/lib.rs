@@ -3,35 +3,22 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
+mod minecraft;
+mod window;
+mod file;
+
 use actix_cors::Cors;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
-use futures_util::stream::StreamExt;
 use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
-use reqwest::header::ACCEPT;
-use reqwest::{header, Client};
-use serde::{Deserialize, Serialize};
-use std::borrow::BorrowMut;
-use std::cmp::min;
-use std::fs::File;
-use std::io::prelude::*;
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
-use std::path::{Path, PathBuf};
-use std::process::Command;
-use std::sync::Mutex;
+// use std::sync::Mutex;
 use std::sync::OnceLock;
-use std::time::{Duration, Instant};
-use std::{default, fs, io};
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
-use tauri::{Builder, Emitter, Listener, Manager};
-use tauri_plugin_http::reqwest;
-use zip::read::ZipArchive; // For Unix-specific permissions
-
-// use dotenv::dotenv;
-// use std::env;
+use tauri::{Emitter, Listener, Manager};
 
 static APPHANDLE: OnceLock<tauri::AppHandle> = OnceLock::new();
 
@@ -83,18 +70,6 @@ struct AppData {
     welcome_message: &'static str,
 }
 
-fn show_window(app: &tauri::AppHandle) {
-    let windows = app.webview_windows();
-
-    windows
-        .values()
-        .next()
-        .expect("Sorry, no wind
-        ow found")
-        .set_focus()
-        .expect("Can't Bring Window to Focus");
-}
-
 pub fn main() -> std::io::Result<()> {
     // let mutex_name = "tauri_single_instance";
 
@@ -114,8 +89,6 @@ pub fn main() -> std::io::Result<()> {
     //     }
     // }
 
-    use tauri_plugin_cli::CliExt;
-
     let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_notification::init())
@@ -123,7 +96,7 @@ pub fn main() -> std::io::Result<()> {
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-            let _ = show_window(app);
+            let _ = window::show_window(app);
         }));
     }
 
@@ -138,23 +111,25 @@ pub fn main() -> std::io::Result<()> {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
-            download_to_app_dir,
-            unzip_windows,
-            unzip_macos,
-            untarbz2_macos,
-            unzip_linux,
-            move_appimage_linux,
-            delete_file,
-            delete_directory,
-            run_url_args,
-            // set_permission,
-            open_directory,
             get_machine_id,
-            is_window_visible,
-            show_transaction_window,
-            hide_transaction_window,
-            set_tray_items_enabled,
-            write_file
+            file::download_to_app_dir,
+            file::unzip_windows,
+            file::unzip_macos,
+            file::untarbz2_macos,
+            file::unzip_linux,
+            file::move_appimage_linux,
+            file::delete_file,
+            file::delete_directory,
+            file::write_file,
+            file::run_url_args,
+            file::open_directory,
+            // file::set_permission,
+            minecraft::get_system_info,
+            window::create_child_window,
+            window::destroy_child_window,
+            window::is_window_visible,
+            window::show_transaction_window,
+            window::hide_transaction_window
         ])
         .setup(|app| {
             app.manage(AppData {
@@ -359,65 +334,7 @@ pub fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-#[tauri::command]
-fn run_url_args(url: String, args: Vec<String>) {
-    println!("{}", url);
-    for arg in args.clone() {
-        println!("{}", arg);
-    }
 
-    let path = if url == "open" {
-        Path::new(&args[1])
-    } else {
-        Path::new(&url)
-    };
-    let working_directory = match path.parent() {
-        Some(dir) => dir,
-        None => {
-            eprintln!("Failed to determine directory for {}", url);
-            return;
-        }
-    };
-
-    let mut command = Command::new(&url);
-    command.current_dir(working_directory);
-    println!("Setting working directory to: {:?}", working_directory);
-
-    if args.is_empty() {
-        println!("No command provided");
-
-        match command.spawn() {
-            Ok(_) => println!("Process started successfully"),
-            Err(e) => eprintln!("Failed to start process: {}", e),
-        }
-    } else {
-        for arg in args {
-            command.arg(arg);
-        }
-
-        match command.spawn() {
-            Ok(_) => println!("Process started successfully"),
-            Err(e) => eprintln!("Failed to start process: {}", e),
-        }
-    }
-}
-
-#[tauri::command]
-fn open_directory(path: &str) {
-    let mut cmd = if cfg!(target_os = "windows") {
-        Command::new("explorer")
-    } else if cfg!(target_os = "macos") {
-        Command::new("open")
-    } else {
-        Command::new("xdg-open")
-    };
-    cmd.arg(path);
-
-    match cmd.output() {
-        Ok(output) => println!("Opened directory successfully: {:?}", output),
-        Err(e) => println!("Failed to open directory: {}", e),
-    }
-}
 
 #[tauri::command]
 fn get_machine_id() -> Result<String, String> {
@@ -430,427 +347,6 @@ fn get_machine_id() -> Result<String, String> {
     Ok(hwid)
 }
 
-#[tauri::command]
-fn is_window_visible(window: tauri::Window) -> bool {
-    window.is_visible().unwrap_or(false)
-}
 
-#[tauri::command]
-async fn show_transaction_window(app_handle: tauri::AppHandle) {
-    if let Some(window) = app_handle.get_webview_window("tymt_d53_transaction") {
-        if let Err(e) = window.show() {
-            eprintln!("Failed to show window: {}", e);
-        }
-    } else {
-        eprintln!("Window 'tymt_d53_transaction' not found");
-    }
 
-    if let Some(window_to_hide) = app_handle.get_webview_window("tymtLauncher") {
-        if let Err(e) = window_to_hide.hide() {
-            eprintln!("Failed to hide window 'tymtLauncher': {}", e);
-        }
-    } else {
-        eprintln!("Window 'tymtLauncher' not found");
-    }
 
-    let item_ids = vec![
-        "showVisible".to_string(),
-        "fullscreen".to_string(),
-        "games".to_string(),
-        "wallet".to_string(),
-        "about".to_string(),
-        "signout".to_string(),
-        "quit".to_string(),
-        "disable_notifications".to_string(),
-    ];
-    let enabled = false;
-    set_tray_items_enabled(app_handle, item_ids, enabled).await
-}
-
-#[tauri::command]
-async fn hide_transaction_window(app_handle: tauri::AppHandle) {
-    if let Some(window) = app_handle.get_webview_window("tymt_d53_transaction") {
-        if let Err(e) = window.hide() {
-            eprintln!("Failed to hide window: {}", e);
-        }
-    } else {
-        eprintln!("Window 'tymt_d53_transaction' not found");
-    }
-
-    if let Some(window_to_hide) = app_handle.get_webview_window("tymtLauncher") {
-        if let Err(e) = window_to_hide.show() {
-            eprintln!("Failed to show window 'tymtLauncher': {}", e);
-        }
-    } else {
-        eprintln!("Window 'tymtLauncher' not found");
-    }
-
-    let item_ids = vec![
-        "showVisible".to_string(),
-        "fullscreen".to_string(),
-        "games".to_string(),
-        "wallet".to_string(),
-        "about".to_string(),
-        "signout".to_string(),
-        "quit".to_string(),
-        "disable_notifications".to_string(),
-    ];
-    let enabled = true;
-    set_tray_items_enabled(app_handle, item_ids, enabled).await
-}
-
-#[tauri::command]
-async fn set_tray_items_enabled(
-    app_handle: tauri::AppHandle,
-    item_ids: Vec<String>,
-    enabled: bool,
-) {
-    for item_id in item_ids {
-        let _ = app_handle
-            .tray_by_id(&item_id)
-            .unwrap()
-            .set_visible(enabled);
-    }
-}
-
-#[tauri::command]
-fn write_file(content: String, filepath: String) -> Result<(), String> {
-    std::fs::write(&filepath, content).map_err(|e| e.to_string())?;
-    Ok(())
-}
-
-#[derive(serde::Serialize)]
-struct DownloadProgress {
-    downloaded: u64,
-    speed: Option<f64>,
-    total: u64,
-    duration: f64,
-    expectation: f64,
-    game: String,
-}
-
-#[tauri::command]
-async fn download_to_app_dir(
-    app_handle: tauri::AppHandle,
-    url: String,
-    file_location: String,
-    game: String,
-) -> Result<(), String> {
-    let path = Path::new(&file_location);
-
-    if let Some(parent) = path.parent() {
-        if !parent.exists() {
-            match fs::create_dir_all(&parent) {
-                Err(why) => panic!("couldn't create directory: {}", why),
-                Ok(_) => println!("Successfully created the directory"),
-            }
-        }
-    }
-
-    // fs::create_dir_all("./download/").expect("Error at create_dir_all");
-    let start_time = Instant::now();
-    let client = Client::new();
-    let res = client
-        .get(&url)
-        .header(ACCEPT, "application/octet-stream")
-        .header(reqwest::header::USER_AGENT, "tymtLauncher/1.0")
-        .send()
-        .await
-        .map_err(|e| format!("Failed to GET from '{}': {}", &url, e))?;
-    let total = res
-        .content_length()
-        .ok_or(format!("Failed to get content length from '{}'", &url))?;
-
-    let mut file =
-        File::create(&path).or(Err(format!("Failed to create file '{}'", file_location)))?;
-    let mut downloaded: u64 = 0;
-    let mut stream = res.bytes_stream();
-
-    let mut last_emit_time = Instant::now();
-
-    while let Some(item) = stream.next().await {
-        let chunk = item.or(Err(format!("Error while downloading file")))?;
-        file.write_all(&chunk)
-            .or(Err(format!("Error while writing to file")))?;
-        downloaded = min(downloaded + (chunk.len() as u64), total);
-        let duration = start_time.elapsed().as_secs_f64();
-        let speed = if duration > 0.0 {
-            Some((downloaded as f64) / duration / 1024.0 / 1024.0)
-        } else {
-            None
-        };
-
-        if last_emit_time.elapsed() >= Duration::new(1, 0) {
-            let expectation = if let Some(s) = speed {
-                (total - downloaded) as f64 / (s * 1024.0 * 1024.0)
-            } else {
-                0.0
-            };
-
-            let progress = DownloadProgress {
-                downloaded,
-                speed,
-                total,
-                duration,
-                expectation,
-                game: game.clone(),
-            };
-
-            app_handle
-                .emit("game-download-progress", &progress)
-                .map_err(|e| format!("Failed to emit progress event: {}", e))?;
-
-            last_emit_time = Instant::now();
-        }
-
-        // println!("downloaded => {}", downloaded);
-        // println!("total_size => {}", total_size);
-        // println!("speed => {:?}", speed);
-    }
-
-    return Ok(());
-}
-
-#[tauri::command]
-async fn unzip_windows(
-    app_handle: tauri::AppHandle,
-    file_location: String,
-    install_dir: String,
-) -> Result<(), String> {
-    let zip_path = PathBuf::from(file_location);
-    let extract_path = PathBuf::from(install_dir);
-
-    // Open the zip file
-    let file = File::open(&zip_path).map_err(|e| format!("Failed to open zip file: {}", e))?;
-    let mut archive =
-        ZipArchive::new(file).map_err(|e| format!("Failed to read zip archive: {}", e))?;
-
-    // Extract each file in the archive
-    for i in 0..archive.len() {
-        let mut file = archive
-            .by_index(i)
-            .map_err(|e| format!("Failed to access file in zip: {}", e))?;
-        let out_path = extract_path.join(file.name());
-
-        if file.is_dir() {
-            // Create directories
-            fs::create_dir_all(&out_path)
-                .map_err(|e| format!("Failed to create directory: {}", e))?;
-        } else {
-            // Create parent directories if necessary
-            if let Some(parent) = out_path.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Failed to create parent directory: {}", e))?;
-            }
-
-            // Write the file
-            let mut outfile =
-                File::create(&out_path).map_err(|e| format!("Failed to create file: {}", e))?;
-            std::io::copy(&mut file, &mut outfile)
-                .map_err(|e| format!("Failed to write file: {}", e))?;
-        }
-    }
-
-    Ok(())
-}
-
-#[tauri::command]
-async fn unzip_linux(
-    app_handle: tauri::AppHandle,
-    file_location: String,
-    install_dir: String,
-) -> Result<(), String> {
-    let zip_path = PathBuf::from(file_location);
-    let extract_path = PathBuf::from(install_dir);
-
-    // Open the zip file
-    let file = File::open(&zip_path).map_err(|e| format!("Failed to open zip file: {}", e))?;
-    let mut archive =
-        ZipArchive::new(file).map_err(|e| format!("Failed to read zip archive: {}", e))?;
-
-    // Extract each file in the archive
-    for i in 0..archive.len() {
-        let mut file = archive
-            .by_index(i)
-            .map_err(|e| format!("Failed to access file in zip: {}", e))?;
-        let out_path = extract_path.join(file.name());
-
-        if file.is_dir() {
-            // Create directories
-            fs::create_dir_all(&out_path)
-                .map_err(|e| format!("Failed to create directory: {}", e))?;
-        } else {
-            // Create parent directories if necessary
-            if let Some(parent) = out_path.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Failed to create parent directory: {}", e))?;
-            }
-
-            // Write the file
-            let mut outfile =
-                File::create(&out_path).map_err(|e| format!("Failed to create file: {}", e))?;
-            std::io::copy(&mut file, &mut outfile)
-                .map_err(|e| format!("Failed to write file: {}", e))?;
-        }
-    }
-
-    Ok(())
-}
-
-// #[tauri::command]
-// async fn unzip_windows(
-//     app_handle: tauri::AppHandle,
-//     file_location: String,
-//     install_dir: String,
-// ) -> Result<(), String> {
-//     let zip_path = PathBuf::from(file_location);
-//     let extract_path = PathBuf::from(install_dir);
-
-//     let _ = zip_extensions::read::zip_extract(&zip_path, &extract_path)
-//         .map_err(|e| format!("Failed to unzip file: {}", e))?;
-
-//     Ok(())
-// }
-
-// #[tauri::command]
-// async fn unzip_linux(
-//     app_handle: tauri::AppHandle,
-//     file_location: String,
-//     install_dir: String,
-// ) -> Result<(), String> {
-//     let zip_path = PathBuf::from(file_location);
-//     let extract_path = PathBuf::from(install_dir);
-
-//     let _ = zip_extensions::read::zip_extract(&zip_path, &extract_path)
-//         .map_err(|e| format!("Failed to unzip file: {}", e))?;
-
-//     Ok(())
-// }
-
-#[tauri::command]
-async fn move_appimage_linux(
-    app_handle: tauri::AppHandle,
-    file_location: String,
-    install_dir: String,
-) -> Result<(), String> {
-    let source_path = PathBuf::from(&file_location);
-    let destination_path = PathBuf::from(&install_dir).join(
-        source_path
-            .file_name()
-            .ok_or_else(|| "Invalid file name".to_string())?,
-    );
-
-    // Ensure the parent directory exists
-    if let Some(parent) = destination_path.parent() {
-        if !parent.exists() {
-            fs::create_dir_all(parent).map_err(|e| format!("Failed to create directory: {}", e))?;
-        }
-    }
-
-    // Move the file
-    fs::rename(&source_path, &destination_path)
-        .map_err(|e| format!("Failed to move file: {}", e))?;
-
-    Ok(())
-}
-
-#[tauri::command]
-async fn unzip_macos(
-    app_handle: tauri::AppHandle,
-    file_location: String,
-    install_dir: String,
-) -> Result<(), String> {
-    let status = Command::new("ditto")
-        .arg("-x")
-        .arg("-k")
-        .arg(&file_location)
-        .arg(&install_dir)
-        .status()
-        .map_err(|e| format!("Failed to execute ditto: {}", e))?;
-
-    if status.success() {
-        Ok(())
-    } else {
-        Err(format!(
-            "Failed to unzip: exit code {}",
-            status.code().unwrap_or(-1)
-        ))
-    }
-}
-
-#[tauri::command]
-async fn untarbz2_macos(
-    app_handle: tauri::AppHandle,
-    file_location: String,
-    install_dir: String,
-) -> Result<(), String> {
-    let install_path = PathBuf::from(&install_dir);
-
-    // Create the directory if it doesn't exist
-    if !install_path.exists() {
-        fs::create_dir_all(&install_path)
-            .map_err(|e| format!("Failed to create directory: {}", e))?;
-    }
-
-    let status = Command::new("tar")
-        .args(["-xvjf", &file_location, "-C", &install_dir])
-        .output()
-        .map_err(|e| format!("Failed to execute tar: {}", e))?;
-
-    if status.status.success() {
-        Ok(())
-    } else {
-        Err(format!(
-            "Failed to unzip: exit code {}",
-            status.status.code().unwrap_or(-1)
-        ))
-    }
-}
-
-#[cfg(target_family = "unix")]
-#[tauri::command]
-async fn set_permission(
-    app_handle: tauri::AppHandle,
-    executable_path: String,
-) -> Result<(), String> {
-    let path = PathBuf::from(&executable_path);
-
-    // Check if the file exists
-    if !path.exists() {
-        return Err(format!("File does not exist: {}", executable_path));
-    }
-
-    // Set the executable permission
-    let mut permissions = fs::metadata(&path)
-        .map_err(|e| format!("Failed to get metadata: {}", e))?
-        .permissions();
-
-    permissions.set_mode(0o755); // Set permissions to rwxr-xr-x
-
-    fs::set_permissions(&path, permissions)
-        .map_err(|e| format!("Failed to set permissions: {}", e))?;
-
-    Ok(())
-}
-
-#[tauri::command]
-async fn delete_file(app_handle: tauri::AppHandle, file_location: String) -> Result<(), String> {
-    let path = PathBuf::from(file_location);
-
-    fs::remove_file(&path).map_err(|e| format!("Failed to delete file: {}", e))?;
-
-    Ok(())
-}
-
-#[tauri::command]
-async fn delete_directory(
-    app_handle: tauri::AppHandle,
-    dir_location: String,
-) -> Result<(), String> {
-    let path = PathBuf::from(dir_location);
-
-    // Attempt to remove the directory and all its contents recursively
-    fs::remove_dir_all(&path).map_err(|e| format!("Failed to delete directory: {}", e))?;
-
-    Ok(())
-}

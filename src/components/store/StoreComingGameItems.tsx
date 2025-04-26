@@ -73,7 +73,7 @@ const StoreComingGameItems = ({ platform, genre, rank, type, keyword, status }: 
           {resultGames?.map((game, index) => (
             <Grid item key={`${game?._id}-${index}`}>
               <AnimatedComponent>
-                <StoreGameCard game={game} isComing={comingGameListStore.games.some((element) => element._id === game._id)} />
+                <StoreGameCard game={game} />
               </AnimatedComponent>
             </Grid>
           ))}
@@ -96,7 +96,7 @@ const StoreComingGameItems = ({ platform, genre, rank, type, keyword, status }: 
           {gamePagination?.data?.map((game, index) => (
             <Grid item key={`${game?._id}-${index}`}>
               <AnimatedComponent>
-                <StoreGameCard game={game} isComing={comingGameListStore?.games?.some((element) => element?._id === game?._id)} />
+                <StoreGameCard game={game} />
               </AnimatedComponent>
             </Grid>
           ))}
