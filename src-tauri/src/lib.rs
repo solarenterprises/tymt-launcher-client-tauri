@@ -114,6 +114,7 @@ pub fn main() -> std::io::Result<()> {
             get_machine_id,
             file::download_to_app_dir,
             file::unzip_windows,
+            file::move_exe_windows,
             file::unzip_macos,
             file::untarbz2_macos,
             file::unzip_linux,

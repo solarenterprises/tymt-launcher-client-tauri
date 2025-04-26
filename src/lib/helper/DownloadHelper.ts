@@ -199,6 +199,11 @@ export const installGame = async (game: IGame) => {
             });
             break;
           case "exe":
+            await invoke("move_exe_windows", {
+              fileLocation: fileLocation,
+              installDir: installDir,
+            });
+            break;
             break;
         }
         break;
