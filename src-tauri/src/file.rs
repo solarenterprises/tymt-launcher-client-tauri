@@ -151,6 +151,33 @@ pub async fn unzip_windows(
 }
 
 #[tauri::command]
+pub async fn move_exe_windows(
+    app_handle: tauri::AppHandle,
+    file_location: String,
+    install_dir: String,
+) -> Result<(), String> {
+    let source_path = PathBuf::from(&file_location);
+    let destination_path = PathBuf::from(&install_dir).join(
+        source_path
+            .file_name()
+            .ok_or_else(|| "Invalid file name".to_string())?,
+    );
+
+    // Ensure the parent directory exists
+    if let Some(parent) = destination_path.parent() {
+        if !parent.exists() {
+            fs::create_dir_all(parent).map_err(|e| format!("Failed to create directory: {}", e))?;
+        }
+    }
+
+    // Move the file
+    fs::rename(&source_path, &destination_path)
+        .map_err(|e| format!("Failed to move file: {}", e))?;
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn unzip_macos(
     app_handle: tauri::AppHandle,
     file_location: String,
