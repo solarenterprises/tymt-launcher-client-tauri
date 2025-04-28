@@ -103,8 +103,7 @@ const StoreGameCard = ({ game, mode, index }: IPropsStoreGameCard) => {
                 },
               }}
               onClick={() => {
-                // if (mode !== "coming-soon")
-                navigate(`/game/${game?._id}`);
+                if (mode !== "coming-soon") navigate(`/game/${game?._id}`);
               }}
             >
               {mode === "trending" && (
