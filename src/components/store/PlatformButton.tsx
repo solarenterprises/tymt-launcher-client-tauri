@@ -9,7 +9,7 @@ import LinuxIcon from "../../assets/main/LinuxIcon.svg";
 import WinIcon from "../../assets/main/WinIcon.svg";
 import macIcon from "../../assets/main/MacIcon.svg";
 
-import { FilterOptionNames } from "../../const/FilterOptionNames";
+import { GameFilterOptionNames } from "../../const/FilterOptionConsts";
 
 const MenuProps = {
   MenuListProps: {
@@ -58,10 +58,10 @@ const theme = createTheme({
 });
 
 const Platform = [
-  { platform: FilterOptionNames.PLATFORM_ALL }, // All
-  { platform: FilterOptionNames.PLATFORM_WINDOWS, icon: WinIcon }, // Windows
-  { platform: FilterOptionNames.PLATFORM_MACOS, icon: macIcon }, // macOS
-  { platform: FilterOptionNames.PLATFORM_LINUX, icon: LinuxIcon }, // Linux
+  { platform: "PLATFORM_ALL" }, // All
+  { platform: "PLATFORM_WINDOWS", icon: WinIcon }, // Windows
+  { platform: "PLATFORM_MACOS", icon: macIcon }, // macOS
+  { platform: "PLATFORM_LINUX", icon: LinuxIcon }, // Linux
 ];
 
 export interface IPropsPlatformButton {
@@ -111,8 +111,8 @@ const PlatformButton = ({ platform, setPlatform }: IPropsPlatformButton) => {
             renderValue={(selected) => (
               <>
                 <Stack flexDirection={"row"} alignItems={"center"} gap={"4px"}>
-                  {selected !== FilterOptionNames.PLATFORM_ALL && <img src={Platform.find((one) => one.platform === selected)?.icon} width={"30px"} />}
-                  <Box className={"fs-16 white"}>{t(selected)}</Box>
+                  {selected !== "PLATFORM_ALL" && <img src={Platform.find((one) => one.platform === selected)?.icon} width={"30px"} />}
+                  <Box className={"fs-16 white"}>{t(GameFilterOptionNames[selected])}</Box>
                 </Stack>
               </>
             )}
@@ -142,7 +142,7 @@ const PlatformButton = ({ platform, setPlatform }: IPropsPlatformButton) => {
                 <Stack flexDirection={"row"} alignItems={"center"}>
                   {one.icon && <img src={one.icon} width={"30px"} />}
                   <Box className={"fs-16 white"} sx={{ marginLeft: "8px" }}>
-                    {t(`${one.platform}`)}
+                    {t(GameFilterOptionNames[one.platform])}
                   </Box>
                 </Stack>
               </MenuItem>

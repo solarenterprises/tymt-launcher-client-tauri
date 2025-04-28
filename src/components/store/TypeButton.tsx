@@ -5,7 +5,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box, MenuItem, FormControl, Select } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { FilterOptionNames } from "../../const/FilterOptionNames";
+import { GameFilterOptionNames } from "../../const/FilterOptionConsts";
 
 const MenuProps = {
   MenuListProps: {
@@ -53,7 +53,7 @@ const theme = createTheme({
   },
 });
 
-const Types = [FilterOptionNames.TYPE_ALL, FilterOptionNames.TYPE_NATIVE, FilterOptionNames.TYPE_BROWSER];
+const Types = ["TYPE_ALL", "TYPE_NATIVE", "TYPE_BROWSER"];
 
 export interface IPropsTypeButton {
   type: string;
@@ -103,7 +103,7 @@ const TypeButton = ({ type, setType }: IPropsTypeButton) => {
             IconComponent={ExpandMoreIcon}
             renderValue={(selected) => (
               <>
-                <Box className={"fs-16 white"}>{t(selected)}</Box>
+                <Box className={"fs-16 white"}>{t(GameFilterOptionNames[selected])}</Box>
               </>
             )}
           >
@@ -129,7 +129,7 @@ const TypeButton = ({ type, setType }: IPropsTypeButton) => {
                 value={one}
               >
                 <Box className={"fs-16 white"} sx={{ margin: "0px 8px" }}>
-                  {t(`${one}`)}
+                  {t(GameFilterOptionNames[one])}
                 </Box>
               </MenuItem>
             ))}

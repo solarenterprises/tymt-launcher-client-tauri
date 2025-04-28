@@ -5,7 +5,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box, MenuItem, FormControl, Select } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { FilterOptionNames } from "../../const/FilterOptionNames";
+import { GameFilterOptionNames } from "../../const/FilterOptionConsts";
 
 const MenuProps = {
   MenuListProps: {
@@ -53,13 +53,7 @@ const theme = createTheme({
   },
 });
 
-const Genre = [
-  FilterOptionNames.GENRE_ALL,
-  FilterOptionNames.GENRE_ACTION,
-  FilterOptionNames.GENRE_ADVENTURE,
-  FilterOptionNames.GENRE_ROLE_PLAYING,
-  FilterOptionNames.GENRE_SIMULATION,
-];
+const Genre = ["GENRE_ALL", "GENRE_ACTION", "GENRE_ADVENTURE", "GENRE_ROLE_PLAYING", "GENRE_SIMULATION"];
 
 export interface IPropsGenreButton {
   genre: string;
@@ -106,7 +100,7 @@ const GenreButton = ({ genre, setGenre }: IPropsGenreButton) => {
           IconComponent={ExpandMoreIcon}
           renderValue={(selected) => (
             <>
-              <Box className={"fs-16 white"}>{t(selected)}</Box>
+              <Box className={"fs-16 white"}>{t(GameFilterOptionNames[selected])}</Box>
             </>
           )}
         >
@@ -132,7 +126,7 @@ const GenreButton = ({ genre, setGenre }: IPropsGenreButton) => {
               value={one}
             >
               <Box className={"fs-16 white"} sx={{ margin: "0px 8px" }}>
-                {t(`${one}`)}
+                {t(GameFilterOptionNames[one])}
               </Box>
             </MenuItem>
           ))}

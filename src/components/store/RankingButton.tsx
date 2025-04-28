@@ -5,7 +5,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Box, MenuItem, FormControl, Select } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { FilterOptionNames } from "../../const/FilterOptionNames";
+import { GameFilterOptionNames } from "../../const/FilterOptionConsts";
 
 const MenuProps = {
   MenuListProps: {
@@ -53,7 +53,7 @@ const theme = createTheme({
   },
 });
 
-const Ranking = [FilterOptionNames.RANK_ALL, FilterOptionNames.RANK_10, FilterOptionNames.RANK_50, FilterOptionNames.RANK_100];
+const Ranking = ["RANK_ALL", "RANK_10", "RANK_50", "RANK_100"];
 
 export interface IPropsRankingButton {
   rank: string;
@@ -103,7 +103,7 @@ const RankingButton = ({ rank, setRank }: IPropsRankingButton) => {
             IconComponent={ExpandMoreIcon}
             renderValue={(selected) => (
               <>
-                <Box className={"fs-16 white"}>{t(selected)}</Box>
+                <Box className={"fs-16 white"}>{t(GameFilterOptionNames[selected])}</Box>
               </>
             )}
           >
@@ -129,7 +129,7 @@ const RankingButton = ({ rank, setRank }: IPropsRankingButton) => {
                 value={one}
               >
                 <Box className={"fs-16 white"} sx={{ margin: "0px 8px" }}>
-                  {t(`${one}`)}
+                  {t(GameFilterOptionNames[one])}
                 </Box>
               </MenuItem>
             ))}

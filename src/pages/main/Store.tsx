@@ -4,14 +4,13 @@ import { useLocation } from "react-router-dom";
 
 import { Grid, Box, Divider } from "@mui/material";
 
-import MultiChainButton from "../../components/store/MultiChainButton";
-import ReleaseButton from "../../components/store/ReleaseButton";
+// import MultiChainButton from "../../components/store/MultiChainButton";
+// import ReleaseButton from "../../components/store/ReleaseButton";
 import PlatformButton from "../../components/store/PlatformButton";
 import GenreButton from "../../components/store/GenreButton";
-import RankingButton from "../../components/store/RankingButton";
+// import RankingButton from "../../components/store/RankingButton";
 import TypeButton from "../../components/store/TypeButton";
 import StoreGameItems from "../../components/game/StoreGameItems";
-import { FilterOptionNames } from "../../const/FilterOptionNames";
 
 const Store = () => {
   const { t } = useTranslation();
@@ -21,14 +20,14 @@ const Store = () => {
   const params = new URLSearchParams(location.search);
   const keyword = params.get("key");
 
-  const [releaseDate, setReleaseDate] = useState<string>("");
-  const [genre, setGenre] = useState<string>(FilterOptionNames.GENRE_ALL);
-  const [platform, setPlatform] = useState<string>(FilterOptionNames.PLATFORM_ALL);
-  const [rank, setRank] = useState<string>(FilterOptionNames.RANK_ALL);
-  const [type, setType] = useState<string>(FilterOptionNames.TYPE_ALL);
+  // const [releaseDate, setReleaseDate] = useState<string>("");
+  const [genre, setGenre] = useState<string>("GENRE_ALL");
+  const [platform, setPlatform] = useState<string>("PLATFORM_ALL");
+  // const [rank, setRank] = useState<string>("RANK_ALL");
+  const [type, setType] = useState<string>("TYPE_ALL");
 
   useEffect(() => {
-    if (type === FilterOptionNames.TYPE_BROWSER) setPlatform(FilterOptionNames.PLATFORM_ALL);
+    if (type === "TYPE_BROWSER") setPlatform("PLATFORM_ALL");
   }, [type]);
 
   return (
@@ -47,11 +46,11 @@ const Store = () => {
             paddingBottom: "24px",
           }}
         >
-          {false && <ReleaseButton releaseDate={releaseDate} setReleaseDate={setReleaseDate} />}
-          {false && <MultiChainButton />}
+          {/* {false && <ReleaseButton releaseDate={releaseDate} setReleaseDate={setReleaseDate} />} */}
+          {/* {false && <MultiChainButton />} */}
           <GenreButton genre={genre} setGenre={setGenre} />
           <PlatformButton platform={platform} setPlatform={setPlatform} />
-          <RankingButton rank={rank} setRank={setRank} />
+          {/* <RankingButton rank={rank} setRank={setRank} /> */}
           <TypeButton type={type} setType={setType} />
         </Grid>
         <Divider
@@ -69,7 +68,7 @@ const Store = () => {
           marginTop: "32px",
         }}
       >
-        <StoreGameItems releaseDate={releaseDate} genre={genre} platform={platform} rank={rank} type={type} keyword={keyword} />
+        <StoreGameItems genre={genre} platform={platform} type={type} keyword={keyword} />
       </Grid>
     </>
   );

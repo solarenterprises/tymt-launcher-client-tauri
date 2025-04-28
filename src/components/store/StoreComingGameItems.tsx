@@ -11,7 +11,6 @@ import { useAppSelector } from "../../store";
 import { getGameList } from "../../store/GameListSlice";
 
 import GameAPI from "../../lib/api/GameAPI";
-import { filterByGenre, filterByKeyword, filterByPlatform, filterByRank, filterByType } from "../../lib/helper/FilterHelper";
 
 import { IGame, IGameList } from "../../types/GameTypes";
 import { IMetaPagination } from "../../types/APITypes/BasicAPITypes";
@@ -46,12 +45,12 @@ const StoreComingGameItems = ({ platform, genre, rank, type, keyword, status }: 
 
   const resultGames: IGame[] = useMemo(() => {
     let data = [...comingGameListStore.games];
-    if (platform) data = filterByPlatform(data, platform);
-    if (genre) data = filterByGenre(data, genre);
-    // if (releaseDate) data = filterByReleaseDate(data, releaseDate);
-    if (rank) data = filterByRank(data, rank);
-    if (type) data = filterByType(data, type);
-    if (keyword) data = filterByKeyword(data, keyword);
+    // if (platform) data = filterByPlatform(data, platform);
+    // if (genre) data = filterByGenre(data, genre);
+    // // if (releaseDate) data = filterByReleaseDate(data, releaseDate);
+    // if (rank) data = filterByRank(data, rank);
+    // if (type) data = filterByType(data, type);
+    // if (keyword) data = filterByKeyword(data, keyword);
     return data;
   }, [comingGameListStore, platform, genre, rank, type, keyword]);
 
