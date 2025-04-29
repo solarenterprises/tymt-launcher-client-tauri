@@ -1,6 +1,6 @@
 # Tauri App Publisher Workflow
-# 
-# Builds and publishes the Tauri desktop application for all supported 
+#
+# Builds and publishes the Tauri desktop application for all supported
 # platforms. Triggered on push to 'prod' branch, creating GitHub draft
 # releases with platform-specific binaries:
 #   - macOS (ARM64)
@@ -14,7 +14,7 @@
 #
 # Output: Platform-specific installers attached to GitHub draft release
 
-name: 'publish'
+name: "publish"
 
 on:
   push:
@@ -33,26 +33,26 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: 'macOS-arm64'
-            platform: 'macos-15'
-            args: '--target aarch64-apple-darwin'
-          - name: 'macOS-x64'
-            platform: 'macos-15'
-            args: '--target x86_64-apple-darwin'
-          - name: 'ubuntu-x64'
-            platform: 'ubuntu-22.04'
-            args: ''
-          - name: 'windows-x64'
-            platform: 'windows-latest'
-            args: ''
+          - name: "macOS-arm64"
+            platform: "macos-15"
+            args: "--target aarch64-apple-darwin"
+          - name: "macOS-x64"
+            platform: "macos-15"
+            args: "--target x86_64-apple-darwin"
+          - name: "ubuntu-x64"
+            platform: "ubuntu-22.04"
+            args: ""
+          - name: "windows-x64"
+            platform: "windows-latest"
+            args: ""
 
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Clone repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1  # v1
+        uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # v1
         with:
           toolchain: stable
           targets: ${{ matrix.platform == 'macos-15' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
@@ -68,26 +68,59 @@ jobs:
             patchelf
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install
 
       - name: Tauri build
-        uses: tauri-apps/tauri-action@42e9df6c59070d114bf90dcd3943a1b8f138b113  # v0.5.20
+        uses: tauri-apps/tauri-action@42e9df6c59070d114bf90dcd3943a1b8f138b113 # v0.5.20
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
-          NODE_OPTIONS: '--max-old-space-size=8192'
+          NODE_OPTIONS: "--max-old-space-size=8192"
+          VITE_APP_PRODUCTION_VERSION: "prod"
+          VITE_APP_NETWORK_NAME: "mainnet"
+          VITE_APP_LOCAL_SERVER_PORT: ${{ secrets.VITE_APP_LOCAL_SERVER_PORT }}
+          VITE_APP_TYMT_BACKEND_URL: ${{ secrets.VITE_APP_TYMT_BACKEND_URL }}
+          VITE_APP_SOCKET_BACKEND_URL: ${{ secrets.VITE_APP_SOCKET_BACKEND_URL }}
+          VITE_APP_TYMT_AVATAR_URL: ${{ secrets.VITE_APP_TYMT_AVATAR_URL }}
+          VITE_APP_NOWNODES_URL: ${{ secrets.VITE_APP_NOWNODES_URL }}
+          VITE_APP_TYMT_RELEASE_DATE: "May 15th, 2025"
+          VITE_APP_TYMT_VERSION: "2.4.2"
+          VITE_APP_MAINNET_SOLAR_API_URL: "https://api.solar.org/api"
+          VITE_APP_MAINNET_SOLAR_WSS_URL: "wss://api.solar.org/ws"
+          VITE_APP_MAINNET_SOLAR_SCAN: "https://solarscan.com/"
+          VITE_APP_MAINNET_ETH_SCAN: "https://etherscan.io/"
+          VITE_APP_MAINNET_ARB_SCAN: "https://arbiscan.io/"
+          VITE_APP_MAINNET_AVAX_SCAN: "https://avascan.info/blockchain/"
+          VITE_APP_MAINNET_BSC_SCAN: "https://bscscan.com/"
+          VITE_APP_MAINNET_OPT_SCAN: "https://optimistic.etherscan.io/"
+          VITE_APP_MAINNET_POL_SCAN: "https://polygonscan.com/"
+          VITE_APP_MAINNET_BTC_SCAN: "https://btcscan.org/"
+          VITE_APP_MAINNET_SOL_SCAN: "https://solscan.io/"
+          VITE_APP_MAINNET_BSC_API_URL: "https://api.bscscan.com/api"
+          VITE_APP_MAINNET_ETH_API_URL: "https://api.etherscan.io/api"
+          VITE_APP_MAINNET_POL_API_URL: "https://api.polygonscan.com/api"
+          VITE_APP_MAINNET_OP_API_URL: "https://api-optimistic.etherscan.io/api"
+          VITE_APP_MAINNET_ARB_API_URL: "https://api.arbiscan.io/api"
+          VITE_APP_MAINNET_AVAX_API_URL: "https://api-beta.avascan.info/v2/network/mainnet/evm/all"
+          VITE_APP_MAINNET_BTC_API_URL:  "https://blockchain.info"
+          VITE_APP_ALCHEMY_KEY: ${{ secrets.VITE_APP_ALCHEMY_KEY }}
+          VITE_APP_BSC_API_KEY: ${{ secrets.VITE_APP_BSC_API_KEY }}
+          VITE_APP_ETH_API_KEY: ${{ secrets.VITE_APP_ETH_API_KEY }}
+          VITE_APP_POL_API_KEY: ${{ secrets.VITE_APP_POL_API_KEY }}
+          VITE_APP_OP_API_KEY: ${{ secrets.VITE_APP_OP_API_KEY }}
+          VITE_APP_ARB_API_KEY: ${{ secrets.VITE_APP_ARB_API_KEY }}
+          VITE_APP_NOTIFICATION_DURATION: 5000
+          VITE_APP_WIF: 170
         with:
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseName: "App v__VERSION__"
+          releaseBody: "See the assets to download this version and install."
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
