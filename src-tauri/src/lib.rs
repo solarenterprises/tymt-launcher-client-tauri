@@ -10,8 +10,6 @@ mod file;
 use actix_cors::Cors;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
-#[cfg(target_family = "unix")]
-use std::os::unix::fs::PermissionsExt;
 // use std::sync::Mutex;
 use std::sync::OnceLock;
 use tauri::{
@@ -19,6 +17,13 @@ use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
 use tauri::{Emitter, Listener, Manager};
+
+#[cfg(target_family = "unix")]
+use std::os::unix::fs::PermissionsExt;
+#[cfg(target_family = "unix")]
+use std::path::Path;
+#[cfg(target_family = "unix")]
+use std::io::{self, Write};
 
 static APPHANDLE: OnceLock<tauri::AppHandle> = OnceLock::new();
 

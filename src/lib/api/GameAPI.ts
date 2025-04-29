@@ -1,6 +1,7 @@
 import axiosAuth from "../core/AxiosAuth";
 import { IGame } from "../../types/GameTypes";
 import { IMetaPagination, IPaginationQuery } from "../../types/APITypes/BasicAPITypes";
+import { IGameListQuery } from "../../types/APITypes/GameAPITypes";
 
 export const GameAPI = {
   fetchGame: async (gameId: string): Promise<IGame> => {
@@ -12,7 +13,7 @@ export const GameAPI = {
     }
   },
 
-  fetchGameList: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+  fetchGameList: async (query: IGameListQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
       return res.data;
@@ -21,7 +22,7 @@ export const GameAPI = {
     }
   },
 
-  fetchFreeGameList: async (query: IPaginationQuery = { page: 1, limit: 20, price: 0 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
+  fetchFreeGameList: async (query: IGameListQuery = { page: 1, limit: 20, price: 0 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });
       return res.data;

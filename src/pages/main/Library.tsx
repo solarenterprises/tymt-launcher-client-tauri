@@ -21,7 +21,7 @@ const Library = () => {
       </Grid>
       <Grid item xs={12} marginTop={"32px"}>
         <LibraryShow status={status} />
-        {status === 3 && <StoreComingGameItems status={status} />}
+        {status === 3 && <StoreComingGameItems />}
       </Grid>
     </Grid>
   );
