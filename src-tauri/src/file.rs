@@ -10,6 +10,10 @@ use reqwest::header::ACCEPT;
 use futures_util::stream::StreamExt;
 use std::cmp::min;
 use std::io::Write;
+use debpkg::DebPkg;
+
+#[cfg(target_family = "unix")]
+use std::os::unix::fs::PermissionsExt;
 
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
@@ -82,6 +86,64 @@ pub async fn move_appimage_linux(
         .map_err(|e| format!("Failed to move file: {}", e))?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn install_deb_linux(
+    app_handle: tauri::AppHandle,
+    executable_path: String,
+) -> Result<(), String> {
+    let status = Command::new("sudo")
+        .arg("apt")
+        .arg("install")
+        .arg(&executable_path)
+        .status()
+        .map_err(|e| format!("Failed to execute sudo apt install: {}", e))?;
+
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "Failed to install deb package: exit code {}",
+            status.code().unwrap_or(-1)
+        ))
+    }
+}
+
+#[tauri::command]
+pub async fn get_deb_package_name(
+    app_handle: tauri::AppHandle,
+    executable_path: String,
+) -> Result<String, String> {
+    let file = File::open(&executable_path)
+        .map_err(|e| format!("Failed to open deb file '{}': {}", executable_path, e))?;
+    let mut pkg = DebPkg::parse(file)
+        .map_err(|e| format!("Failed to parse deb package '{}': {}", executable_path, e))?;
+    let mut control_tar = pkg
+        .control()
+        .map_err(|e| format!("Failed to extract control.tar from '{}': {}", executable_path, e))?;
+    let control = debpkg::Control::extract(control_tar)
+        .map_err(|e| format!("Failed to extract control information from '{}': {}", executable_path, e))?;
+    Ok(control.name().to_string())
+}
+
+#[tauri::command]
+pub async fn run_deb_linux(
+    app_handle: tauri::AppHandle,
+    package_name: String,
+) -> Result<(), String> {
+    let status = Command::new(&package_name)
+        .status()
+        .map_err(|e| format!("Failed to run deb package: {}", e))?;
+
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "Failed to run deb package: exit code {}",
+            status.code().unwrap_or(-1)
+        ))
+    }
 }
 
 #[cfg(target_family = "unix")]

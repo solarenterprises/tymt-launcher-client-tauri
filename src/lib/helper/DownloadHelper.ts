@@ -32,11 +32,25 @@ export const runNewGame = async (game: IGame) => {
 
     const platform = await type();
 
+    console.log("gameExtension", gameExtension);
+    console.log("fullExecutablePath", fullExecutablePath);
+
     switch (platform) {
       case "linux":
         switch (gameExtension) {
           case "appimage":
             await runUrlArgs(fullExecutablePath, [`--appimage-extract-and-run`]);
+            break;
+          case "deb":
+            const packageName = await invoke<string>("get_deb_package_name", {
+              executablePath: fullExecutablePath,
+            });
+            await invoke("run_deb_linux", {
+              packageName: packageName
+            });
+            break;
+          case "":
+            await runUrlArgs(fullExecutablePath, []);
             break;
         }
         break;
@@ -177,18 +191,28 @@ export const installGame = async (game: IGame) => {
               fileLocation: fileLocation,
               installDir: installDir,
             });
+            await invoke("set_permission", {
+              executablePath: fullExecutablePath,
+            });
             break;
           case "appimage":
             await invoke("move_appimage_linux", {
               fileLocation: fileLocation,
               installDir: installDir,
             });
-
+            await invoke("set_permission", {
+              executablePath: fullExecutablePath,
+            });
             break;
+          case "deb":
+            await invoke("move_appimage_linux", {
+              fileLocation: fileLocation,
+              installDir: installDir,
+            });
+            await invoke("install_deb_linux", {
+              executablePath: fullExecutablePath,
+            })
         }
-        await invoke("set_permission", {
-          executablePath: fullExecutablePath,
-        });
         break;
       case "windows":
         switch (sourceExtension) {
@@ -203,7 +227,6 @@ export const installGame = async (game: IGame) => {
               fileLocation: fileLocation,
               installDir: installDir,
             });
-            break;
             break;
         }
         break;

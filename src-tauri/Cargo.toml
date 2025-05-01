@@ -47,6 +47,7 @@ tauri-plugin-notification = "2.2.2"
 tauri-plugin-shell = "2.2.1"
 window-vibrancy = "0.6.0"
 window-shadows = "0.2.2"
+debpkg = "0.6.0"
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.61.1", features = ["Win32_UI", "Win32_UI_WindowsAndMessaging"] }
 

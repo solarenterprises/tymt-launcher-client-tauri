@@ -124,12 +124,15 @@ pub fn main() -> std::io::Result<()> {
             file::untarbz2_macos,
             file::unzip_linux,
             file::move_appimage_linux,
+            file::install_deb_linux,
+            file::get_deb_package_name,
+            file::run_deb_linux,
             file::delete_file,
             file::delete_directory,
             file::write_file,
             file::run_url_args,
             file::open_directory,
-            #[cfg(target_family = "unix")]
+#[cfg(target_family = "unix")]
             file::set_permission,
             minecraft::get_system_info,
             window::create_child_window,
