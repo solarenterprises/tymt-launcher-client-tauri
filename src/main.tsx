@@ -58,7 +58,7 @@ import EventListenerProvider from "./providers/EventListenerProvider";
 window.Buffer = Buffer;
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <StoreProvider store={store}>
       <MetaMaskProvider
         debug={false}
@@ -112,5 +112,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         </FullscreenProvider>
       </MetaMaskProvider>
     </StoreProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
