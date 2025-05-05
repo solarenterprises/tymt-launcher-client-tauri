@@ -23,9 +23,12 @@ import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
 export interface IPropsInstallButton {
   game: IGame;
+  purchased?: boolean;
+  setOpenBuyGameModal?: (_: boolean) => void;
+  purchaseLoading?: boolean;
 }
 
-const InstallButton = ({ game }: IPropsInstallButton) => {
+const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }: IPropsInstallButton) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { showNotification } = useNotification();
@@ -45,6 +48,12 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
         openLink(externalUrl);
         return;
       }
+
+      if (!purchased) {
+        setOpenBuyGameModal(true);
+        return;
+      }
+
       if (installed) {
         if (game?._id === CONST_GAME_DISTRICT53?._id) setD53ModalView(true);
         else setModalView(true);
@@ -95,7 +104,7 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
       <Button
         fullWidth
         onClick={handleClick}
-        disabled={!isSupporting || !!downloadStatusStore?.game}
+        disabled={!isSupporting || !!downloadStatusStore?.game || purchaseLoading}
         sx={{
           height: "46px",
           width: "226px",
@@ -120,14 +129,24 @@ const InstallButton = ({ game }: IPropsInstallButton) => {
         {game?.projectMeta?.type === "browser" && t("hom-7_play-game")}
         {game?.projectMeta?.type === "native" && (
           <>
-            {!isSupporting && `Not supported`}
-            {isSupporting && !installed && !downloadStatusStore?.game && t("hom-20_install-game")}
-            {isSupporting && installed && !downloadStatusStore?.game && t("hom-7_play-game")}
-            {downloadStatusStore?.game && (
+            {purchaseLoading ? (
+              <Stack direction={"row"} alignItems={"center"} gap={"4px"}>
+                <Box className={"fs-14-regular white t-center"}>{`Loading`}</Box>
+                <ThreeDots height="12px" width={"24px"} radius={4} color={`white`} />
+              </Stack>
+            ) : !isSupporting ? (
+              `Not supported`
+            ) : !purchased ? (
+              `Purchase`
+            ) : installed ? (
+              t("hom-7_play-game")
+            ) : downloadStatusStore?.game ? (
               <Stack direction={"row"} alignItems={"center"} gap={"4px"}>
                 <Box className={"fs-14-regular white t-center"}>{`${t("hom-21_downloading")}`}</Box>
                 <ThreeDots height="12px" width={"24px"} radius={4} color={`white`} />
               </Stack>
+            ) : (
+              t("hom-20_install-game")
             )}
           </>
         )}

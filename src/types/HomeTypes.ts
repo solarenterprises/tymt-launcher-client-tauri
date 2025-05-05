@@ -24,7 +24,9 @@ export interface IDownloadStatus {
   total: number;
   duration: number;
   expectation: number;
-  game: string;
+  game_id: string;
+  game_image_url: string;
+  game_title: string;
 }
 
 export interface IInstallStatus {

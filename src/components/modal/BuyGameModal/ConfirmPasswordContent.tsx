@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Box, Button, CircularProgress, Stack } from "@mui/material";
@@ -11,9 +11,10 @@ import { IAccount } from "../../../types/AccountTypes";
 
 export interface IPropsConfirmPasswordContent {
   confirmPurchase: () => void;
+  sendingTransaction: boolean;
 }
 
-const ConfirmPasswordContent = ({ confirmPurchase }: IPropsConfirmPasswordContent) => {
+const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsConfirmPasswordContent) => {
   const { t } = useTranslation();
 
   const accountStore: IAccount = useSelector(getAccount);
@@ -21,8 +22,6 @@ const ConfirmPasswordContent = ({ confirmPurchase }: IPropsConfirmPasswordConten
   useEffect(() => {
     accountStoreRef.current = accountStore;
   }, [accountStore]);
-
-  const [loading, setLoading] = useState<boolean>(false);
 
   const formik = useFormik({
     initialValues: {
@@ -37,12 +36,9 @@ const ConfirmPasswordContent = ({ confirmPurchase }: IPropsConfirmPasswordConten
     }),
     onSubmit: async () => {
       try {
-        setLoading(true);
         confirmPurchase();
-        setLoading(false);
       } catch (err) {
         console.error("Failed to onSubmit at ConfirmPasswordContent: ", err);
-        setLoading(false);
       }
     },
   });
@@ -68,8 +64,8 @@ const ConfirmPasswordContent = ({ confirmPurchase }: IPropsConfirmPasswordConten
             {formik.touched.password && formik.errors.password && <Box className={"fs-16-regular red t-left"}>{formik.errors.password}</Box>}
           </Stack>
 
-          <Button className={"red-button fw"} disabled={formik.touched.password && formik.errors.password ? true : false} type="submit">
-            {loading ? (
+          <Button className={"red-button fw"} disabled={(formik.touched.password && formik.errors.password) || sendingTransaction ? true : false} type="submit">
+            {sendingTransaction ? (
               <CircularProgress
                 sx={{
                   color: "#F5EBFF",

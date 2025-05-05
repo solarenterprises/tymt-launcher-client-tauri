@@ -46,7 +46,7 @@ export const runNewGame = async (game: IGame) => {
               executablePath: fullExecutablePath,
             });
             await invoke("run_deb_linux", {
-              packageName: packageName
+              packageName: packageName,
             });
             break;
           case "":
@@ -158,7 +158,9 @@ export const downloadFileToAppDir = async (game: IGame) => {
     await invoke("download_to_app_dir", {
       url: url,
       fileLocation: downloadPath,
-      game: game?._id,
+      gameId: game?._id,
+      gameImageUrl: game?.imageUrl,
+      gameTitle: game?.title,
     });
 
     return true;
@@ -211,7 +213,7 @@ export const installGame = async (game: IGame) => {
             });
             await invoke("install_deb_linux", {
               executablePath: fullExecutablePath,
-            })
+            });
         }
         break;
       case "windows":

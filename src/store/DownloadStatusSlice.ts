@@ -7,7 +7,9 @@ const init: IDownloadStatus = {
   total: 0,
   duration: 0,
   expectation: 0,
-  game: null,
+  game_id: null,
+  game_image_url: null,
+  game_title: null,
 };
 
 const loadDownloadStatus: () => IDownloadStatus = () => {

@@ -302,7 +302,9 @@ pub struct DownloadProgress {
     total: u64,
     duration: f64,
     expectation: f64,
-    game: String,
+    game_id: String,
+    game_image_url: String,
+    game_title: String,
 }
 
 #[tauri::command]
@@ -310,7 +312,9 @@ pub async fn download_to_app_dir(
     app_handle: tauri::AppHandle,
     url: String,
     file_location: String,
-    game: String,
+    game_id: String,
+    game_image_url: String,
+    game_title: String,
 ) -> Result<(), String> {
     let path = Path::new(&file_location);
 
@@ -369,7 +373,9 @@ pub async fn download_to_app_dir(
                 total,
                 duration,
                 expectation,
-                game: game.clone(),
+                game_id: game_id.clone(),
+                game_image_url: game_image_url.clone(),
+                game_title: game_title.clone(),
             };
 
             app_handle

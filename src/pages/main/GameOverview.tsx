@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Grid } from "@mui/material";
@@ -19,10 +19,13 @@ import GameOverViewInstallSize from "../../components/game/GameOverViewInstallSi
 import GameOverViewJumbo from "../../components/game/GameOverViewJumbo";
 import GameOverViewDescription from "../../components/game/GameOverViewDescription";
 import GameReview from "../../components/game/GameReview";
+import BuyGameModal from "../../components/modal/BuyGameModal/BuyGameModal";
+
+import GameAPI from "../../lib/api/GameAPI";
+
+import { IGame } from "../../types/GameTypes";
 
 import gradient1 from "../../assets/main/GradientGameOverview.svg";
-import { IGame } from "../../types/GameTypes";
-import BuyGameModal from "../../components/modal/BuyGameModal/BuyGameModal";
 
 export interface IPropsGameOverview {
   game: IGame;
@@ -36,8 +39,31 @@ const GameOverview = ({ game }: IPropsGameOverview) => {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [currentSwitchIndex, setCurrentSwitchIndex] = useState<number>(0);
   const [openBuyGameModal, setOpenBuyGameModal] = useState<boolean>(false);
+  const [purchased, setPurchased] = useState<boolean>(false);
+  const [purchaseLoading, setPurchaseLoading] = useState<boolean>(false);
 
   const textList: string[] = [t("ga-10_overview"), t("ga-11_review")];
+
+  useEffect(() => {
+    if (game?.projectMeta?.type === "browser") return;
+    if (game?.price === 0) {
+      setPurchased(true);
+      return;
+    }
+
+    setPurchaseLoading(true);
+    GameAPI.verifyPurchase(game?._id)
+      .then((res) => {
+        setPurchased(res?.data ?? false);
+      })
+      .catch((err) => {
+        console.log("Failed to verifyPurchase: ", err);
+        setPurchased(false);
+      })
+      .finally(() => {
+        setPurchaseLoading(false);
+      });
+  }, [game]);
 
   return (
     <>
@@ -62,7 +88,7 @@ const GameOverview = ({ game }: IPropsGameOverview) => {
           <img src={gradient1} style={{ position: "absolute", right: 0, top: 0 }} />
           <Grid item xs={12} display={"flex"} justifyContent={"space-between"} alignItems={"center"}>
             <Grid item xs={12} flexDirection={"row"} justifyContent={"space-between"} display={"flex"}>
-              <GameOverViewHeader game={game} />
+              <GameOverViewHeader game={game} purchased={purchased} setOpenBuyGameModal={setOpenBuyGameModal} purchaseLoading={purchaseLoading} />
             </Grid>
           </Grid>
           <Grid item xs={12} container display={"flex"} justifyContent={"space-between"} marginTop={"32px"}>
@@ -112,7 +138,7 @@ const GameOverview = ({ game }: IPropsGameOverview) => {
           </Grid>
         </AnimatedComponent>
       </Grid>
-      <BuyGameModal open={true} setOpen={setOpenBuyGameModal} game={game} />
+      <BuyGameModal open={openBuyGameModal} setOpen={setOpenBuyGameModal} game={game} setPurchased={setPurchased} />
     </>
   );
 };

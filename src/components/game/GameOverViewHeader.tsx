@@ -9,9 +9,12 @@ import { IGame } from "../../types/GameTypes";
 
 export interface IPropsGameOverViewHeader {
   game: IGame;
+  purchased: boolean;
+  setOpenBuyGameModal: (_: boolean) => void;
+  purchaseLoading: boolean;
 }
 
-const GameOverViewHeader = ({ game }: IPropsGameOverViewHeader) => {
+const GameOverViewHeader = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }: IPropsGameOverViewHeader) => {
   const { t } = useTranslation();
 
   return (
@@ -48,7 +51,7 @@ const GameOverViewHeader = ({ game }: IPropsGameOverViewHeader) => {
         </Stack>
       </Stack>
       <Stack direction={"row"} alignItems={"center"} gap={"16px"}>
-        <InstallButton game={game} />
+        <InstallButton game={game} purchased={purchased} setOpenBuyGameModal={setOpenBuyGameModal} purchaseLoading={purchaseLoading} />
         <RemoveButton game={game} />
       </Stack>
     </Stack>

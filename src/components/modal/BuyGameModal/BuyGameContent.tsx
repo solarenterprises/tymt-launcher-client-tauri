@@ -16,7 +16,7 @@ const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const isInsufficient: boolean = useMemo(() => sxpBalance * sxpPrice > game?.price, [sxpBalance, sxpPrice, game?.price]);
+  const isInsufficient: boolean = useMemo(() => sxpBalance * sxpPrice < game?.price, [sxpBalance, sxpPrice, game?.price]);
 
   return (
     <Stack direction={"column"} justifyContent={"center"} alignItems={"center"} gap={"24px"}>

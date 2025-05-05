@@ -62,9 +62,9 @@ export const GameAPI = {
     }
   },
 
-  postGameOrder: async (gameId: string): Promise<any> => {
+  postGameOrder: async (game_id: string): Promise<any> => {
     try {
-      const res = await axiosAuth.post<{ data: any }>(`/game/order`, { gameId });
+      const res = await axiosAuth.post<{ data: any }>(`/game/order`, { game_id });
       return res.data;
     } catch (err) {
       throw new Error(err.response?.data?.error ?? "Failed to postGameOrder");
@@ -77,6 +77,15 @@ export const GameAPI = {
       return res.data;
     } catch (err) {
       throw new Error(err.response?.data?.error ?? "Failed to postGamePurchase");
+    }
+  },
+
+  verifyPurchase: async (game_id: string): Promise<any> => {
+    try {
+      const res = await axiosAuth.post<{ data: any }>(`/game/verify-purchase`, { game_id });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to verifyPurchase");
     }
   },
 

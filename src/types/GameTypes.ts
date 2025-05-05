@@ -102,6 +102,7 @@ export interface IGame {
   feedbackCount: number;
   downloadCount: number;
   price: number;
+  recipient_address: string;
   createdAt: string;
   updatedAt: string;
   __v: number;

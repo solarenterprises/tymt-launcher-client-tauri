@@ -139,6 +139,7 @@ export class Solar {
     try {
       const addr = await Solar.getAddress(passphrase);
       let nonce: number = await Solar.getCurrentNonce(addr);
+      console.log("Current nonce: ", nonce);
       if (tx.recipients.length === 0) {
         return {
           success: false,
