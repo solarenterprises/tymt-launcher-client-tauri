@@ -2,6 +2,7 @@ import axiosAuth from "../core/AxiosAuth";
 import { IGame } from "../../types/GameTypes";
 import { IMetaPagination, IPaginationQuery } from "../../types/APITypes/BasicAPITypes";
 import { IGameListQuery } from "../../types/APITypes/GameAPITypes";
+import { IPurchaseHistory } from "../../types/APITypes/PurchaseAPITypes";
 
 export const GameAPI = {
   fetchGame: async (gameId: string): Promise<IGame> => {
@@ -107,9 +108,9 @@ export const GameAPI = {
     }
   },
 
-  fetchPurchaseHistory: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: any[]; meta: IMetaPagination }> => {
+  fetchPurchaseHistory: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IPurchaseHistory[]; meta: IMetaPagination }> => {
     try {
-      const res = await axiosAuth.get<{ data: any[]; meta: IMetaPagination }>(`/purchase`, { params: query });
+      const res = await axiosAuth.get<{ data: IPurchaseHistory[]; meta: IMetaPagination }>(`/purchase`, { params: query });
       return res.data;
     } catch (err) {
       throw new Error(err.response?.data?.error ?? "Failed to fetchPurchaseHistory");

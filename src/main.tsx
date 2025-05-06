@@ -54,6 +54,7 @@ import { NotificationProvider } from "./providers/NotificationProvider";
 
 import { Buffer } from "buffer";
 import EventListenerProvider from "./providers/EventListenerProvider";
+import PurchaseHistoryPage from "./pages/main/PurchaseHistoryPage";
 
 window.Buffer = Buffer;
 
@@ -99,6 +100,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
                         <Route path="/wallet-send" element={<WalletSend />} />
                         <Route path="/store" element={<Store />} />
                         <Route path="/library" element={<Library />} />
+                        <Route path="/purchase-history" element={<PurchaseHistoryPage />} />
                         <Route path="/developer-store" element={<DeveloperStore />} />
                         <Route path="/developer-store/:gameId" element={<DeveloperGameOverview />} />
                       </Route>
