@@ -31,9 +31,15 @@ const GameDetailPage = () => {
 
   return (
     <>
-      {loading && <Skeleton variant="rounded" sx={{ width: "100%", height: "100%", borderRadius: "32px", backgroundColor: "rgba(0, 0, 0, 0.5)" }} />}
-      {!loading && !game && <ErrorComponent />}
-      {!loading && game && (game?.external_url ? <GameSiteViewer game={game} /> : <GameOverview game={game} />)}
+      {loading ? (
+        <Skeleton variant="rounded" sx={{ width: "100%", height: "100%", borderRadius: "32px", backgroundColor: "rgba(0, 0, 0, 0.5)" }} />
+      ) : !game ? (
+        <ErrorComponent />
+      ) : game?.external_url ? (
+        <GameSiteViewer game={game} />
+      ) : (
+        <GameOverview game={game} />
+      )}
     </>
   );
 };
