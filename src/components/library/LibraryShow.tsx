@@ -1,19 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Grid, Box, Stack } from "@mui/material";
+import { Grid, Box, Stack, Skeleton } from "@mui/material";
 
 import AnimatedComponent from "../home/AnimatedComponent";
 import StoreGameCard from "../game/StoreGameCard";
+import ReviewPagination from "../game/ReviewPagination";
 
-import { isInstalled } from "../../lib/helper/DownloadHelper";
+import GameAPI from "../../lib/api/GameAPI";
 
 import NoGamePng from "../../assets/main/NoGames.png";
 
-import { IGame, IGameList } from "../../types/GameTypes";
-import { useSelector } from "react-redux";
-import { getGameList } from "../../store/GameListSlice";
-import { getLibraryList } from "../../store/LibraryListSlice";
+import { IGame } from "../../types/GameTypes";
+import { IMetaPagination } from "../../types/APITypes/BasicAPITypes";
 
 export interface IPropsLibraryShow {
   status: number;
@@ -22,84 +21,107 @@ export interface IPropsLibraryShow {
 const LibraryShow = ({ status }: IPropsLibraryShow) => {
   const { t } = useTranslation();
 
-  const gameListStore: IGameList = useSelector(getGameList);
-  const libraryListStore: IGameList = useSelector(getLibraryList);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [gamePagination, setGamePagination] = useState<{ data: IGame[]; meta: IMetaPagination } | null>(null);
+  const [page, setPage] = useState<number>(1);
 
-  const activeGameList: IGame[] = useMemo(() => gameListStore?.games?.filter((one) => one?.visibilityState === "active"), [gameListStore]);
-  const displayGameList: IGame[] = useMemo(() => [...activeGameList], [activeGameList]);
+  // Map status to API calls and titles
+  const statusConfig = {
+    0: {
+      fetchGames: GameAPI.fetchPurchasedGameList,
+      title: t("lib-1_your-games"),
+    },
+    2: {
+      fetchGames: GameAPI.fetchGameList,
+      title: t("lib-3_download"),
+    },
+    3: {
+      fetchGames: GameAPI.fetchComingSoonGameList,
+      title: t("lib-5_coming"),
+    },
+  };
 
-  const [installedList, setInstalledList] = useState<IGame[]>([]);
+  const fetchGames = useCallback(
+    (page: number) => {
+      const config = statusConfig[status];
+      if (!config) return;
 
-  const uninstalledList: IGame[] = useMemo(
-    () => displayGameList?.filter((game) => ![...libraryListStore?.games, ...installedList]?.some((one) => one?._id === game?._id)),
-    [displayGameList, installedList, libraryListStore]
+      setLoading(true);
+      config
+        .fetchGames({ page })
+        .then(setGamePagination)
+        .catch((err) => {
+          console.error("Error fetching game list:", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    },
+    [status]
+  );
+
+  const handlePageChange = useCallback(
+    (_event: any, value: number) => {
+      setPage(value);
+      fetchGames(value);
+    },
+    [fetchGames]
   );
 
   useEffect(() => {
-    const fetchInstalledGames = async () => {
-      // setLoading(true);
-      const results = await Promise.all(
-        displayGameList?.map(async (game) => {
-          const installed = await isInstalled(game);
-          return installed ? game : null;
-        })
-      );
-      setInstalledList(results.filter((game) => game !== null));
-      // setLoading(false);
-    };
+    setPage(1);
+    fetchGames(1);
+  }, [status, fetchGames]);
 
-    fetchInstalledGames();
-  }, [displayGameList]);
+  const renderSkeletons = () =>
+    Array.from({ length: 10 }).map((_, index) => (
+      <Grid key={index} item>
+        <Skeleton
+          variant="rectangular"
+          sx={{
+            width: "182px",
+            height: "302px !important", // Ensure height is enforced
+            minHeight: "302px",
+            borderRadius: "16px",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        />
+      </Grid>
+    ));
+
+  const renderNoGames = () => (
+    <Grid item xs={12} container justifyContent={"center"} marginTop={"32px"}>
+      <AnimatedComponent>
+        <Stack flexDirection={"column"} justifyContent={"center"}>
+          <Box component={"img"} src={NoGamePng} width={"300px"} height={"300px"} alignSelf={"center"} />
+          <Box className={"fs-18-regular white"} sx={{ alignSelf: "center", marginTop: "24px" }}>
+            {t("sto-36_no-games")}
+          </Box>
+        </Stack>
+      </AnimatedComponent>
+    </Grid>
+  );
 
   return (
     <>
       <Grid item xs={12}>
-        {status === 0 && <Box className={"fs-40-bold white"}>{t("lib-1_your-games")}</Box>}
-        {status === 1 && <Box className={"fs-40-bold white"}>{t("lib-2_wishlist")}</Box>}
-        {status === 2 && <Box className={"fs-40-bold white"}>{t("lib-3_download")}</Box>}
-        {status === 3 && <Box className={"fs-40-bold white"}>{t("lib-5_coming")}</Box>}
+        <Box className={"fs-40-bold white"}>{statusConfig[status]?.title}</Box>
       </Grid>
       <Grid item xs={12} container spacing={"32px"} mt={"32px"}>
-        {status === 0 &&
-          [...libraryListStore?.games, ...installedList]?.map((installedGame, index) => (
-            <Grid item key={index}>
-              <AnimatedComponent>
-                <StoreGameCard game={installedGame} />
-              </AnimatedComponent>
-            </Grid>
-          ))}
-        {status === 0 && [...libraryListStore?.games, ...installedList]?.length === 0 && (
-          <Grid item xs={12} container justifyContent={"center"} marginTop={"32px"}>
-            <AnimatedComponent>
-              <Stack flexDirection={"column"} justifyContent={"center"}>
-                <Box component={"img"} src={NoGamePng} width={"300px"} height={"300px"} alignSelf={"center"} />
-                <Box className={"fs-18-regular white"} sx={{ alignSelf: "center", marginTop: "24px" }}>
-                  {t("sto-36_no-games")}
-                </Box>
-              </Stack>
-            </AnimatedComponent>
-          </Grid>
-        )}
-        {status === 2 &&
-          uninstalledList?.map((uninstalledGame, index) => (
-            <Grid item key={index}>
-              <AnimatedComponent>
-                <StoreGameCard game={uninstalledGame} />
-              </AnimatedComponent>
-            </Grid>
-          ))}
-        {status === 2 && uninstalledList?.length === 0 && (
-          <Grid item xs={12} container justifyContent={"center"} marginTop={"32px"}>
-            <AnimatedComponent>
-              <Stack flexDirection={"column"} justifyContent={"center"}>
-                <Box component={"img"} src={NoGamePng} width={"300px"} height={"300px"} alignSelf={"center"} />
-                <Box className={"fs-18-regular white"} sx={{ alignSelf: "center", marginTop: "24px" }}>
-                  {t("sto-36_no-games")}
-                </Box>
-              </Stack>
-            </AnimatedComponent>
-          </Grid>
-        )}
+        {loading
+          ? renderSkeletons()
+          : gamePagination?.data?.length === 0
+          ? renderNoGames()
+          : gamePagination?.data?.map((game, index) => (
+              <Grid item key={index}>
+                <AnimatedComponent>
+                  <StoreGameCard game={game} />
+                </AnimatedComponent>
+              </Grid>
+            ))}
+        <Grid item xs={12} container justifyContent={"center"} marginTop={"32px"}>
+          <ReviewPagination totalPage={gamePagination?.meta?.pagination?.pageCount} page={page} handlePageChange={handlePageChange} />
+        </Grid>
       </Grid>
     </>
   );

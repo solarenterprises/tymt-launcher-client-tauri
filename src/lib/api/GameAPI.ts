@@ -98,12 +98,21 @@ export const GameAPI = {
     }
   },
 
-  fetchPurchase: async (): Promise<any> => {
+  fetchPurchasedGameList: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
-      const res = await axiosAuth.get<{ data: any }>(`/game/purchase`);
+      const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/purchase`, { params: query });
       return res.data;
     } catch (err) {
       throw new Error(err.response?.data?.error ?? "Failed to fetchPurchase");
+    }
+  },
+
+  fetchPurchaseHistory: async (query: IPaginationQuery = { page: 1, limit: 20 }): Promise<{ data: any[]; meta: IMetaPagination }> => {
+    try {
+      const res = await axiosAuth.get<{ data: any[]; meta: IMetaPagination }>(`/purchase`, { params: query });
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchPurchaseHistory");
     }
   },
 
