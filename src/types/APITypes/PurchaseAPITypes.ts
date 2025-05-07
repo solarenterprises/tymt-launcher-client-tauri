@@ -5,4 +5,5 @@ export interface IPurchaseHistory {
   game_imageUrl: string;
   price: number;
   wallet_address: string;
+  tx_hash: string;
 }
