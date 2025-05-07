@@ -47,7 +47,7 @@ const PurchaseTable = ({ loading, historyPagination }: IPropsPurchaseTable) => {
         <Stack flexDirection={"column"} justifyContent={"center"}>
           <Box component={"img"} src={NoGamePng} width={"300px"} height={"300px"} alignSelf={"center"} />
           <Box className={"fs-18-regular white"} sx={{ alignSelf: "center", marginTop: "24px" }}>
-            {t("sto-36_no-games")}
+            {t("pur-16_no-purchase-history")}
           </Box>
         </Stack>
       </AnimatedComponent>
@@ -67,12 +67,19 @@ const PurchaseTable = ({ loading, historyPagination }: IPropsPurchaseTable) => {
     renderLoader()
   ) : historyPagination?.data.length > 0 ? (
     <Stack display={"flex"} flexDirection={"column"} alignItems={"center"} spacing={"-1px"}>
-      {historyPagination.data.map((history, index) => (
+      {historyPagination?.data?.map((history, index) => (
         <TooltipComponent text={t("pur-6_double-click-detail")} placement="bottom" key={history?.game_id}>
           <Button
             sx={{
               border: "1px solid #FFFFFF1A",
-              borderRadius: index === 0 ? "16px 16px 0 0" : index === historyPagination.data.length - 1 ? "0 0 16px 16px" : "0",
+              borderRadius:
+                historyPagination?.data?.length === 1
+                  ? "16px"
+                  : index === 0
+                  ? "16px 16px 0 0"
+                  : index === historyPagination.data.length - 1
+                  ? "0 0 16px 16px"
+                  : "0",
               width: "100%",
               backgroundColor: "transparent",
               textTransform: "none",

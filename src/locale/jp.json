@@ -649,6 +649,7 @@
     "pur-12_confirm-purchase": "購入の確認",
     "pur-13_thank-you-purchase": "ご購入ありがとうございます！",
     "pur-14-ready-to-install": "ゲームをインストールする準備はできましたか？",
-    "pur-15_install-now": "今すぐインストール"
+    "pur-15_install-now": "今すぐインストール",
+    "pur-16_no-purchase-history": "購入履歴がありません"
   }
 }

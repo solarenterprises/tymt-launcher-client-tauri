@@ -651,6 +651,7 @@
     "pur-12_confirm-purchase": "Confirm Purchase",
     "pur-13_thank-you-purchase": "Thank you for your purchase!",
     "pur-14_ready-to-install": "Ready to install your game?",
-    "pur-15_install-now": "Install Now"
+    "pur-15_install-now": "Install Now",
+    "pur-16_no-purchase-history": "No purchase history"
   }
 }
