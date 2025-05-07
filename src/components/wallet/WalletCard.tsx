@@ -39,9 +39,10 @@ export interface IPropsWalletCard {
   supportChain: ISupportChain;
   index: number;
   setLoading: (_: boolean) => void;
+  openQR: boolean;
 }
 
-const WalletCard = ({ supportChain, index }: IPropsWalletCard) => {
+const WalletCard = ({ supportChain, index, openQR }: IPropsWalletCard) => {
   const dispatch = useDispatch();
   const { currentCurrencyReserve, currentCurrencySymbol } = useWallet();
   const { showNotification } = useNotification();
@@ -54,7 +55,7 @@ const WalletCard = ({ supportChain, index }: IPropsWalletCard) => {
   const balance = useMemo(() => getTokenBalanceBySymbol(balanceListStore, supportChain?.native?.symbol), [balanceListStore]);
   const price = useMemo(() => getTokenPriceBySymbol(priceListStore, supportChain?.native?.symbol), [priceListStore]);
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(openQR);
 
   const handleWalletCardClick = () => {
     try {

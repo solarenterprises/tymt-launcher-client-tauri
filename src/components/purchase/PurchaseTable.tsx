@@ -28,8 +28,8 @@ const PurchaseTable = ({ loading, historyPagination }: IPropsPurchaseTable) => {
       sx={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "center", // Optional for vertical alignment
-        width: "100%", // Fill the parent width
+        alignItems: "center",
+        width: "100%",
         padding: "150px 0",
       }}
     >
@@ -68,7 +68,7 @@ const PurchaseTable = ({ loading, historyPagination }: IPropsPurchaseTable) => {
   ) : historyPagination?.data.length > 0 ? (
     <Stack display={"flex"} flexDirection={"column"} alignItems={"center"} spacing={"-1px"}>
       {historyPagination.data.map((history, index) => (
-        <TooltipComponent text={"Double-click for detail view"} placement="bottom" key={history?.game_id}>
+        <TooltipComponent text={t("pur-6_double-click-detail")} placement="bottom" key={history?.game_id}>
           <Button
             sx={{
               border: "1px solid #FFFFFF1A",
@@ -88,8 +88,8 @@ const PurchaseTable = ({ loading, historyPagination }: IPropsPurchaseTable) => {
               width={"520px"}
               key={history?.game_id}
             >
-              <Stack display={"flex"} flexDirection={"row"} alignItems={"center"} gap={"8px"}>
-                <Box component={"img"} src={history?.game_imageUrl} width={"60px"} height={"40px"} borderRadius={"16px"} />
+              <Stack display={"flex"} flexDirection={"row"} alignItems={"center"} gap={"16px"}>
+                <Box component={"img"} src={history?.game_imageUrl} width={"60px"} height={"40px"} borderRadius={"4px"} />
                 <Stack display={"flex"} flexDirection={"column"} alignItems={"flex-start"} gap={"4px"}>
                   <Box key={history?.game_id} className={"fs-20-regular white"}>
                     {history?.game_title}

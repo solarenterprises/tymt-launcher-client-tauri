@@ -571,6 +571,8 @@
     "ga-44_remove": "削除",
     "ga-45_remove-from-library": "ライブラリから削除",
     "ga-46_remove-from-developer-store": "開発者ストアから削除",
+    "ga-47_not-supported": "サポートされていません",
+    "ga-48_purchase": "購入",
     "alt-1_nickname-saved": "ニックネームが保存されました",
     "alt-2_nickname-saved-intro": "あなたのニックネームは正常に保存されました。",
     "alt-3_nickname-notsaved": "ニックネームが保存されました",
@@ -632,6 +634,21 @@
     "not-11_fr-accept": "友達リクエストが承認されました",
     "not-12_fr-reject": "友達リクエストが拒否されました",
     "not-13_cannot-decrypt": "メッセージを復号化できません",
-    "not-14_warning": "警告"
+    "not-14_warning": "警告",
+    "pur-1_your-purchase-history": "ご購入履歴",
+    "pur-2_keep-track-everything": "当店でご購入いただいたすべての商品を追跡しましょう！",
+    "pur-3_total-items": "商品合計",
+    "pur-4_total-spent-sxp": "合計SXP",
+    "pur-5_total-spent": "合計支出額",
+    "pur-6_double-click-detail": "詳細ビューを表示するにはダブルクリックしてください",
+    "pur-7_items": "アイテム",
+    "pur-8_buy-a-game": "ゲームの購入",
+    "pur-9_your-current-balance": "現在の残高",
+    "pur-10_balance-after-purchase": "購入後の残高",
+    "pur-11_there-are-insufficient": "アカウントの残高が不足しています。",
+    "pur-12_confirm-purchase": "購入の確認",
+    "pur-13_thank-you-purchase": "ご購入ありがとうございます！",
+    "pur-14-ready-to-install": "ゲームをインストールする準備はできましたか？",
+    "pur-15_install-now": "今すぐインストール"
   }
 }

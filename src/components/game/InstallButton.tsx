@@ -20,6 +20,8 @@ import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 import { IGame } from "../../types/GameTypes";
 import { IDownloadStatus } from "../../types/HomeTypes";
 import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
+import { listen } from "@tauri-apps/api/event";
+import { CONST_EVENT_NAMES } from "../../const/EventConsts";
 
 export interface IPropsInstallButton {
   game: IGame;
@@ -75,7 +77,17 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
     } finally {
       dispatch(resetDownloadStatus());
     }
-  }, [game, installed]);
+  }, [game, installed, purchased]);
+
+  useEffect(() => {
+    const unlisten_game_install_from_purchase_modal = listen(CONST_EVENT_NAMES.GAME_INSTALL, async (_event) => {
+      handleClick();
+    });
+
+    return () => {
+      unlisten_game_install_from_purchase_modal.then((unlistenFn) => unlistenFn());
+    };
+  }, [handleClick]);
 
   useEffect(() => {
     const checkSupport = async () => {
@@ -135,9 +147,9 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
                 <ThreeDots height="12px" width={"24px"} radius={4} color={`white`} />
               </Stack>
             ) : !isSupporting ? (
-              `Not supported`
+              t("ga-47_not-supported")
             ) : !purchased ? (
-              `Purchase`
+              t("ga-48_purchase")
             ) : installed ? (
               t("hom-7_play-game")
             ) : downloadStatusStore?.game_id ? (

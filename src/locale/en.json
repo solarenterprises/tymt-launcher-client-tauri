@@ -572,6 +572,8 @@
     "ga-44_remove": "Remove",
     "ga-45_remove-from-library": "Remove from library",
     "ga-46_remove-from-developer-store": "Remove from developer store",
+    "ga-47_not-supported": "Not supported",
+    "ga-48_purchase": "Purchase",
     "alt-1_nickname-saved": "Nickname saved",
     "alt-2_nickname-saved-intro": "Your nickname has been successfully saved.",
     "alt-3_nickname-notsaved": "Nickname saved",
@@ -634,6 +636,21 @@
     "not-11_fr-accept": "Friend Request Accepted",
     "not-12_fr-reject": "Friend Request Rejected",
     "not-13_cannot-decrypt": "Cannot decrypt message",
-    "not-14_warning": "Warning"
+    "not-14_warning": "Warning",
+    "pur-1_your-purchase-history": "Your purchase history",
+    "pur-2_keep-track-everything": "Keep track of everything you've bought with us!",
+    "pur-3_total-items": "Total Items",
+    "pur-4_total-spent-sxp": "Total Spent SXP",
+    "pur-5_total-spent": "Total Spent",
+    "pur-6_double-click-detail": "Double-click for detail view",
+    "pur-7_items": "Item(s)",
+    "pur-8_buying-a-game": "Buying a Game",
+    "pur-9_your-current-balance": "Your current balance",
+    "pur-10_balance-after-purchase": "Balance after purchase",
+    "pur-11_there-are-insufficient": "There are insufficient funds in your account.",
+    "pur-12_confirm-purchase": "Confirm Purchase",
+    "pur-13_thank-you-purchase": "Thank you for your purchase!",
+    "pur-14_ready-to-install": "Ready to install your game?",
+    "pur-15_install-now": "Install Now"
   }
 }

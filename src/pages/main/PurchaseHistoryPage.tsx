@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Grid, Box } from "@mui/material";
 import ReviewPagination from "../../components/game/ReviewPagination";
+import PurchaseTable from "../../components/purchase/PurchaseTable";
+import PurchaseMetrics from "../../components/purchase/PurchaseMetrics";
 import GameAPI from "../../lib/api/GameAPI";
 import { IPurchaseHistory } from "../../types/APITypes/PurchaseAPITypes";
 import { IMetaPurchasePagination } from "../../types/APITypes/BasicAPITypes";
-import PurchaseTable from "../../components/purchase/PurchaseTable";
-import PurchaseMetrics from "../../components/purchase/PurchaseMetrics";
 
 const PurchaseHistoryPage = () => {
+  const { t } = useTranslation();
+
   const [historyPagination, setHistoryPagination] = useState<{ data: IPurchaseHistory[]; meta: IMetaPurchasePagination }>(null);
   const [page, setPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,9 +44,11 @@ const PurchaseHistoryPage = () => {
   return (
     <Grid item xs={12} sx={{ display: "flex", flexDirection: "column" }}>
       <Box className={"fs-60-bold white"} mb={"24px"}>
-        Your Purchase History
+        {t("pur-1_your-purchase-history")}
       </Box>
-      <Box className="fs-16-regular light" mb={"12px"}>{`Confirm your purchase history here`}</Box>
+      <Box className="fs-16-regular light" mb={"12px"}>
+        {t("pur-2_keep-track-everything")}
+      </Box>
       <Grid item xs={12} container justifyContent={"center"}>
         <PurchaseMetrics loading={loading} historyPagination={historyPagination} />
       </Grid>

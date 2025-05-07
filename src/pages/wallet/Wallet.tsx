@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import numeral from "numeral";
@@ -38,10 +38,16 @@ import refreshIcon from "../../assets/wallet/RefreshIcon.svg";
 
 // const order = ["Solar", "Binance", "Ethereum", "Bitcoin", "Solana", "Polygon", "Avalanche", "Arbitrum", "Optimism"];
 
+export interface ILocationStateWallet {
+  openGameTopUp: boolean;
+}
+
 const Wallet = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
+  const { openGameTopUp } = (location.state as ILocationStateWallet) || {}; // from buy game modal
   const { currentSupportChain, currentCurrencySymbol, totalBalance, handleRefreshClick } = useWallet();
 
   const currentTokenStore: ICurrentToken = useSelector(getCurrentToken);
@@ -201,14 +207,24 @@ const Wallet = () => {
                         if (getNativeTokenBalanceByChainName(balanceListStore, supportChain?.native?.name) > 0) {
                           return (
                             <Grid item xs={6} key={`wallet-card-non-zero-${index}`}>
-                              <WalletCard supportChain={supportChain} index={index} setLoading={setLoading} />
+                              <WalletCard
+                                supportChain={supportChain}
+                                index={index}
+                                setLoading={setLoading}
+                                openQR={openGameTopUp && supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLAR}
+                              />
                             </Grid>
                           );
                         }
                       } else {
                         return (
                           <Grid item xs={6} key={`wallet-card-${index}`}>
-                            <WalletCard supportChain={supportChain} index={index} setLoading={setLoading} />
+                            <WalletCard
+                              supportChain={supportChain}
+                              index={index}
+                              setLoading={setLoading}
+                              openQR={openGameTopUp && supportChain?.native?.name === CONST_CHAIN_NAMES?.SOLAR}
+                            />
                           </Grid>
                         );
                       }

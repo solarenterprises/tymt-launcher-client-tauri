@@ -72,7 +72,7 @@ const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsC
                 }}
               />
             ) : (
-              "Confirm purchase"
+              t("pur-12_confirm-purchase")
             )}
           </Button>
         </Stack>

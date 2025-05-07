@@ -12,7 +12,6 @@ import ThankContent from "./ThankContent";
 import { IGame } from "../../../types/GameTypes";
 import { IRecipient } from "../../../types/TransactionTypes";
 
-import CloseIcon from "../../../assets/setting/XIcon.svg";
 import GameAPI from "../../../lib/api/GameAPI";
 
 export interface IPropsBuyGameModal {
@@ -105,10 +104,9 @@ const BuyGameModal = ({ open, setOpen, game, setPurchased }: IPropsBuyGameModal)
               },
             }}
           >
-            <img src={CloseIcon} alt="close icon" className="close-icon" onClick={() => setOpen(false)} />
             {content === "buy-game" && <BuyGameContent game={game} purchaseGame={purchaseGame} />}
             {content === "confirm-password" && <ConfirmPasswordContent confirmPurchase={confirmPurchase} sendingTransaction={sendingTransaction} />}
-            {content === "thank-purchase" && <ThankContent game={game} />}
+            {content === "thank-purchase" && <ThankContent game={game} setOpen={setOpen} />}
           </Box>
         </Fade>
       </Modal>

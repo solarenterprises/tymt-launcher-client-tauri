@@ -1,3 +1,4 @@
 export const CONST_EVENT_NAMES = {
   NOTIFICATION: "event-notification",
+  GAME_INSTALL: "event-game-install",
 };
