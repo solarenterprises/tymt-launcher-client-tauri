@@ -6,6 +6,7 @@ import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
+import { AuthAPI } from "../api/AuthAPI";
 
 export async function runUrlArgs(url: string, args: string[]) {
   return invoke("run_url_args", {
@@ -28,56 +29,42 @@ export const runNewGame = async (game: IGame) => {
   try {
     const fullExecutablePath = await getFullExecutablePathNewGame(game);
     const gameExtension = (await getExecutableFileExtension(game)).toLowerCase();
-
     const platform = await type();
 
-    console.log("gameExtension", gameExtension);
-    console.log("fullExecutablePath", fullExecutablePath);
+    const drmToken = game?.drmProtected ? await AuthAPI.getDrmToken(game?._id) : null;
+
+    const runArgs = (args: string[] = []) => (drmToken ? [...args, `--tymt`, drmToken] : args);
 
     switch (platform) {
       case "linux":
-        switch (gameExtension) {
-          case "appimage":
-            await runUrlArgs(fullExecutablePath, [`--appimage-extract-and-run`]);
-            break;
-          case "deb":
-            const packageName = await invoke<string>("get_deb_package_name", {
-              executablePath: fullExecutablePath,
-            });
-            await invoke("run_deb_linux", {
-              packageName: packageName,
-            });
-            break;
-          case "":
-            await runUrlArgs(fullExecutablePath, []);
-            break;
+        if (gameExtension === "appimage") {
+          await runUrlArgs(fullExecutablePath, runArgs([`--appimage-extract-and-run`]));
+        } else if (gameExtension === "deb") {
+          const packageName = await invoke<string>("get_deb_package_name", { executablePath: fullExecutablePath });
+          await invoke("run_deb_linux", { packageName, args: runArgs() });
+        } else {
+          await runUrlArgs(fullExecutablePath, runArgs());
         }
         break;
+
       case "windows":
-        switch (gameExtension) {
-          case "exe":
-            await runUrlArgs(fullExecutablePath, []);
-            break;
-          case "bat":
-            await runUrlArgs(fullExecutablePath, []);
-            break;
+        if (["exe", "bat"].includes(gameExtension)) {
+          await runUrlArgs(fullExecutablePath, runArgs());
         }
         break;
+
       case "macos":
-        switch (gameExtension) {
-          case "":
-            await runUrlArgs(fullExecutablePath, []);
-            break;
-          case "app":
-            await runUrlArgs("open", [`-a`, fullExecutablePath]);
-            break;
+        if (gameExtension === "app") {
+          await runUrlArgs("open", [`-a`, fullExecutablePath, ...runArgs()]);
+        } else {
+          await runUrlArgs(fullExecutablePath, runArgs());
         }
         break;
     }
 
     return true;
   } catch (err) {
-    // console.error("Failed to runNewGame: ", err);
+    console.error("Failed to runNewGame: ", err);
     return false;
   }
 };

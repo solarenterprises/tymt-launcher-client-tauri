@@ -103,6 +103,7 @@ export interface IGame {
   downloadCount: number;
   price?: number;
   recipient_address?: string;
+  drmProtected?: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;

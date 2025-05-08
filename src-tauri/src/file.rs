@@ -20,7 +20,7 @@ use std::os::unix::fs::PermissionsExt;
 
 #[tauri::command]
 pub async fn unzip_linux(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     file_location: String,
     install_dir: String,
 ) -> Result<(), String> {
@@ -63,7 +63,7 @@ pub async fn unzip_linux(
 
 #[tauri::command]
 pub async fn move_appimage_linux(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     file_location: String,
     install_dir: String,
 ) -> Result<(), String> {
@@ -90,7 +90,7 @@ pub async fn move_appimage_linux(
 
 #[tauri::command]
 pub async fn install_deb_linux(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     executable_path: String,
 ) -> Result<(), String> {
     let status = Command::new("sudo")
@@ -112,14 +112,14 @@ pub async fn install_deb_linux(
 
 #[tauri::command]
 pub async fn get_deb_package_name(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     executable_path: String,
 ) -> Result<String, String> {
     let file = File::open(&executable_path)
         .map_err(|e| format!("Failed to open deb file '{}': {}", executable_path, e))?;
     let mut pkg = DebPkg::parse(file)
         .map_err(|e| format!("Failed to parse deb package '{}': {}", executable_path, e))?;
-    let mut control_tar = pkg
+    let control_tar = pkg
         .control()
         .map_err(|e| format!("Failed to extract control.tar from '{}': {}", executable_path, e))?;
     let control = debpkg::Control::extract(control_tar)
@@ -129,10 +129,12 @@ pub async fn get_deb_package_name(
 
 #[tauri::command]
 pub async fn run_deb_linux(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     package_name: String,
+    args: Vec<String>,
 ) -> Result<(), String> {
     let status = Command::new(&package_name)
+        .args(&args)
         .status()
         .map_err(|e| format!("Failed to run deb package: {}", e))?;
 
@@ -174,7 +176,7 @@ pub async fn set_permission(
 
 #[tauri::command]
 pub async fn unzip_windows(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     file_location: String,
     install_dir: String,
 ) -> Result<(), String> {
@@ -217,7 +219,7 @@ pub async fn unzip_windows(
 
 #[tauri::command]
 pub async fn move_exe_windows(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     file_location: String,
     install_dir: String,
 ) -> Result<(), String> {
@@ -244,7 +246,7 @@ pub async fn move_exe_windows(
 
 #[tauri::command]
 pub async fn unzip_macos(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     file_location: String,
     install_dir: String,
 ) -> Result<(), String> {
@@ -268,7 +270,7 @@ pub async fn unzip_macos(
 
 #[tauri::command]
 pub async fn untarbz2_macos(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     file_location: String,
     install_dir: String,
 ) -> Result<(), String> {
@@ -400,7 +402,7 @@ pub fn write_file(content: String, filepath: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn delete_file(app_handle: tauri::AppHandle, file_location: String) -> Result<(), String> {
+pub async fn delete_file(_app_handle: tauri::AppHandle, file_location: String) -> Result<(), String> {
     let path = PathBuf::from(file_location);
 
     fs::remove_file(&path).map_err(|e| format!("Failed to delete file: {}", e))?;
@@ -410,7 +412,7 @@ pub async fn delete_file(app_handle: tauri::AppHandle, file_location: String) ->
 
 #[tauri::command]
 pub async fn delete_directory(
-    app_handle: tauri::AppHandle,
+    _app_handle: tauri::AppHandle,
     dir_location: String,
 ) -> Result<(), String> {
     let path = PathBuf::from(dir_location);

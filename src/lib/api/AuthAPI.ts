@@ -4,6 +4,7 @@ import tymtCore from "../core/tymtCore";
 import { getPublicKey } from "../helper/WalletHelper";
 import { IUser } from "../../types/APITypes/UserAPITypes";
 import { ILoginParams, ISignupParams, ILoginResponse } from "../../types/APITypes/AuthAPITypes";
+import axiosAuth from "../core/AxiosAuth";
 
 export const AuthAPI = {
   requestMessage: async (publicKey: string): Promise<string> => {
@@ -50,6 +51,16 @@ export const AuthAPI = {
     } catch (err) {
       console.error("Failed to refreshToken: ", err.response?.data ?? err);
       throw new Error(err.response?.data?.error ?? "Failed to refreshToken");
+    }
+  },
+
+  getDrmToken: async (gameId: string) => {
+    try {
+      const res = await axiosAuth.get(`${CONFIG_TYMT_BACKEND_URL}/auth/game/drm-token/${gameId}`);
+      return res?.data?.data;
+    } catch (err) {
+      console.error("Failed to getDrmToken: ", err.response?.data ?? err);
+      throw new Error(err.response?.data?.error ?? "Failed to getDrmToken");
     }
   },
 };
