@@ -16,9 +16,9 @@ export interface IPropsBuyGameContent {
 const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { sxpBalance, sxpPrice } = useWallet();
+  const { sxpBalance, sxpPrice, sxpFee } = useWallet();
 
-  const isInsufficient: boolean = useMemo(() => sxpBalance * sxpPrice < game?.price, [sxpBalance, sxpPrice, game?.price]);
+  const isInsufficient: boolean = useMemo(() => sxpBalance < game?.price + sxpFee, [sxpBalance, game?.price, sxpFee]);
 
   const handleClick = () => {
     if (isInsufficient) {
@@ -39,7 +39,7 @@ const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
         </Stack>
         <Stack direction={"row"} alignItems={"center"} gap={"8px"}>
           <Box component={"img"} src={CONST_CHAIN_ICONS.SOLAR} alt="game" sx={{ width: "24px", height: "24px" }} />
-          <Box className="fs-20-regular white">{numeral(game?.price).format("0.0")}</Box>
+          <Box className="fs-20-regular white">{numeral(game?.price + sxpFee).format("0.0")}</Box>
         </Stack>
       </Stack>
 
@@ -69,8 +69,8 @@ const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
             <Stack direction={"column"} gap={"8px"}>
               <Box className="fs-16-regular light">{`${t("pur-10_balance-after-purchase")}:`}</Box>
               <Stack direction={"column"} gap={"4px"}>
-                <Box className="fs-16-regular white">{numeral(sxpBalance - game?.price).format("0,0.00")} SXP</Box>
-                <Box className="fs-16-regular light">$ {numeral((sxpBalance - game?.price) * sxpPrice).format("0,0.00")}</Box>
+                <Box className="fs-16-regular white">{numeral(sxpBalance - game?.price - sxpFee).format("0,0.00")} SXP</Box>
+                <Box className="fs-16-regular light">$ {numeral((sxpBalance - game?.price - sxpFee) * sxpPrice).format("0,0.00")}</Box>
               </Stack>
             </Stack>
           </Stack>
