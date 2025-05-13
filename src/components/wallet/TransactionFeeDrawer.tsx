@@ -140,7 +140,6 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
                 }}
                 sx={{
                   width: "100%",
-
                   height: "58px",
                   borderRadius: "16px",
                   border: "1px solid #FFFFFF1A",
