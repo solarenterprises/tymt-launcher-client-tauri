@@ -140,7 +140,7 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
                 }}
                 sx={{
                   width: "100%",
-                  textAlign: "right",
+
                   height: "58px",
                   borderRadius: "16px",
                   border: "1px solid #FFFFFF1A",
@@ -151,6 +151,7 @@ const TransactionFeeDrawer = ({ view, setView }: props) => {
                   "& .MuiInputBase-input": {
                     font: "unset",
                     color: "white",
+                    textAlign: "right",
                     fontFamily: "Cobe",
                     fontSize: "18px",
                     fontStyle: "normal",
