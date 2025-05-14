@@ -4,4 +4,5 @@ export const CONST_TYMT_LINKS = {
   /// termsofservice: "https://solarenterprises.com/terms",
   twitter: "https://twitter.com/tymt_com",
   discord: "https://discord.gg/district53",
+  solarcard: "https://solarcard.app",
 };

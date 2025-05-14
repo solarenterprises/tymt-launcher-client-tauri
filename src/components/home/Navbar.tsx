@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { debounce } from "lodash";
+import { openLink } from "../../lib/helper/TauriHelper";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Grid, Button, TextField, InputAdornment, Stack, Box } from "@mui/material";
@@ -28,6 +29,7 @@ import { tymtLogoType } from "../../types/HomeTypes";
 import newlogo from "../../assets/main/NewLogo.png";
 import newlogohead from "../../assets/main/NewLogoHead.png";
 import searchlg from "../../assets/main/SearchLg.svg";
+import { CONST_TYMT_LINKS } from "../../const/tymtConsts";
 
 const theme = createTheme({
   palette: {
@@ -53,7 +55,7 @@ const Navbar = () => {
   const notificationSettingStore: INotificationSetting = useSelector(getNotificationSetting);
 
   const [showSetting, setShowSetting] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  // const [showAlert, setShowAlert] = useState(false);
   const [value, setValue] = useState<string>("");
   const [cardModalOpen, setCardModalOpen] = useState<boolean>(false);
   const [coming, setComing] = useState<boolean>(false);
@@ -160,7 +162,8 @@ const Navbar = () => {
             <Button
               className="button_navbar_common"
               onClick={() => {
-                setCardModalOpen(true);
+                // setCardModalOpen(true);
+                openLink(CONST_TYMT_LINKS?.solarcard);
               }}
             >
               <svg
@@ -215,7 +218,8 @@ const Navbar = () => {
               className="button_navbar_common"
               sx={{ position: "relative" }}
               onClick={() => {
-                setShowAlert(!showAlert);
+                // setShowAlert(!showAlert);
+                setComing(true);
               }}
             >
               {/* {alertListStore.unread.length > 0 && <span className={"notification_dot"}></span>} */}
