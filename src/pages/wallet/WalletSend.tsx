@@ -174,12 +174,16 @@ const WalletSend = () => {
   }, [currentChainStore]);
 
   useEffect(() => {
-    if (currentChainNativeBalance < Number(amount) + Number(sxpFee)) {
-      setLowBalanceError(true);
+    if (currentSupportChain?.native?.symbol === "SXP") {
+      if (currentChainNativeBalance < Number(amount) + Number(sxpFee)) {
+        setLowBalanceError(true);
+      } else {
+        setLowBalanceError(false);
+      }
     } else {
       setLowBalanceError(false);
     }
-  }, [amount, currentChainNativeBalance, sxpFee]);
+  }, [amount, currentChainNativeBalance, sxpFee, currentSupportChain]);
 
   return (
     <AnimatedComponent threshold={0}>
@@ -214,7 +218,11 @@ const WalletSend = () => {
                     <Box
                       className={"fs-14-bold blue"}
                       onClick={() => {
-                        handleAmount((currentChainNativeBalance - sxpFee)?.toString());
+                        if (currentSupportChain?.native?.symbol === "SXP") {
+                          handleAmount((currentChainNativeBalance - sxpFee)?.toString());
+                        } else {
+                          handleAmount(currentChainNativeBalance?.toString());
+                        }
                       }}
                       sx={{
                         cursor: "pointer",
