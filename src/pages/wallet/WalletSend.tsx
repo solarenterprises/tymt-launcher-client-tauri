@@ -47,6 +47,7 @@ const WalletSend = () => {
   const [draft, setDraft] = useState<IRecipient[]>([]);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [lowBalanceError, setLowBalanceError] = useState<boolean>(false);
 
   const {
     sxpFee,
@@ -141,6 +142,7 @@ const WalletSend = () => {
       console.error(`Failed to handleTransfer`, err);
     } finally {
       setLoading(false);
+      resetAllFields();
     }
   }, [sxpFee, draft, address, amount, password, currentNativeOrToken, currentSupportChain, dispatch]);
 
@@ -160,12 +162,24 @@ const WalletSend = () => {
     [amount, setAmount]
   );
 
-  useEffect(() => {
+  const resetAllFields = () => {
     setDraft([]);
     setAmount("");
     setAddress("");
     setPassword("");
+  };
+
+  useEffect(() => {
+    resetAllFields();
   }, [currentChainStore]);
+
+  useEffect(() => {
+    if (currentChainNativeBalance < Number(amount) + Number(sxpFee)) {
+      setLowBalanceError(true);
+    } else {
+      setLowBalanceError(false);
+    }
+  }, [amount, currentChainNativeBalance, sxpFee]);
 
   return (
     <AnimatedComponent threshold={0}>
@@ -200,8 +214,7 @@ const WalletSend = () => {
                     <Box
                       className={"fs-14-bold blue"}
                       onClick={() => {
-                        setAmount(currentChainNativeBalance?.toString());
-                        handleAmount(currentChainNativeBalance?.toString());
+                        handleAmount((currentChainNativeBalance - sxpFee)?.toString());
                       }}
                       sx={{
                         cursor: "pointer",
@@ -218,6 +231,11 @@ const WalletSend = () => {
                       Number(amount) * Number(currentChainNativePrice) * currentCurrencyReserve,
                       4
                     )}`}</Box>
+                    {lowBalanceError && (
+                      <Box className={"fs-14-light red"} mt={"16px"}>
+                        {t("wal-88_adjust-fee")}
+                      </Box>
+                    )}
                   </Stack>
                   <Stack direction={"row"} alignItems={"center"} padding={"4px 8px"} spacing={"8px"}>
                     <Box component={"img"} src={currentSupportChain?.native?.logo} width={30} />
@@ -312,6 +330,7 @@ const WalletSend = () => {
                     onClick={() => {
                       updateDraft();
                     }}
+                    disabled={lowBalanceError}
                   >
                     {t("set-57_save")}
                   </Button>
@@ -336,6 +355,7 @@ const WalletSend = () => {
               <Button
                 disabled={
                   loading ||
+                  lowBalanceError ||
                   Number(amount) === 0 ||
                   address === "" ||
                   (Number(sxpFee) === 0 && currentSupportChain?.native?.symbol === "SXP") ||
