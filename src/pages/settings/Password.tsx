@@ -31,37 +31,47 @@ const Password = ({ view, setView }: IPropsPassword) => {
   const [oldPwd, setOldPwd] = useState("");
   const [cfmPwd, setCfmPwd] = useState("");
 
-  const updatePassword = useCallback(async () => {
-    if (accountStore?.password !== getKeccak256Hash(oldPwd)) {
-      setNewPwd("");
-      setOldPwd("");
-      setCfmPwd("");
-      return;
-    }
-    if (accountStore?.password === getKeccak256Hash(newPwd)) {
-      setNewPwd("");
-      setOldPwd("");
-      setCfmPwd("");
-      return;
-    }
-    if (cfmPwd !== newPwd) {
-      setNewPwd("");
-      setOldPwd("");
-      setCfmPwd("");
-      return;
-    }
-    const newMnemonic = await encrypt(await decrypt(accountStore?.mnemonic, oldPwd), newPwd);
-    const newAccountStore = {
-      ...accountStore,
-      password: getKeccak256Hash(newPwd),
-      mnemonic: newMnemonic,
-    };
-    console.log(newAccountStore);
-    dispatch(setAccount(newAccountStore));
-    dispatch(addAccountList(newAccountStore));
+  const resetFields = () => {
     setNewPwd("");
     setOldPwd("");
     setCfmPwd("");
+  };
+
+  const updatePassword = useCallback(async () => {
+    try {
+      const oldPwdHash = getKeccak256Hash(oldPwd);
+      const newPwdHash = getKeccak256Hash(newPwd);
+
+      if (accountStore?.password !== oldPwdHash || oldPwd === "") {
+        resetFields();
+        return;
+      }
+      if (accountStore?.password === newPwdHash || newPwd === "") {
+        resetFields();
+        return;
+      }
+
+      if (cfmPwd !== newPwd || cfmPwd === "") {
+        resetFields();
+        return;
+      }
+
+      const decryptedMnemonic = await decrypt(accountStore?.mnemonic, oldPwd);
+      const encryptedMnemonic = await encrypt(decryptedMnemonic, newPwd);
+
+      const newAccountStore = {
+        ...accountStore,
+        password: newPwdHash,
+        mnemonic: encryptedMnemonic,
+      };
+
+      dispatch(setAccount(newAccountStore));
+      dispatch(addAccountList(newAccountStore));
+      resetFields();
+    } catch (err) {
+      console.error("Error updating password:", err);
+      resetFields();
+    }
   }, [accountStore, newPwd, oldPwd, cfmPwd]);
 
   return (
