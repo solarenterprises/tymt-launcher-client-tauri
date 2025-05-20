@@ -1,15 +1,16 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-
 import { Box, Button, Divider, Stack } from "@mui/material";
 
+import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 import InputText from "../../components/account/InputText";
 import SecurityLevel from "../../components/account/SecurityLevel";
 
 import { getAccount, setAccount } from "../../store/AccountSlice";
 
-import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
+import { useNotification } from "../../providers/NotificationProvider";
+import { encrypt, decrypt, getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 
 import { IAccount } from "../../types/AccountTypes";
 import { addAccountList } from "../../store/AccountListSlice";
@@ -23,6 +24,7 @@ export interface IPropsPassword {
 
 const Password = ({ view, setView }: IPropsPassword) => {
   const { t } = useTranslation();
+  const { showNotification } = useNotification();
   const dispatch = useDispatch();
 
   const accountStore: IAccount = useSelector(getAccount);
@@ -31,35 +33,49 @@ const Password = ({ view, setView }: IPropsPassword) => {
   const [oldPwd, setOldPwd] = useState("");
   const [cfmPwd, setCfmPwd] = useState("");
 
-  const updatePassword = useCallback(() => {
-    if (accountStore?.password !== getKeccak256Hash(oldPwd)) {
-      setNewPwd("");
-      setOldPwd("");
-      setCfmPwd("");
-      return;
-    }
-    if (accountStore?.password === getKeccak256Hash(newPwd)) {
-      setNewPwd("");
-      setOldPwd("");
-      setCfmPwd("");
-      return;
-    }
-    if (cfmPwd !== newPwd) {
-      setNewPwd("");
-      setOldPwd("");
-      setCfmPwd("");
-      return;
-    }
-    dispatch(
-      setAccount({
-        ...accountStore,
-        password: getKeccak256Hash(newPwd),
-      })
-    );
-    dispatch(addAccountList(accountStore));
+  const resetFields = () => {
     setNewPwd("");
     setOldPwd("");
     setCfmPwd("");
+  };
+
+  const updatePassword = useCallback(async () => {
+    try {
+      const oldPwdHash = getKeccak256Hash(oldPwd);
+      const newPwdHash = getKeccak256Hash(newPwd);
+
+      if (accountStore?.password !== oldPwdHash || oldPwd === "") {
+        resetFields();
+        return;
+      }
+      if (accountStore?.password === newPwdHash || newPwd === "") {
+        resetFields();
+        return;
+      }
+
+      if (cfmPwd !== newPwd || cfmPwd === "") {
+        resetFields();
+        return;
+      }
+
+      const decryptedMnemonic = await decrypt(accountStore?.mnemonic, oldPwd);
+      const encryptedMnemonic = await encrypt(decryptedMnemonic, newPwd);
+
+      const newAccountStore = {
+        ...accountStore,
+        password: newPwdHash,
+        mnemonic: encryptedMnemonic,
+      };
+
+      dispatch(setAccount(newAccountStore));
+      dispatch(addAccountList(newAccountStore));
+      resetFields();
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.PROFILE_UPDATE_SUCCESS });
+    } catch (err) {
+      console.error("Error updating password:", err);
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.PROFILE_UPDATE_FAIL, text: err.toString() });
+      resetFields();
+    }
   }, [accountStore, newPwd, oldPwd, cfmPwd]);
 
   return (
