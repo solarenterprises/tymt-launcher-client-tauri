@@ -1,21 +1,21 @@
 import { useState } from "react";
-
-import { Grid } from "@mui/material";
-
-import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
-
+import { Grid, Stack } from "@mui/material";
+// import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 // import GameBarSticker from "../../components/home/GameBarSticker";
 import Bottom from "../../components/home/Bottom";
 // import ComingsoonD53 from "../../components/home/ComingSoon-D53";
-import District53Intro from "../../components/home/District53Intro";
+// import District53Intro from "../../components/home/District53Intro";
 // import RecentlyAddedGames from "../../components/home/RecentlyAddedGames";
 import UpdateModal from "../../components/home/UpdateModal";
 import AnimatedComponent from "../../components/home/AnimatedComponent";
 import GameSwiperComponent from "../../components/home/GameSwiperComponent";
+import ReactPlayer from "react-player";
+import { CONST_TYMT_LINKS } from "../../const/tymtConsts";
+import TymtIntro from "../../components/home/TymtIntro";
 // import EmbeddedWebview from "../../components/home/EmbeddedWebview";
 
 const Homepage = () => {
-  const [image, setImage] = useState<string>(CONST_GAME_DISTRICT53?.imageUrl);
+  // const [image, setImage] = useState<string>(CONST_GAME_DISTRICT53?.imageUrl);
   const [updateModal, setUpdateModal] = useState<boolean>(false);
 
   return (
@@ -29,9 +29,15 @@ const Homepage = () => {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ width: "calc(100% - 353px)" }}>
-            <Grid item xs={12}>
-              <img
+          <Stack display={"flex"} direction={"row"} justifyContent={"space-between"} width={"100%"}>
+            <div style={{ width: "calc(100% - 353px)", borderRadius: "16px", overflow: "hidden" }}>
+              <ReactPlayer url={CONST_TYMT_LINKS.youtube} playing loop muted width={"100%"} height={"100%"} />
+            </div>
+            <TymtIntro />
+          </Stack>
+          {/* <div style={{ width: "calc(100% - 353px)" }}> */}
+          {/* <Grid item xs={12}> */}
+          {/* <img
                 className="District53"
                 src={image}
                 width={"100%"}
@@ -42,13 +48,13 @@ const Homepage = () => {
                   flexShrink: 1,
                 }}
                 loading="lazy"
-              />
-            </Grid>
-            {/* <Grid item xs={12} container spacing={"32px"} mt={"0px"}>
+              /> */}
+          {/* </Grid> */}
+          {/* <Grid item xs={12} container spacing={"32px"} mt={"0px"}>
               <GameBarSticker />
             </Grid> */}
-          </div>
-          <District53Intro setImage={setImage} />
+          {/* </div> */}
+          {/* <District53Intro setImage={setImage} /> */}
         </Grid>
       </AnimatedComponent>
       <Grid container sx={{ marginTop: "80px" }}>
