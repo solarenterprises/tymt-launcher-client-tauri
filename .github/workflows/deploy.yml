@@ -92,7 +92,7 @@ jobs:
           VITE_APP_TYMT_AVATAR_URL: ${{ secrets.VITE_APP_TYMT_AVATAR_URL }}
           VITE_APP_NOWNODES_URL: ${{ secrets.VITE_APP_NOWNODES_URL }}
           VITE_APP_TYMT_RELEASE_DATE: "May 15th, 2025"
-          VITE_APP_TYMT_VERSION: "2.4.2"
+          VITE_APP_TYMT_VERSION: "2.2.2"
           VITE_APP_MAINNET_SOLAR_API_URL: "https://api.solar.org/api"
           VITE_APP_MAINNET_SOLAR_WSS_URL: "wss://api.solar.org/ws"
           VITE_APP_MAINNET_SOLAR_SCAN: "https://solarscan.com/"

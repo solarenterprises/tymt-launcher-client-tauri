@@ -17,7 +17,7 @@
   },
   "productName": "tymtLauncher",
   "mainBinaryName": "tymtLauncher",
-  "version": "2.4.2",
+  "version": "2.2.2",
   "identifier": "tymtLauncher",
   "plugins": {
     "updater": {
