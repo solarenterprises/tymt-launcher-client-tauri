@@ -117,6 +117,15 @@ export const GameAPI = {
     }
   },
 
+  fetchGamePriceInSXP: async (game_id: string): Promise<any> => {
+    try {
+      const res = await axiosAuth.get<{ data: any }>(`/game/price/${game_id}`);
+      return res.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error ?? "Failed to fetchGamePriceInSXP");
+    }
+  },
+
   // fetchComingGameList: async (page: number): Promise<any> => {
   //   const res = await axiosAuth.get<{ data: any }>(`/store/by-visibility-state/coming%20soon?page=${page}`);
   //   return res.data.data;

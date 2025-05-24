@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import numeral from "numeral";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Skeleton, Stack } from "@mui/material";
 import { CONST_CHAIN_ICONS } from "../../../const/ChainConsts";
 import { useWallet } from "../../../providers/WalletProvider";
 import { IGame } from "../../../types/GameTypes";
@@ -11,14 +11,16 @@ import ChevronRightDouble from "../../../assets/arrow/ChevronRightDouble.png";
 export interface IPropsBuyGameContent {
   game: IGame;
   purchaseGame: () => void;
+  loadingPrice: boolean;
+  gamePriceInSXP: number;
 }
 
-const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
+const BuyGameContent = ({ game, purchaseGame, loadingPrice, gamePriceInSXP }: IPropsBuyGameContent) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { sxpBalance, sxpPrice, sxpFee } = useWallet();
 
-  const isInsufficient: boolean = useMemo(() => sxpBalance < game?.price + sxpFee, [sxpBalance, game?.price, sxpFee]);
+  const isInsufficient: boolean = useMemo(() => sxpBalance < +gamePriceInSXP + +sxpFee, [sxpBalance, gamePriceInSXP, sxpFee]);
 
   const handleClick = () => {
     if (isInsufficient) {
@@ -39,7 +41,7 @@ const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
         </Stack>
         <Stack direction={"row"} alignItems={"center"} gap={"8px"}>
           <Box component={"img"} src={CONST_CHAIN_ICONS.SOLAR} alt="game" sx={{ width: "24px", height: "24px" }} />
-          <Box className="fs-20-regular white">{numeral(game?.price + sxpFee).format("0.0")}</Box>
+          <Box className="fs-20-regular white">{loadingPrice ? <Skeleton /> : numeral(+gamePriceInSXP + +sxpFee).format("0,0.[0000]")}</Box>
         </Stack>
       </Stack>
 
@@ -69,8 +71,12 @@ const BuyGameContent = ({ game, purchaseGame }: IPropsBuyGameContent) => {
             <Stack direction={"column"} gap={"8px"}>
               <Box className="fs-16-regular light">{`${t("pur-10_balance-after-purchase")}:`}</Box>
               <Stack direction={"column"} gap={"4px"}>
-                <Box className="fs-16-regular white">{numeral(sxpBalance - game?.price - sxpFee).format("0,0.00")} SXP</Box>
-                <Box className="fs-16-regular light">$ {numeral((sxpBalance - game?.price - sxpFee) * sxpPrice).format("0,0.00")}</Box>
+                <Box className="fs-16-regular white">
+                  {loadingPrice ? <Skeleton /> : `${numeral(sxpBalance - gamePriceInSXP - sxpFee).format("0,0.00")} SXP`}
+                </Box>
+                <Box className="fs-16-regular light">
+                  {loadingPrice ? <Skeleton /> : `$ ${numeral((sxpBalance - gamePriceInSXP - sxpFee) * sxpPrice).format("0,0.00")}`}
+                </Box>
               </Stack>
             </Stack>
           </Stack>

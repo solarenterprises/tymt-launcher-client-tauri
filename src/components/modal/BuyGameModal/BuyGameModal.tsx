@@ -27,12 +27,29 @@ const BuyGameModal = ({ open, setOpen, game, setPurchased }: IPropsBuyGameModal)
 
   const [content, setContent] = useState<string>("buy-game");
   const [sendingTransaction, setSendingTransaction] = useState<boolean>(false);
+  const [loadingPrice, setLoadingPrice] = useState<boolean>(false);
+  const [gamePriceInSXP, setGamePriceInSXP] = useState<number>(0);
 
   const modalStyle = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   };
+
+  const fetchGamePriceInSXP = useCallback(async () => {
+    setLoadingPrice(true);
+    GameAPI.fetchGamePriceInSXP(game?._id)
+      .then((res) => {
+        setGamePriceInSXP(res?.data?.price as number);
+      })
+      .catch((err) => {
+        console.error("Failed to fetchGamePriceInSXP: ", err);
+        setGamePriceInSXP(0);
+      })
+      .finally(() => {
+        setLoadingPrice(false);
+      });
+  }, [game]);
 
   const purchaseGame = async () => {
     setContent("confirm-password");
@@ -76,8 +93,9 @@ const BuyGameModal = ({ open, setOpen, game, setPurchased }: IPropsBuyGameModal)
   useEffect(() => {
     if (open) {
       setContent("buy-game");
+      fetchGamePriceInSXP();
     }
-  }, [open]);
+  }, [open, fetchGamePriceInSXP]);
 
   return (
     <>
@@ -104,7 +122,7 @@ const BuyGameModal = ({ open, setOpen, game, setPurchased }: IPropsBuyGameModal)
               },
             }}
           >
-            {content === "buy-game" && <BuyGameContent game={game} purchaseGame={purchaseGame} />}
+            {content === "buy-game" && <BuyGameContent game={game} purchaseGame={purchaseGame} loadingPrice={loadingPrice} gamePriceInSXP={gamePriceInSXP} />}
             {content === "confirm-password" && <ConfirmPasswordContent confirmPurchase={confirmPurchase} sendingTransaction={sendingTransaction} />}
             {content === "thank-purchase" && <ThankContent game={game} setOpen={setOpen} />}
           </Box>
