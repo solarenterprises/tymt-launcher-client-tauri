@@ -10,7 +10,6 @@ import { Box, Stack } from "@mui/material";
 import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
 import { useNotification } from "../../providers/NotificationProvider";
-import { useWallet } from "../../providers/WalletProvider";
 
 import AccountNextButton from "./AccountNextButton";
 import InputText from "./InputText";
@@ -33,7 +32,6 @@ const LoginAccountForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { showNotification } = useNotification();
-  const { handleRefreshClick } = useWallet();
 
   const accountStore: IAccount = useSelector(getAccount);
   const accountStoreRef = useRef(accountStore);
@@ -77,8 +75,6 @@ const LoginAccountForm = () => {
       dispatch(setMnemonic(passphrase));
       navigate("/home");
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_SUCCESS });
-
-      // handleRefreshClick();
     } catch (err) {
       console.error("Failed to handleLogin: ", err);
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_FAIL, text: err.toString() });
@@ -93,14 +89,6 @@ const LoginAccountForm = () => {
       const password = "";
       const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
       const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
-      // navigate("/confirm-information/login", {
-      //   state: {
-      //     password: password,
-      //     walletAddresses: walletAddresses,
-      //     nickname: "Guest",
-      //     passphrase: decryptedMnemonic,
-      //   },
-      // });
       await handleLogin(walletAddresses, decryptedMnemonic, password);
     } catch (err) {
       console.error("Failed to handleGuestLogin: ", err);

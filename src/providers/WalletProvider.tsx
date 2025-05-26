@@ -11,7 +11,7 @@ import { getCurrentChain } from "../store/CurrentChainSlice";
 import { getCurrentCurrency } from "../store/CurrentCurrencySlice";
 import { getCurrentToken, setCurrentToken } from "../store/CurrentTokenSlice";
 import { getWallet } from "../store/WalletSlice";
-import { /*appendPriceList,*/ getPriceList, setPriceList } from "../store/PriceListSlice";
+import { getPriceList, setPriceList } from "../store/PriceListSlice";
 import { appendBalanceList, getBalanceList, setBalanceList } from "../store/BalanceListSlice";
 import { getReserveList, setReserveList } from "../store/ReserveListSlice";
 import { getWalletSetting, setWalletSetting } from "../store/WalletSettingSlice";
@@ -285,8 +285,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   }, [walletSettingStore]);
 
   useEffect(() => {
-    handleRefreshClick();
-  }, [walletStore]);
+    if (authStore?.isLoggedIn) handleRefreshClick();
+  }, [walletStore, authStore]);
 
   return (
     <WalletContext.Provider
