@@ -1,6 +1,6 @@
 import axiosAuth from "../core/AxiosAuth";
 import { IFeedback } from "../../types/GameTypes";
-import { IMetaPagination, IPaginationQuery } from "../../types/APITypes/BasicAPITypes";
+import { IMetaFeedbackPagination, IPaginationQuery } from "../../types/APITypes/BasicAPITypes";
 
 export const FeedbackAPI = {
   getFeedbacks: async ({
@@ -9,9 +9,9 @@ export const FeedbackAPI = {
   }: {
     gameId: string;
     query?: IPaginationQuery;
-  }): Promise<{ data: IFeedback[]; meta: IMetaPagination }> => {
+  }): Promise<{ data: IFeedback[]; meta: IMetaFeedbackPagination }> => {
     try {
-      const res = await axiosAuth.get<{ data: IFeedback[]; meta: IMetaPagination }>(`/game/${gameId}/feedback`, { params: query });
+      const res = await axiosAuth.get<{ data: IFeedback[]; meta: IMetaFeedbackPagination }>(`/game/${gameId}/feedback`, { params: query });
       return res.data;
     } catch (err) {
       console.error("Failed to getFeedbacks: ", err.response?.data ?? err);

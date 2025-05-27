@@ -14,7 +14,7 @@ import { FeedbackAPI } from "../../lib/api/FeedbackAPI";
 import noreviews from "../../assets/main/NoReviews.png";
 
 import { IFeedback, IGame } from "../../types/GameTypes";
-import { IMetaPagination } from "../../types/APITypes/BasicAPITypes";
+import { IMetaFeedbackPagination } from "../../types/APITypes/BasicAPITypes";
 
 export interface IPropsGameReview {
   game: IGame;
@@ -26,10 +26,8 @@ const GameReview = ({ game }: IPropsGameReview) => {
   const [view, setView] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [feedbackList, setFeedbackList] = useState<IFeedback[]>([]);
-  const [meta, setMeta] = useState<IMetaPagination>();
+  const [meta, setMeta] = useState<IMetaFeedbackPagination>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const averageStar = 3;
 
   const fetchReviewData = async (currentPage: number = 1) => {
     try {
@@ -37,9 +35,11 @@ const GameReview = ({ game }: IPropsGameReview) => {
       const res = await FeedbackAPI.getFeedbacks({ gameId: game?._id, query: { page: currentPage, limit: 5, sort: "-createdAt" } });
       setFeedbackList(res.data);
       setMeta(res.meta);
-      setLoading(false);
     } catch (err) {
       console.error("Failed to fetchReviewData: ", err);
+      setFeedbackList([]);
+      setMeta(null);
+    } finally {
       setLoading(false);
     }
   };
@@ -67,9 +67,9 @@ const GameReview = ({ game }: IPropsGameReview) => {
                 marginTop: "16px",
               }}
             >
-              <ReviewRating value={averageStar} />
+              <ReviewRating value={meta?.averageRating ?? 0} />
               <Box className={"fs-18-bold white"} marginLeft={"5px"}>
-                {numeral(averageStar).format("0,0.[00]")}
+                {numeral(meta?.averageRating ?? 0).format("0,0.[00]")}
               </Box>
             </Box>
           )}

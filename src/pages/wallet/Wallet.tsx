@@ -57,7 +57,7 @@ const Wallet = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [comingSoon, setComingSoon] = useState<boolean>(false);
-  const [txList, setTxList] = useState<ITransactionPagination>();
+  const [txList, setTxList] = useState<ITransactionPagination>(null);
   const [currentTxPage, setCurrentTxPage] = useState<number>(1);
 
   const fetchTransactionList = useCallback(
@@ -90,6 +90,8 @@ const Wallet = () => {
         }
         setTxList(res);
       } catch (err) {
+        console.error(`Failed to fetchTransactionList: `, err);
+        setTxList(null);
       } finally {
         setLoading(false);
       }
