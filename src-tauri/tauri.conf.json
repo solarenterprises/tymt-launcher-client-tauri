@@ -66,15 +66,15 @@
     ],
     "security": {
       "csp": {
-        "default-src": "*",
-        "script-src": "* 'unsafe-inline' 'unsafe-eval'",
-        "style-src": "* 'unsafe-inline'",
-        "img-src": "* data: blob:",
-        "font-src": "* data:",
-        "connect-src": "*",
-        "frame-src": "*",
-        "object-src": "*",
-        "base-uri": "*"
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self'",
+        "img-src": "'self' data:",
+        "font-src": "'self' data:",
+        "connect-src": "'self'",
+        "frame-src": "'none'",
+        "object-src": "'none'",
+        "base-uri": "'self'"
       },
       "dangerousDisableAssetCspModification": false,
       "capabilities": ["main-capability"]

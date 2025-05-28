@@ -6,8 +6,13 @@ const tymtStorage = {
   },
   get(key: string, defaultValue = "") {
     const stringify = localStorage.getItem(key);
-    if (stringify === null || stringify === "undefined") return defaultValue;
-    return JSON.parse(stringify) ? JSON.parse(stringify) : "";
+    if (!stringify) return defaultValue;
+    try {
+      return JSON.parse(stringify);
+    } catch (err) {
+      console.error("Failed to parse value from localStorage for key:", key, err);
+      return defaultValue;
+    }
   },
   clear() {
     localStorage.clear();
