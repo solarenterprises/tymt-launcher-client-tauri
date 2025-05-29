@@ -1,25 +1,16 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { getConstTymtLinks, IConstTymtLinks } from "../const/tymtConsts";
+import { createContext, ReactNode, useContext, useState } from "react";
+import { CONST_TYMT_LINKS, IConstTymtLinks } from "../const/tymtConsts";
 
 interface ConstVarContextType {
   constTymtLinks: IConstTymtLinks;
-  setConstTymtLinks: (_: IConstTymtLinks) => void;
 }
 
 const ConstVarContext = createContext<ConstVarContextType | undefined>(undefined);
 
 export const ConstVarProvider = ({ children }: { children: ReactNode }) => {
-  const [constTymtLinks, setConstTymtLinks] = useState<IConstTymtLinks>(null);
+  const [constTymtLinks, _setConstTymtLinks] = useState<IConstTymtLinks>(CONST_TYMT_LINKS);
 
-  useEffect(() => {
-    getConstTymtLinks()
-      .then(setConstTymtLinks)
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
-
-  return <ConstVarContext.Provider value={{ constTymtLinks, setConstTymtLinks }}>{children}</ConstVarContext.Provider>;
+  return <ConstVarContext.Provider value={{ constTymtLinks }}>{children}</ConstVarContext.Provider>;
 };
 
 export const useConstVar = (): ConstVarContextType => {
