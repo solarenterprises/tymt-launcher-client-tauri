@@ -67,12 +67,13 @@
     "security": {
       "csp": {
         "default-src": "'self'",
-        "script-src": "'self'",
-        "style-src": "'self'",
-        "img-src": "'self' data:",
+        "script-src": "'self' 'unsafe-eval'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: https:",
         "font-src": "'self' data:",
-        "connect-src": "'self'",
-        "frame-src": "'none'",
+        "connect-src": "'self' ipc: http://ipc.localhost https://*.tymt.com https://api.solar.org wss://metamask-sdk.api.cx.metamask.io https://metamask-sdk.api.cx.metamask.io https:",
+        "media-src": "'self' https://*.tymt.com",
+        "frame-src": "'none' https://www.youtube.com https://www.youtube-nocookie.com",
         "object-src": "'none'",
         "base-uri": "'self'"
       },
