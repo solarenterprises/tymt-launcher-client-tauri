@@ -15,7 +15,7 @@ import { getPriceList, setPriceList } from "../store/PriceListSlice";
 import { appendBalanceList, getBalanceList, setBalanceList } from "../store/BalanceListSlice";
 import { getReserveList, setReserveList } from "../store/ReserveListSlice";
 import { getWalletSetting, setWalletSetting } from "../store/WalletSettingSlice";
-import { getMnemonic } from "../store/MnemonicSlice";
+import { getAccount } from "../store/AccountSlice";
 import { getAuth } from "../store/AuthSlice";
 
 import { CryptoAPI } from "../lib/api/CryptoAPI";
@@ -29,26 +29,23 @@ import {
   getSupportNativeOrTokenBySymbol,
   getTokenBalanceBySymbol,
   getTokenPriceBySymbol,
-  getPublicKey,
   getNativeDecimalsBySymbol,
 } from "../lib/helper/WalletHelper";
+import { decrypt } from "../lib/helper/EncryptHelper";
 
 import { ICurrentChain, ISupportChain, ISupportNative, ISupportToken } from "../types/ChainTypes";
 import { ICurrentCurrency, IReserveList } from "../types/CurrencyTypes";
 import { IBalanceList, ICurrentToken, IVotingData, IWalletAddresses } from "../types/WalletTypes";
 import { IPriceList } from "../types/PriceTypes";
-import { IAuth, IMnemonic } from "../types/AccountTypes";
+import { IAccount, IAuth } from "../types/AccountTypes";
 import { IWalletSetting } from "../types/SettingTypes";
 import { IRecipient } from "../types/TransactionTypes";
 
 interface WalletContextType {
-  passphrase: string;
   sxpPrice: number;
   sxpBalance: number;
   sxpAddress: string;
   sxpFee: number;
-  publicKey: string;
-  ethPrivateKey: string;
   currentSupportChain: ISupportChain;
   currentChainWalletAddress: string;
   currentChainExplorerUrl: string;
@@ -59,13 +56,15 @@ interface WalletContextType {
   currentChainNativeBalance: number;
   totalBalance: number;
 
-  sxpVote: (__: IWalletAddresses, ___: number, _____: IVotingData) => Promise<{ success: boolean; error?: string }>;
-  transferCoin: (recipients: IRecipient[], fee: string) => Promise<{ success: boolean; message?: string; error?: string; data?: any }>;
+  sxpVote: (_: IWalletAddresses, __: number, ___: IVotingData, ____: string) => Promise<{ success: boolean; error?: string }>;
+  transferCoin: (recipients: IRecipient[], fee: string, passphrase: string) => Promise<{ success: boolean; message?: string; error?: string; data?: any }>;
   setSxpFeeAsInput: (_: number) => void;
   fetchBalanceList: () => void;
   fetchSXPBalance: () => void;
   fetchPriceList: () => void;
   handleRefreshClick: () => void;
+  getEthPrivateKey: (_: string) => Promise<string>;
+  getPassphrase: (_: string) => Promise<string>;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -74,10 +73,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
 
   const [sxpFee, setSxpFee] = useState<number>(0);
-  const [ethPrivateKey, setEthPrivagteKey] = useState<string>("");
 
   const authStore: IAuth = useSelector(getAuth);
-  const mnemonicStore: IMnemonic = useSelector(getMnemonic);
+  const accountStore: IAccount = useSelector(getAccount);
   const currentChainStore: ICurrentChain = useSelector(getCurrentChain);
   const currentCurrencyStore: ICurrentCurrency = useSelector(getCurrentCurrency);
   const currentTokenStore: ICurrentToken = useSelector(getCurrentToken);
@@ -87,11 +85,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const reserveListStore: IReserveList = useSelector(getReserveList);
   const walletSettingStore: IWalletSetting = useSelector(getWalletSetting);
 
-  const passphrase = useMemo(() => mnemonicStore?.mnemonic, [mnemonicStore]);
   const sxpPrice = useMemo(() => getNativeTokenPriceByChainName(priceListStore, CONST_CHAIN_NAMES?.SOLAR), [priceListStore]);
   const sxpBalance = useMemo(() => getNativeTokenBalanceByChainName(balanceListStore, CONST_CHAIN_NAMES?.SOLAR), [balanceListStore]);
   const sxpAddress = useMemo(() => walletStore?.solar, [walletStore]);
-  const publicKey = useMemo(() => getPublicKey(passphrase), [passphrase]);
 
   const currentSupportChain = useMemo(() => getSupportChainByName(currentChainStore?.chain), [currentChainStore]);
   const currentChainWalletAddress: string = useMemo(
@@ -139,12 +135,49 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     [dispatch, walletSettingStore]
   );
 
+  const getPassphrase = useCallback(
+    async (password: string) => {
+      if (!accountStore?.mnemonic) {
+        throw new Error("Mnemonic not found in account store.");
+      }
+      try {
+        const passphrase = await decrypt(accountStore?.mnemonic, password);
+        if (!passphrase) {
+          throw new Error("Failed to decrypt mnemonic. Invalid password?");
+        }
+        return passphrase;
+      } catch (error) {
+        console.error("Error in getPassphrase:", error);
+        throw new Error("Unable to retrieve passphrase. " + (error?.message || ""));
+      }
+    },
+    [accountStore]
+  );
+
+  const getEthPrivateKey = async (passphrase: string) => {
+    if (!passphrase || typeof passphrase !== "string") {
+      throw new Error("Invalid passphrase provided.");
+    }
+    try {
+      const privateKey = await tymtCore.Blockchains.eth.wallet.getPrivateKey(passphrase);
+      if (!privateKey) {
+        throw new Error("Failed to retrieve Ethereum private key.");
+      }
+      return privateKey;
+    } catch (error) {
+      console.error("Error in getEthPrivateKey:", error);
+      throw new Error("Unable to get Ethereum private key. " + (error?.message || ""));
+    }
+  };
+
   const transferCoin = useCallback(
     async (
       recipients: IRecipient[],
-      fee: string // fee in SXP
+      fee: string, // fee in SXP
+      passphrase: string
     ) => {
       let res;
+      const ethPrivateKey: string = await getEthPrivateKey(passphrase);
       switch (recipients[0].chainSymbol) {
         case CONST_CHAIN_SYMBOLS.SOLAR:
           res = await tymtCore.Blockchains.solar.wallet.sendTransaction(passphrase, { recipients, fee });
@@ -170,7 +203,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       }
       return res;
     },
-    [passphrase, ethPrivateKey, walletStore]
+    [/*passphrase, */ walletStore, getEthPrivateKey]
   );
 
   const fetchCurrencyRates = useCallback(async () => {
@@ -225,13 +258,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [fetchPriceList, fetchBalanceList]);
 
-  const getEthPrivateKey = async (passphrase: string) => {
-    const privateKey = await tymtCore.Blockchains.eth.wallet.getPrivateKey(passphrase);
-    setEthPrivagteKey(privateKey);
-  };
-
   const sxpVote = useCallback(
-    async (walletStore: IWalletAddresses, sxpFee: number, voteAsset: IVotingData) => {
+    async (walletStore: IWalletAddresses, sxpFee: number, voteAsset: IVotingData, passphrase: string) => {
       try {
         const res = await tymtCore.Blockchains.solar.wallet.vote(passphrase, walletStore?.solar, voteAsset, sxpFee);
         if (res.data.data.invalid[0]) {
@@ -249,12 +277,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         };
       }
     },
-    [passphrase, fetchSXPBalance]
+    [/*passphrase, */ fetchSXPBalance]
   );
-
-  useEffect(() => {
-    getEthPrivateKey(passphrase);
-  }, [passphrase]);
 
   useEffect(() => {
     dispatch(setCurrentToken(currentSupportChain?.native?.symbol));
@@ -291,13 +315,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   return (
     <WalletContext.Provider
       value={{
-        passphrase,
+        // passphrase,
         sxpPrice,
         sxpBalance,
         sxpAddress,
         sxpFee,
-        publicKey,
-        ethPrivateKey,
         currentSupportChain,
         currentChainWalletAddress,
         currentChainExplorerUrl,
@@ -314,6 +336,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         fetchSXPBalance,
         fetchPriceList,
         handleRefreshClick,
+        getEthPrivateKey,
+        getPassphrase,
       }}
     >
       {children}

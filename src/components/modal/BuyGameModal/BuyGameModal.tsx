@@ -22,7 +22,7 @@ export interface IPropsBuyGameModal {
 }
 
 const BuyGameModal = ({ open, setOpen, game, setPurchased }: IPropsBuyGameModal) => {
-  const { sxpFee, passphrase } = useWallet();
+  const { sxpFee, getPassphrase } = useWallet();
   const { showNotification } = useNotification();
 
   const [content, setContent] = useState<string>("buy-game");
@@ -55,40 +55,44 @@ const BuyGameModal = ({ open, setOpen, game, setPurchased }: IPropsBuyGameModal)
     setContent("confirm-password");
   };
 
-  const confirmPurchase = useCallback(async () => {
-    try {
-      setSendingTransaction(true);
+  const confirmPurchase = useCallback(
+    async (password: string) => {
+      try {
+        setSendingTransaction(true);
 
-      const resOrder = await GameAPI.postGameOrder(game?._id);
-      const orderId = resOrder?.data?.order_id;
-      const recipientAddress = resOrder?.data?.recipient_solar_address;
-      const amount = resOrder?.data?.price.toString();
+        const resOrder = await GameAPI.postGameOrder(game?._id);
+        const orderId = resOrder?.data?.order_id;
+        const recipientAddress = resOrder?.data?.recipient_solar_address;
+        const amount = resOrder?.data?.price.toString();
 
-      const recipient: IRecipient = {
-        address: recipientAddress,
-        amount: amount,
-      };
-      const res = await tymtCore.Blockchains.solar.wallet.sendTransaction(passphrase, { recipients: [recipient], fee: sxpFee.toString() });
+        const recipient: IRecipient = {
+          address: recipientAddress,
+          amount: amount,
+        };
+        const passphrase = await getPassphrase(password);
+        const res = await tymtCore.Blockchains.solar.wallet.sendTransaction(passphrase, { recipients: [recipient], fee: sxpFee.toString() });
 
-      if (res.success) {
-        showNotification({ content: CONST_NOTIFICATION_CONTENTS.TX_SENT_SUCCESS });
-        const txId = res?.message;
-        const resPurchase = await GameAPI.postGamePurchase(orderId, txId);
-        console.log("Purchase response: ", resPurchase);
-        setPurchased(true);
-        setContent("thank-purchase");
-      } else {
-        showNotification({ content: CONST_NOTIFICATION_CONTENTS.TX_SENT_FAIL, text: res.error });
-        console.error("Error confirming purchase: ", res.error);
+        if (res.success) {
+          showNotification({ content: CONST_NOTIFICATION_CONTENTS.TX_SENT_SUCCESS });
+          const txId = res?.message;
+          const resPurchase = await GameAPI.postGamePurchase(orderId, txId);
+          console.log("Purchase response: ", resPurchase);
+          setPurchased(true);
+          setContent("thank-purchase");
+        } else {
+          showNotification({ content: CONST_NOTIFICATION_CONTENTS.TX_SENT_FAIL, text: res.error });
+          console.error("Error confirming purchase: ", res.error);
+          setOpen(false);
+        }
+      } catch (err) {
+        console.error("Error confirming purchase: ", err);
         setOpen(false);
+      } finally {
+        setSendingTransaction(false);
       }
-    } catch (err) {
-      console.error("Error confirming purchase: ", err);
-      setOpen(false);
-    } finally {
-      setSendingTransaction(false);
-    }
-  }, [passphrase, sxpFee, game, tymtCore]);
+    },
+    [sxpFee, game, tymtCore]
+  );
 
   useEffect(() => {
     if (open) {

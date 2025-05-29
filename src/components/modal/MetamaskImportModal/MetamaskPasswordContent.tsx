@@ -1,20 +1,19 @@
 import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { Box, Button, CircularProgress, Stack } from "@mui/material";
+import { useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import InputText from "../../account/InputText";
+import { Box, Button, Stack } from "@mui/material";
 import { getAccount } from "../../../store/AccountSlice";
+import InputText from "../../account/InputText";
 import { getKeccak256Hash } from "../../../lib/helper/EncryptHelper";
 import { IAccount } from "../../../types/AccountTypes";
 
-export interface IPropsConfirmPasswordContent {
-  confirmPurchase: (_: string) => void;
-  sendingTransaction: boolean;
+export interface IPropsMetamaskPasswordContent {
+  confirmPassword: (_: string) => void;
 }
 
-const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsConfirmPasswordContent) => {
+const MetamaskPasswordContent = ({ confirmPassword }: IPropsMetamaskPasswordContent) => {
   const { t } = useTranslation();
 
   const accountStore: IAccount = useSelector(getAccount);
@@ -36,7 +35,7 @@ const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsC
     }),
     onSubmit: async () => {
       try {
-        confirmPurchase(formik.values.password);
+        confirmPassword(formik.values.password);
       } catch (err) {
         console.error("Failed to onSubmit at ConfirmPasswordContent: ", err);
       }
@@ -45,7 +44,7 @@ const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsC
 
   return (
     <Stack direction={"column"} justifyContent={"center"} alignItems={"center"} gap={"24px"}>
-      <Box className="fs-40-regular white">Confirm your purchase</Box>
+      <Box className="fs-40-regular white">Confirm your password</Box>
 
       <form onSubmit={formik.handleSubmit} style={{ width: "100%" }}>
         <Stack direction={"column"} justifyContent={"center"} alignItems={"center"} gap={"24px"}>
@@ -64,16 +63,8 @@ const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsC
             {formik.touched.password && formik.errors.password && <Box className={"fs-16-regular red t-left"}>{formik.errors.password}</Box>}
           </Stack>
 
-          <Button className={"red-button fw"} disabled={(formik.touched.password && formik.errors.password) || sendingTransaction ? true : false} type="submit">
-            {sendingTransaction ? (
-              <CircularProgress
-                sx={{
-                  color: "#F5EBFF",
-                }}
-              />
-            ) : (
-              t("pur-12_confirm-purchase")
-            )}
+          <Button className={"red-button fw"} disabled={formik.touched.password && formik.errors.password ? true : false} type="submit">
+            {`Confirm`}
           </Button>
         </Stack>
       </form>
@@ -81,4 +72,4 @@ const ConfirmPasswordContent = ({ confirmPurchase, sendingTransaction }: IPropsC
   );
 };
 
-export default ConfirmPasswordContent;
+export default MetamaskPasswordContent;

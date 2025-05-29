@@ -7,7 +7,7 @@ import { getWallet } from "../store/WalletSlice";
 
 import { IRPCRequest } from "../types/APITypes/MetamaskTypes";
 import { IWalletAddresses } from "../types/WalletTypes";
-import MetamaskImportModal from "../components/modal/MetamaskImportModal";
+import MetamaskImportModal from "../components/modal/MetamaskImportModal/MetamaskImportModal";
 import {
   CONST_CHAIN_BLOCK_EXPLORER,
   CONST_CHAIN_HEX_IDS,
@@ -19,6 +19,7 @@ import {
 
 interface MetamaskContextType {
   connect: () => Promise<void>;
+  disconnect: () => Promise<void>;
 }
 
 const MetamaskContext = createContext<MetamaskContextType | undefined>(undefined);
@@ -45,6 +46,14 @@ export const MetamaskCustomProvider = ({ children }: { children: ReactNode }) =>
       console.error("Failed to connect: ", err);
     }
   }, [ethWalletAddress, sdk]);
+
+  const disconnect = useCallback(async () => {
+    try {
+      sdk?.disconnect();
+    } catch (err) {
+      console.error("Failed to disconnect: ", err);
+    }
+  }, [sdk]);
 
   const changeNetwork = async (chainId: string) => {
     try {
@@ -111,6 +120,7 @@ export const MetamaskCustomProvider = ({ children }: { children: ReactNode }) =>
     <MetamaskContext.Provider
       value={{
         connect,
+        disconnect,
       }}
     >
       {children}

@@ -59,7 +59,7 @@ const WalletSend = () => {
     currentChainNativePrice,
     currentNativeOrToken,
     transferCoin,
-    // fetchBalanceList,
+    getPassphrase,
   } = useWallet();
   const { showNotification } = useNotification();
 
@@ -123,8 +123,8 @@ const WalletSend = () => {
           },
         ];
       }
-
-      const res = await transferCoin(recipients, sxpFee.toString());
+      const passphrase = await getPassphrase(password);
+      const res = await transferCoin(recipients, sxpFee.toString(), passphrase);
       if (res.success) {
         showNotification({ content: CONST_NOTIFICATION_CONTENTS.TX_SENT_SUCCESS });
         setDraft([]);

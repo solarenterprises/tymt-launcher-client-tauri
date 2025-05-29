@@ -1,27 +1,17 @@
 import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-
 import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
-
 import { Box, Stack, Modal, Button, TextField, InputAdornment, CircularProgress, Fade } from "@mui/material";
-
 import { useWallet } from "../../providers/WalletProvider";
 import { useNotification } from "../../providers/NotificationProvider";
-
 import InputText from "../account/InputText";
 import FeeSwitchButton from "../home/FeeSwitchButton";
-
 import { getAccount } from "../../store/AccountSlice";
 import { getWallet } from "../../store/WalletSlice";
-import { getWalletSetting } from "../../store/WalletSettingSlice";
-
 import { getKeccak256Hash } from "../../lib/helper/EncryptHelper";
-
 import { IAccount } from "../../types/AccountTypes";
 import { IVotingData, IWalletAddresses } from "../../types/WalletTypes";
-import { IWalletSetting } from "../../types/SettingTypes";
-
 import closeIcon from "../../assets/setting/XIcon.svg";
 import logo from "../../assets/main/FoxHeadComingSoon.png";
 import solarBlockchainIcon from "../../assets/main/SolarBlockchain.png";
@@ -34,12 +24,11 @@ export interface IPropsPasswordModal {
 
 const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
   const { t } = useTranslation();
-  const { sxpFee, setSxpFeeAsInput, sxpVote } = useWallet();
+  const { sxpFee, setSxpFeeAsInput, sxpVote, getPassphrase } = useWallet();
   const { showNotification } = useNotification();
 
   const accountStore: IAccount = useSelector(getAccount);
   const walletStore: IWalletAddresses = useSelector(getWallet);
-  const walletSettingStore: IWalletSetting = useSelector(getWalletSetting);
 
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,26 +44,25 @@ const PasswordModal = ({ open, setOpen, voteAsset }: IPropsPasswordModal) => {
   }, [password, accountStore]);
 
   const handleVoteClick = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await sxpVote(walletStore, sxpFee, voteAsset);
+      const passphrase = await getPassphrase(password);
+      const res = await sxpVote(walletStore, sxpFee, voteAsset, passphrase);
       if (res.success) {
         setOpen(false);
         setPassword("");
         showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_SUCCESS });
       } else {
-        console.error("Failed to handleVoteClick: ", res.error);
         showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_FAIL, text: res.error });
       }
-      setLoading(false);
-    } catch (err) {
-      console.error("Failed to handleVoteClick: ", err);
+    } catch (err: any) {
+      showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_FAIL, text: err?.message });
       setOpen(false);
       setPassword("");
+    } finally {
       setLoading(false);
-      showNotification({ content: CONST_NOTIFICATION_CONTENTS.VOTE_FAIL, text: err.message });
     }
-  }, [walletStore, accountStore, walletSettingStore, password]);
+  }, [walletStore, sxpFee, voteAsset, password, getPassphrase, sxpVote, setOpen, showNotification]);
 
   return (
     <Modal
