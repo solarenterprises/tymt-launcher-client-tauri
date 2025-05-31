@@ -19,12 +19,13 @@ import { setAuth } from "../../store/AuthSlice";
 import { addAccountList } from "../../store/AccountListSlice";
 import { setWallet } from "../../store/WalletSlice";
 import { setMnemonic } from "../../store/MnemonicSlice";
+import { getLoginAttempts, setLoginAttempts } from "../../store/LoginAttemptsSlice";
 
 import { AuthAPI } from "../../lib/api/AuthAPI";
 import { decrypt, encrypt, getKeccak256Hash } from "../../lib/helper/EncryptHelper";
 import { getWalletAddressesFromPassphrase } from "../../lib/helper/WalletHelper";
 
-import { IAccount } from "../../types/AccountTypes";
+import { IAccount, ILoginAttempts } from "../../types/AccountTypes";
 import { IWalletAddresses } from "../../types/WalletTypes";
 
 const LoginAccountForm = () => {
@@ -32,7 +33,7 @@ const LoginAccountForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { showNotification } = useNotification();
-  const [attempts, setAttempts] = useState(0);
+
   const MAX_ATTEMPTS = 5;
 
   const accountStore: IAccount = useSelector(getAccount);
@@ -40,6 +41,12 @@ const LoginAccountForm = () => {
   useEffect(() => {
     accountStoreRef.current = accountStore;
   }, [accountStore]);
+
+  const loginAttemptsStore: ILoginAttempts = useSelector(getLoginAttempts);
+  const loginAttemptsStoreRef = useRef(loginAttemptsStore);
+  useEffect(() => {
+    loginAttemptsStoreRef.current = loginAttemptsStore;
+  }, [loginAttemptsStore]);
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -126,11 +133,18 @@ const LoginAccountForm = () => {
         .required(t("cca-63_required")),
     }),
     onSubmit: async () => {
-      if (attempts >= MAX_ATTEMPTS) {
+      if (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil) {
         showNotification({ content: CONST_NOTIFICATION_CONTENTS.TOO_MANY_LOGIN_ATTEMPTS });
         return;
       }
       try {
+        dispatch(
+          setLoginAttempts({
+            count: 0,
+            newLockout: null,
+          })
+        );
+
         const password = formik.values.password;
         const decryptedMnemonic = await decrypt(accountStoreRef?.current?.mnemonic, password);
         const walletAddresses = await getWalletAddressesFromPassphrase(decryptedMnemonic);
@@ -147,8 +161,15 @@ const LoginAccountForm = () => {
         // });
       } catch (err) {
         console.error("Failed to onSubmit at LoginAccountForm:  ", err);
-        setAttempts((prev) => prev + 1);
-        if (attempts + 1 >= MAX_ATTEMPTS) {
+        const newCount = loginAttemptsStoreRef?.current?.count;
+        const newLockout = newCount >= MAX_ATTEMPTS ? Date.now() + 15 * 60 * 1000 : 0;
+        dispatch(
+          setLoginAttempts({
+            count: newCount,
+            newLockout: newLockout,
+          })
+        );
+        if (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil) {
           showNotification({ content: CONST_NOTIFICATION_CONTENTS.TOO_MANY_LOGIN_ATTEMPTS });
         }
       }
@@ -177,7 +198,13 @@ const LoginAccountForm = () => {
               <AccountNextButton
                 isSubmit={true}
                 text={t("ncca-7_next")}
-                disabled={(formik.touched.password && formik.errors.password) || loading || attempts >= MAX_ATTEMPTS ? true : false}
+                disabled={
+                  (formik.touched.password && formik.errors.password) ||
+                  loading ||
+                  (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil)
+                    ? true
+                    : false
+                }
                 loading={loading}
               />
             </>

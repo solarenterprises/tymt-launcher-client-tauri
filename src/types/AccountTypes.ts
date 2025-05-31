@@ -29,3 +29,8 @@ export interface IAuth {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface ILoginAttempts {
+  count: number;
+  lockoutUntil: number;
+}

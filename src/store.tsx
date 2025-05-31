@@ -7,6 +7,7 @@ import accountReducer from "./store/AccountSlice";
 import accountListReducer from "./store/AccountListSlice";
 import mnemonicReducer from "./store/MnemonicSlice";
 import authReducer from "./store/AuthSlice";
+import loginAttemptsReducer from "./store/LoginAttemptsSlice";
 // ~Auth
 
 // Wallet
@@ -55,6 +56,7 @@ const store = configureStore({
     accountList: accountListReducer,
     mnemonic: mnemonicReducer,
     auth: authReducer,
+    loginAttempts: loginAttemptsReducer,
     // ~Auth
 
     // Wallet
