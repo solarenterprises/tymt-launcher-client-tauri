@@ -171,6 +171,13 @@ export const CONST_NOTIFICATION_CONTENTS = {
     duration: CONST_NOTIFICATION_DURATION.DEFAULT,
     link: "",
   },
+  TX_AMOUNT_LIMIT: {
+    title: "not-14_warning",
+    text: "wal-91_tx-amount-limit",
+    status: CONST_NOTIFICATION_STATUS.WARNING,
+    duration: CONST_NOTIFICATION_DURATION.DEFAULT,
+    link: "",
+  },
   ADDRESS_DUPLICATE: {
     title: "not-14_warning",
     text: "wal-87_address-duplicated",

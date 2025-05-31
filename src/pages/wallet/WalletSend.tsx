@@ -32,6 +32,8 @@ import { IRecipient } from "../../types/TransactionTypes";
 import { useNotification } from "../../providers/NotificationProvider";
 import { CONST_NOTIFICATION_CONTENTS } from "../../const/NotificationConsts";
 
+const MAX_TRANSACTION_AMOUNT_USD = 100;
+
 const WalletSend = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
@@ -106,6 +108,10 @@ const WalletSend = () => {
 
   const handleTransfer = useCallback(async () => {
     try {
+      if (Number(amount) * Number(currentChainNativePrice) > MAX_TRANSACTION_AMOUNT_USD) {
+        showNotification({ content: CONST_NOTIFICATION_CONTENTS.TX_AMOUNT_LIMIT });
+        return;
+      }
       setLoading(true);
       let recipients: IRecipient[] = [];
       if (draft?.length > 0) {
