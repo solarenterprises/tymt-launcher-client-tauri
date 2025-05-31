@@ -5,7 +5,7 @@ import { ILoginAttempts } from "../types/AccountTypes";
 
 const init: ILoginAttempts = {
   count: 0,
-  lockoutUntil: null,
+  lockoutUntil: 0,
 };
 
 const loadLoginAttempts: () => ILoginAttempts = () => {
@@ -14,7 +14,16 @@ const loadLoginAttempts: () => ILoginAttempts = () => {
     tymtStorage.set(`loginAttempts`, JSON.stringify(init));
     return init;
   }
-  return JSON.parse(data);
+  const parsed = JSON.parse(data);
+
+  // Clear expired lockouts
+  if (parsed.lockoutUntil && Date.now() >= parsed.lockoutUntil) {
+    const cleared = { count: 0, lockoutUntil: 0 };
+    tymtStorage.set("loginAttempts", JSON.stringify(cleared));
+    return cleared;
+  }
+
+  return parsed;
 };
 
 const initialState = {

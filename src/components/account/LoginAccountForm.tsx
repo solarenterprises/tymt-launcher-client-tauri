@@ -141,7 +141,7 @@ const LoginAccountForm = () => {
         dispatch(
           setLoginAttempts({
             count: 0,
-            newLockout: null,
+            lockoutUntil: 0,
           })
         );
 
@@ -161,12 +161,12 @@ const LoginAccountForm = () => {
         // });
       } catch (err) {
         console.error("Failed to onSubmit at LoginAccountForm:  ", err);
-        const newCount = loginAttemptsStoreRef?.current?.count;
+        const newCount = loginAttemptsStoreRef?.current?.count + 1;
         const newLockout = newCount >= MAX_ATTEMPTS ? Date.now() + 15 * 60 * 1000 : 0;
         dispatch(
           setLoginAttempts({
             count: newCount,
-            newLockout: newLockout,
+            lockoutUntil: newLockout,
           })
         );
         if (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil) {
@@ -175,6 +175,15 @@ const LoginAccountForm = () => {
       }
     },
   });
+
+  // At component initialization:
+  useEffect(() => {
+    if (!loginAttemptsStore) {
+      console.error("Login attempts store not initialized");
+      // Initialize with default values
+      dispatch(setLoginAttempts({ count: 0, lockoutUntil: 0 }));
+    }
+  }, []);
 
   return (
     <>
