@@ -8,22 +8,39 @@ const init: ILoginAttempts = {
   lockoutUntil: 0,
 };
 
+const isValidAttempts = (data: any): data is ILoginAttempts => {
+  return data && typeof data.count === "number" && !isNaN(data.count) && typeof data.lockoutUntil === "number";
+};
+
 const loadLoginAttempts: () => ILoginAttempts = () => {
   const data = tymtStorage.get(`loginAttempts`);
   if (!data || !compareJSONStructure(JSON.parse(data), init)) {
     tymtStorage.set(`loginAttempts`, JSON.stringify(init));
     return init;
   }
-  const parsed = JSON.parse(data);
+  try {
+    const parsed = JSON.parse(data);
 
-  // Clear expired lockouts
-  if (parsed.lockoutUntil && Date.now() >= parsed.lockoutUntil) {
-    const cleared = { count: 0, lockoutUntil: 0 };
-    tymtStorage.set("loginAttempts", JSON.stringify(cleared));
-    return cleared;
+    // Validate data integrity
+    if (!isValidAttempts(parsed)) {
+      console.error("Invalid login attempts data, resetting");
+      tymtStorage.set("loginAttempts", JSON.stringify(init));
+      return init;
+    }
+
+    // Clear expired lockouts
+    if (parsed.lockoutUntil && Date.now() >= parsed.lockoutUntil) {
+      const cleared = { count: 0, lockoutUntil: 0 };
+      tymtStorage.set("loginAttempts", JSON.stringify(cleared));
+      return cleared;
+    }
+
+    return parsed;
+  } catch (err) {
+    console.error("Failed to parse login attempts", err);
+    tymtStorage.set(`loginAttempts`, JSON.stringify(init));
+    return init;
   }
-
-  return parsed;
 };
 
 const initialState = {

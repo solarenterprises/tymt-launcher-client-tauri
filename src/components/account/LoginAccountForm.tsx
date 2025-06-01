@@ -133,7 +133,10 @@ const LoginAccountForm = () => {
         .required(t("cca-63_required")),
     }),
     onSubmit: async () => {
-      if (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil) {
+      // Get current state with fallback
+      const currentAttempts = loginAttemptsStoreRef?.current || { count: 0, lockoutUntil: 0 };
+      // Check lockout with safe access
+      if (currentAttempts.lockoutUntil && Date.now() < currentAttempts.lockoutUntil) {
         showNotification({ content: CONST_NOTIFICATION_CONTENTS.TOO_MANY_LOGIN_ATTEMPTS });
         return;
       }
@@ -161,15 +164,19 @@ const LoginAccountForm = () => {
         // });
       } catch (err) {
         console.error("Failed to onSubmit at LoginAccountForm:  ", err);
-        const newCount = loginAttemptsStoreRef?.current?.count + 1;
+
+        const attempts = loginAttemptsStoreRef?.current || { count: 0, lockoutUntil: 0 };
+        const newCount = attempts.count + 1;
         const newLockout = newCount >= MAX_ATTEMPTS ? Date.now() + 15 * 60 * 1000 : 0;
+
         dispatch(
           setLoginAttempts({
             count: newCount,
             lockoutUntil: newLockout,
           })
         );
-        if (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil) {
+        // Check if just locked out
+        if (newLockout > 0) {
           showNotification({ content: CONST_NOTIFICATION_CONTENTS.TOO_MANY_LOGIN_ATTEMPTS });
         }
       }
@@ -207,13 +214,12 @@ const LoginAccountForm = () => {
               <AccountNextButton
                 isSubmit={true}
                 text={t("ncca-7_next")}
-                disabled={
-                  (formik.touched.password && formik.errors.password) ||
-                  loading ||
-                  (loginAttemptsStoreRef?.current?.lockoutUntil && Date.now() < loginAttemptsStoreRef?.current?.lockoutUntil)
+                disabled={(() => {
+                  const attempts = loginAttemptsStoreRef?.current || { count: 0, lockoutUntil: 0 };
+                  return (formik.touched.password && formik.errors.password) || loading || (attempts.lockoutUntil && Date.now() < attempts.lockoutUntil)
                     ? true
-                    : false
-                }
+                    : false;
+                })()}
                 loading={loading}
               />
             </>
