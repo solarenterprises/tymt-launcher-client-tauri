@@ -15,9 +15,6 @@ use debpkg::DebPkg;
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
 
-#[cfg(target_family = "unix")]
-use std::os::unix::fs::PermissionsExt;
-
 #[tauri::command]
 pub async fn unzip_linux(
     _app_handle: tauri::AppHandle,
