@@ -8,6 +8,14 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
+    watch: false,
+    silent: false,
+    onConsoleLog: (log) => {
+      // Silence React act() warnings
+      if (log.includes('wrapped in act(...)')) return false;
+      // Silence CJS deprecation warning
+      if (log.includes('CJS build of Vite')) return false;
+    },
   },
   resolve: {
     alias: {
