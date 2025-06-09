@@ -18,7 +18,7 @@ export const CONST_TYMT_LINKS = {
   twitter: "https://twitter.com/tymt_com/",
   discord: "https://discord.solar.org/",
   solarcard: "https://solarcard.app/",
-  youtube: "https://staging.tymt.com/api/uploads/tymt-Solar_Enterprises_(720p,_h264).mp4",
+  youtube: "https://youtube.com/watch?v=Q6KL6rrbmNg",
   telegram: "https://t.me/Solar/",
   medium: "https://blog.solar.org/",
   instagram: "https://www.instagram.com/solarnetworkofficial/",
