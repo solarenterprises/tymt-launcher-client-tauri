@@ -5,14 +5,14 @@ import WalletBar from "./WalletBar";
 import { IWalletAddresses } from "../../types/WalletTypes";
 
 import solar from "../../assets/chain/Solar.svg";
-import binance from "../../assets/chain/Binance.svg";
-import ethereum from "../../assets/chain/Ethereum.svg";
-import bitcoin from "../../assets/chain/Bitcoin.svg";
-import solana from "../../assets/chain/Solana.svg";
-import polygon from "../../assets/chain/Polygon.svg";
-import avalanche from "../../assets/chain/Avalanche.svg";
-import arbitrumOne from "../../assets/chain/Arbitrum.svg";
-import optimism from "../../assets/chain/Optimism.svg";
+// import binance from "../../assets/chain/Binance.svg";
+// import ethereum from "../../assets/chain/Ethereum.svg";
+// import bitcoin from "../../assets/chain/Bitcoin.svg";
+// import solana from "../../assets/chain/Solana.svg";
+// import polygon from "../../assets/chain/Polygon.svg";
+// import avalanche from "../../assets/chain/Avalanche.svg";
+// import arbitrumOne from "../../assets/chain/Arbitrum.svg";
+// import optimism from "../../assets/chain/Optimism.svg";
 
 export interface IPropsWalletList {
   wallet: IWalletAddresses;
@@ -24,7 +24,7 @@ const WalletList = ({ wallet }: IPropsWalletList) => {
       <Grid item xs={12}>
         <WalletBar icon={solar} chain={"Solar"} address={wallet?.solar} />
       </Grid>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <WalletBar icon={binance} chain={"Binance"} address={wallet?.binance} />
       </Grid>
       <Grid item xs={12}>
@@ -47,7 +47,7 @@ const WalletList = ({ wallet }: IPropsWalletList) => {
       </Grid>
       <Grid item xs={12}>
         <WalletBar icon={optimism} chain={"Optimism"} address={wallet?.optimism} />
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };

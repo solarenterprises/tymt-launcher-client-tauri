@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Box, Button, Divider, Stack } from "@mui/material";
+import { Box, Button, Divider } from "@mui/material";
+// import { Box, Button, Divider, Stack } from "@mui/material";
 import { multiply, formatForDisplay } from "../../lib/helper/balanceUtils";
 
 import { useWallet } from "../../providers/WalletProvider";
@@ -18,7 +19,7 @@ import { IAccount, IAccountList } from "../../types/AccountTypes";
 import { openLink } from "../../lib/helper/TauriHelper";
 
 import settingImg from "../../assets/setting/SettingIcon1.svg";
-import walletImg from "../../assets/setting/WalletIcon.svg";
+// import walletImg from "../../assets/setting/WalletIcon.svg";
 import arrowImg from "../../assets/setting/ArrowRight.svg";
 import copyIcon from "../../assets/setting/CopyIcon.svg";
 import searchIcon from "../../assets/setting/SearchIcon.svg";
@@ -109,7 +110,7 @@ const Main = ({ view, setView }: IPropsMain) => {
             </Box>
           </Box>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
-          <Button
+          {/* <Button
             onClick={() => setView("chain")}
             className="center-align common-btn"
             sx={{
@@ -147,7 +148,7 @@ const Main = ({ view, setView }: IPropsMain) => {
               </Box>
             </Stack>
           </Button>
-          <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
+          <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} /> */}
           <Box sx={{ backgroundColor: "#0f2727", margin: "15px", borderRadius: "16px", display: "flex", flexDirection: "column" }}>
             <Box sx={{ justifyContent: "space-between", margin: "15px", paddingBottom: "15px", display: "flex" }}>
               <Box

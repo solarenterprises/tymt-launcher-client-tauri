@@ -10,7 +10,7 @@ import { Grid, Button, TextField, InputAdornment, Stack, Box } from "@mui/materi
 
 import { useWallet } from "../../providers/WalletProvider";
 
-import MetamaskButton from "./MetamaskButton";
+// import MetamaskButton from "./MetamaskButton";
 import Avatar from "./Avatar";
 import Back from "./Back";
 import TooltipComponent from "./TooltipComponent";
@@ -242,7 +242,7 @@ const Navbar = () => {
               </svg>
             </Button>
           </TooltipComponent>
-          <MetamaskButton />
+          {/* <MetamaskButton /> */}
           <Button className="button_navbar_profile" onClick={() => setShowSetting(!showSetting)}>
             <Stack direction={"row"} alignItems={"center"} marginLeft={"0px"} justifyContent={"left"} spacing={"8px"} height={"32px"}>
               <Avatar url={accountStore?.avatar} size={32} isChain={true} onlineStatus={true} status={notificationSettingStore?.status} />
