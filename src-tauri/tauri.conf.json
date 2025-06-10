@@ -72,7 +72,7 @@
         "img-src": "'self' data: https:",
         "font-src": "'self' data:",
         "connect-src": "'self' ipc: http://ipc.localhost https://*.tymt.com https://api.solar.org wss://metamask-sdk.api.cx.metamask.io https://metamask-sdk.api.cx.metamask.io https://*.valist.io https://*.veloren.net https://*.github.com https://*.epicgames.com https://*.aka.ms",
-        "media-src": "'self' https://*.tymt.com",
+        "media-src": "'self' https://*.tymt.com https://*.railway.app",
         "frame-src": "'none' https://www.youtube.com https://www.youtube-nocookie.com",
         "object-src": "'none'",
         "base-uri": "'self'"
