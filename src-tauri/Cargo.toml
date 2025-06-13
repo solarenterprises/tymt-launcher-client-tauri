@@ -4,10 +4,10 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [package]
 name = "tymtLauncher"
-version = "2.2.2"
+version = "2.1.4"
 description = "tymtLauncher"
 authors = ["solar"]
-edition = "2021"
+edition = "2025"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
