@@ -14,7 +14,7 @@ export default defineConfig({
       modernTargets: ["chrome >= 87", "edge >= 88", "firefox >= 78", "safari >= 14"],
     }),
     nodePolyfills({
-      include: ["crypto", "vm", "process", "os", "stream"], // Include the required polyfills
+      include: ["crypto", "vm", "process", "os", "stream", "util"], // Include the required polyfills
     }),
   ],
   resolve: {

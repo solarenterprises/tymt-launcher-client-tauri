@@ -55,18 +55,26 @@ export const NotificationProvider = () => {
   // }, []);
 
   useEffect(() => {
-    const unlisten_notification = listen(CONST_EVENT_NAMES.NOTIFICATION, async (event) => {
-      const data = event.payload as INotificationEventParams;
-      setContent(data.content);
-      setCustormText(data.text);
-      setCustomLink(data.link);
-      setOpen(true);
-    });
+    const setupListener = async () => {
+      try {
+        const unlisten = await listen(CONST_EVENT_NAMES.NOTIFICATION, async (event) => {
+          const data = event.payload as INotificationEventParams;
+          setContent(data.content);
+          setCustormText(data.text);
+          setCustomLink(data.link);
+          setOpen(true);
+        });
 
-    return () => {
-      unlisten_notification.then((unlistenFn) => unlistenFn());
+        return () => {
+          unlisten();
+        };
+      } catch (error) {
+        console.error("Failed to setup notification listener:", error);
+      }
     };
-  });
+
+    setupListener();
+  }, []);
 
   return (
     <NotificationContext.Provider

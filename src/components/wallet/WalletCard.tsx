@@ -55,7 +55,7 @@ const WalletCard = ({ supportChain, index, openQR }: IPropsWalletCard) => {
   const balance = useMemo(() => getTokenBalanceBySymbol(balanceListStore, supportChain?.native?.symbol), [balanceListStore]);
   const price = useMemo(() => getTokenPriceBySymbol(priceListStore, supportChain?.native?.symbol), [priceListStore]);
 
-  const [open, setOpen] = useState<boolean>(openQR);
+  const [open, setOpen] = useState<boolean>(openQR || false);
 
   const handleWalletCardClick = () => {
     try {

@@ -145,7 +145,7 @@ const Avatar = ({ size, url, onlineStatus, isChain, status }: IPropsAvatar) => {
           )}
           <Box
             component={"img"}
-            src={`${CONFIG_TYMT_BACKEND_URL}${url}`}
+            src={url ? `${CONFIG_TYMT_BACKEND_URL}/${url}` : accountIcon}
             sx={{
               position: "absolute",
               top: "50%",

@@ -25,39 +25,44 @@ const Splash = () => {
 
   useEffect(() => {
     const runUpdate = async () => {
-      const update = await check();
-      if (update) {
-        console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`);
-        const userAccepted = await ask(`A new version (${update.version}) is available.\n\nRelease notes:\n${update.body}\n\nDo you want to update now?`, {
-          title: "Update Available",
-          kind: "info",
-          okLabel: "Update",
-          cancelLabel: "Later",
-        });
-        if (userAccepted) {
-          let downloaded = 0;
-          let contentLength = 0;
-          // Alternatively, we could also call update.download() and update.install() separately
-          await update.downloadAndInstall((event) => {
-            switch (event.event) {
-              case "Started":
-                contentLength = event.data.contentLength;
-                console.log(`started downloading ${event.data.contentLength} bytes`);
-                break;
-              case "Progress":
-                downloaded += event.data.chunkLength;
-                console.log(`downloaded ${downloaded} from ${contentLength}`);
-                break;
-              case "Finished":
-                console.log("download finished");
-                break;
-              default:
-                break;
-            }
+      try {
+        const update = await check();
+        if (update) {
+          console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`);
+          const userAccepted = await ask(`A new version (${update.version}) is available.\n\nRelease notes:\n${update.body}\n\nDo you want to update now?`, {
+            title: "Update Available",
+            kind: "info",
+            okLabel: "Update",
+            cancelLabel: "Later",
           });
-          console.log("update installed");
-          await relaunch();
+          if (userAccepted) {
+            let downloaded = 0;
+            let contentLength = 0;
+            // Alternatively, we could also call update.download() and update.install() separately
+            await update.downloadAndInstall((event) => {
+              switch (event.event) {
+                case "Started":
+                  contentLength = event.data.contentLength;
+                  console.log(`started downloading ${event.data.contentLength} bytes`);
+                  break;
+                case "Progress":
+                  downloaded += event.data.chunkLength;
+                  console.log(`downloaded ${downloaded} from ${contentLength}`);
+                  break;
+                case "Finished":
+                  console.log("download finished");
+                  break;
+                default:
+                  break;
+              }
+            });
+            console.log("update installed");
+            await relaunch();
+          }
         }
+      } catch (error) {
+        // console.error("Update check failed:", error);
+        // Continue loading the app even if update check fails
       }
     };
 
