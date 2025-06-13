@@ -1,0 +1,194 @@
+# Tauri App Publisher Workflow
+#
+# Builds and publishes the Tauri desktop application for all supported
+# platforms. Triggered on push to 'prod' branch, creating GitHub draft
+# releases with platform-specific binaries:
+#   - macOS (ARM64)
+#   - macOS (x64)
+#   - Ubuntu (x64)
+#   - Windows (x64)
+#
+# Output: Platform-specific installers attached to GitHub draft release
+
+name: "publish"
+
+on:
+  push:
+    branches:
+      - prod
+      - staging
+
+jobs:
+  publish-tauri:
+    name: Tauri Publish (${{ matrix.name }})
+    environment: ${{ github.ref_name == 'prod' && 'production' || 'staging' }}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: "macOS-arm64"
+            platform: "macos-15"
+            args: "--target aarch64-apple-darwin"
+            rust_target: "aarch64-apple-darwin"
+
+          - name: "macOS-x64"
+            platform: "macos-15"
+            args: "--target x86_64-apple-darwin"
+            rust_target: "x86_64-apple-darwin"
+
+          - name: "ubuntu-x64"
+            platform: "ubuntu-22.04"
+            args: ""
+            rust_target: ""
+
+          - name: "windows-x64"
+            platform: "windows-latest"
+            args: ""
+            rust_target: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # v1
+        with:
+          toolchain: stable
+          targets: ${{ matrix.rust_target }}
+
+      - name: ${{ matrix.name == 'ubuntu-x64' && 'Install' || 'Skip' }} Ubuntu dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Tauri build
+        uses: tauri-apps/tauri-action@42e9df6c59070d114bf90dcd3943a1b8f138b113 # v0.5.20
+        env:
+          # GitHub Token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Node Options
+          NODE_OPTIONS: "--max-old-space-size=8192"
+
+          # Tauri Signing Keys
+          TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+          # Environment-specific variables
+          VITE_APP_PRODUCTION_VERSION: ${{ secrets.VITE_APP_PRODUCTION_VERSION }}
+          VITE_APP_NETWORK_NAME: ${{ secrets.VITE_APP_NETWORK_NAME }}
+          VITE_APP_TYMT_RELEASE_DATE: ${{ secrets.VITE_APP_TYMT_RELEASE_DATE }}
+          VITE_APP_TYMT_VERSION: ${{ secrets.VITE_APP_TYMT_VERSION }}
+          VITE_APP_NOTIFICATION_DURATION: ${{ secrets.VITE_APP_NOTIFICATION_DURATION }}
+          VITE_APP_LOCAL_SERVER_PORT: ${{ secrets.VITE_APP_LOCAL_SERVER_PORT }}
+          VITE_APP_WIF: ${{ secrets.VITE_APP_WIF }}
+
+          # Backend URLs
+          CONFIG_TYMT_BACKEND_URL: ${{ secrets.CONFIG_TYMT_BACKEND_URL }}
+          VITE_APP_TYMT_BACKEND_URL: ${{ secrets.VITE_APP_TYMT_BACKEND_URL }}
+          VITE_APP_TYMT_BACKEND_DEV_URL: ${{ secrets.VITE_APP_TYMT_BACKEND_DEV_URL }}
+          VITE_APP_TYMT_AVATAR_URL: ${{ secrets.VITE_APP_TYMT_AVATAR_URL }}
+          VITE_APP_SOCKET_BACKEND_URL: ${{ secrets.VITE_APP_SOCKET_BACKEND_URL }}
+          VITE_APP_SOCKET_BACKEND_DEV_URL: ${{ secrets.VITE_APP_SOCKET_BACKEND_DEV_URL }}
+
+          # Solar Network URLs
+          VITE_APP_MAINNET_SOLAR_SCAN: ${{ secrets.VITE_APP_MAINNET_SOLAR_SCAN }}
+          VITE_APP_MAINNET_SOLAR_API_URL: ${{ secrets.VITE_APP_MAINNET_SOLAR_API_URL }}
+          VITE_APP_MAINNET_SOLAR_WSS_URL: ${{ secrets.VITE_APP_MAINNET_SOLAR_WSS_URL }}
+          VITE_APP_TESTNET_SOLAR_SCAN: ${{ secrets.VITE_APP_TESTNET_SOLAR_SCAN }}
+          VITE_APP_TESTNET_SOLAR_API_URL: ${{ secrets.VITE_APP_TESTNET_SOLAR_API_URL }}
+          VITE_APP_TESTNET_SOLAR_WSS_URL: ${{ secrets.VITE_APP_TESTNET_SOLAR_WSS_URL }}
+
+         # Arbitrum
+          VITE_APP_ARB_API_KEY: ${{ secrets.VITE_APP_ARB_API_KEY }}
+          VITE_APP_MAINNET_ARB_SCAN: ${{ secrets.VITE_APP_MAINNET_ARB_SCAN }}
+          VITE_APP_MAINNET_ARB_API_URL: ${{ secrets.VITE_APP_MAINNET_ARB_API_URL }}
+          VITE_APP_MAINNET_ARB_RPC_URL: ${{ secrets.VITE_APP_MAINNET_ARB_RPC_URL }}
+          VITE_APP_TESTNET_ARB_SCAN: ${{ secrets.VITE_APP_TESTNET_ARB_SCAN }}
+          VITE_APP_TESTNET_ARB_API_URL: ${{ secrets.VITE_APP_TESTNET_ARB_API_URL }}
+          VITE_APP_TESTNET_ARB_RPC_URL: ${{ secrets.VITE_APP_TESTNET_ARB_RPC_URL }}
+
+          # Avalanche
+          VITE_APP_MAINNET_AVAX_SCAN: ${{ secrets.VITE_APP_MAINNET_AVAX_SCAN }}
+          VITE_APP_MAINNET_AVAX_API_URL: ${{ secrets.VITE_APP_MAINNET_AVAX_API_URL }}
+          VITE_APP_MAINNET_AVAX_PROVIDER: ${{ secrets.VITE_APP_MAINNET_AVAX_PROVIDER }}
+          VITE_APP_TESTNET_AVAX_SCAN: ${{ secrets.VITE_APP_TESTNET_AVAX_SCAN }}
+          VITE_APP_TESTNET_AVAX_API_URL: ${{ secrets.VITE_APP_TESTNET_AVAX_API_URL }}
+          VITE_APP_TESTNET_AVAX_PROVIDER: ${{ secrets.VITE_APP_TESTNET_AVAX_PROVIDER }}
+
+          # Binance
+          VITE_APP_BSC_API_KEY: ${{ secrets.VITE_APP_BSC_API_KEY }}
+          VITE_APP_MAINNET_BSC_SCAN: ${{ secrets.VITE_APP_MAINNET_BSC_SCAN }}
+          VITE_APP_MAINNET_BSC_API_URL: ${{ secrets.VITE_APP_MAINNET_BSC_API_URL }}
+          VITE_APP_MAINNET_BSC_RPC_URL: ${{ secrets.VITE_APP_MAINNET_BSC_RPC_URL }}
+          VITE_APP_TESTNET_BSC_SCAN: ${{ secrets.VITE_APP_TESTNET_BSC_SCAN }}
+          VITE_APP_TESTNET_BSC_API_URL: ${{ secrets.VITE_APP_TESTNET_BSC_API_URL }}
+          VITE_APP_TESTNET_BSC_RPC_URL: ${{ secrets.VITE_APP_TESTNET_BSC_RPC_URL }}
+
+          # Bitcoin
+          VITE_APP_MAINNET_BTC_SCAN: ${{ secrets.VITE_APP_MAINNET_BTC_SCAN }}
+          VITE_APP_MAINNET_BTC_API_URL: ${{ secrets.VITE_APP_MAINNET_BTC_API_URL }}
+          VITE_APP_TESTNET_BTC_SCAN: ${{ secrets.VITE_APP_TESTNET_BTC_SCAN }}
+          VITE_APP_TESTNET_BTC_API_URL: ${{ secrets.VITE_APP_TESTNET_BTC_API_URL }}
+
+          # Ethereum
+          VITE_APP_ETH_API_KEY: ${{ secrets.VITE_APP_ETH_API_KEY }}
+          VITE_APP_MAINNET_ETH_SCAN: ${{ secrets.VITE_APP_MAINNET_ETH_SCAN }}
+          VITE_APP_MAINNET_ETH_API_URL: ${{ secrets.VITE_APP_MAINNET_ETH_API_URL }}
+          VITE_APP_MAINNET_ETH_RPC_URL: ${{ secrets.VITE_APP_MAINNET_ETH_RPC_URL }}
+          VITE_APP_TESTNET_ETH_SCAN: ${{ secrets.VITE_APP_TESTNET_ETH_SCAN }}
+          VITE_APP_TESTNET_ETH_API_URL: ${{ secrets.VITE_APP_TESTNET_ETH_API_URL }}
+          VITE_APP_TESTNET_ETH_RPC_URL: ${{ secrets.VITE_APP_TESTNET_ETH_RPC_URL }}
+
+          # Optimism
+          VITE_APP_OP_API_KEY: ${{ secrets.VITE_APP_OP_API_KEY }}
+          VITE_APP_MAINNET_OPT_SCAN: ${{ secrets.VITE_APP_MAINNET_OPT_SCAN }}
+          VITE_APP_MAINNET_OP_API_URL: ${{ secrets.VITE_APP_MAINNET_OP_API_URL }}
+          VITE_APP_MAINNET_OP_RPC_URL: ${{ secrets.VITE_APP_MAINNET_OP_RPC_URL }}
+          VITE_APP_TESTNET_OPT_SCAN: ${{ secrets.VITE_APP_TESTNET_OPT_SCAN }}
+          VITE_APP_TESTNET_OP_API_URL: ${{ secrets.VITE_APP_TESTNET_OP_API_URL }}
+          VITE_APP_TESTNET_OP_RPC_URL: ${{ secrets.VITE_APP_TESTNET_OP_RPC_URL }}
+
+          # Polygon
+          VITE_APP_POL_API_KEY: ${{ secrets.VITE_APP_POL_API_KEY }}
+          VITE_APP_MAINNET_POL_SCAN: ${{ secrets.VITE_APP_MAINNET_POL_SCAN }}
+          VITE_APP_MAINNET_POL_API_URL: ${{ secrets.VITE_APP_MAINNET_POL_API_URL }}
+          VITE_APP_MAINNET_POL_RPC_URL: ${{ secrets.VITE_APP_MAINNET_POL_RPC_URL }}
+          VITE_APP_TESTNET_POL_SCAN: ${{ secrets.VITE_APP_TESTNET_POL_SCAN }}
+          VITE_APP_TESTNET_POL_API_URL: ${{ secrets.VITE_APP_TESTNET_POL_API_URL }}
+          VITE_APP_TESTNET_POL_RPC_URL: ${{ secrets.VITE_APP_TESTNET_POL_RPC_URL }}
+
+          # Solana
+          VITE_APP_MAINNET_SOL_SCAN: ${{ secrets.VITE_APP_MAINNET_SOL_SCAN }}
+          VITE_APP_TESTNET_SOL_SCAN: ${{ secrets.VITE_APP_TESTNET_SOL_SCAN }}
+
+          # Other Blockchain API URLs
+          VITE_APP_NOWNODES_URL: ${{ secrets.VITE_APP_NOWNODES_URL }}
+ 
+          # Misc. API Keys
+          VITE_APP_ALCHEMY_KEY: ${{ secrets.VITE_APP_ALCHEMY_KEY }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "tymt™ v__VERSION__"
+          releaseBody: "See assets below to download and install this version."
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
