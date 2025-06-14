@@ -67,7 +67,7 @@
     "security": {
       "csp": {
         "default-src": "'self'",
-        "script-src": "'self' 'unsafe-eval'",
+        "script-src": "'self' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://*.gstatic.com",
         "style-src": "'self' 'unsafe-inline'",
         "img-src": "'self' data: https:",
         "font-src": "'self' data:",
