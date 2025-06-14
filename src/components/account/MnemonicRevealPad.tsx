@@ -15,7 +15,21 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPa
     navigator.clipboard.writeText(passphrase);
   };
 
-  const saveFile = async () => {};
+  const saveFile = async () => {
+    try {
+      const blob = new Blob([passphrase], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'mnemonic-phrase.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error saving file:', error);
+    }
+  };
 
   return (
     <div
