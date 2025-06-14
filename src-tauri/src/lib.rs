@@ -7,8 +7,6 @@ mod minecraft;
 mod window;
 mod file;
 
-use actix_cors::Cors;
-use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
 // use std::sync::Mutex;
 use std::sync::OnceLock;
@@ -120,7 +118,6 @@ pub fn main() -> std::io::Result<()> {
         })
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
@@ -269,73 +266,6 @@ pub fn main() -> std::io::Result<()> {
                 })
                 .build(app)?;
 
-            async fn rpc_request(
-                request: HttpRequest,
-                request_param: web::Json<serde_json::Value>,
-            ) -> HttpResponse {
-                println!("-------> POST /rpc_request");
-
-                let json_data =
-                    serde_json::to_string(&request_param).expect("Failed to serialize JSON data");
-                println!("{}", json_data);
-
-                APPHANDLE
-                    .get()
-                    .expect("APPHANDLE is available")
-                    .emit("POST-/rpc_request", json_data)
-                    .expect("failed to emit event POST /rpc_request");
-
-                let (tx, rx) = std::sync::mpsc::channel();
-
-                let response = APPHANDLE.get().expect("APPHANDLE is available").listen_any(
-                    "res-POST-/rpc_request",
-                    move |event| {
-                        let payload = event.payload().to_string();
-                        println!("!!!----> res POST /rpc_request");
-                        println!("{}", payload);
-                        match tx.send(payload) {
-                            Ok(()) => {}
-                            Err(err) => {
-                                println!("Error sending message: {:?}", err);
-                            }
-                        }
-                    },
-                );
-
-                match rx.recv() {
-                    Ok(received) => {
-                        APPHANDLE
-                            .get()
-                            .expect("APPHANDLE is available")
-                            .unlisten(response);
-                        return HttpResponse::Ok().body(received);
-                    }
-                    Err(err) => {
-                        println!("Error receiving message: {:?}", err);
-                        APPHANDLE
-                            .get()
-                            .expect("APPHANDLE is available")
-                            .unlisten(response);
-                        return HttpResponse::InternalServerError().finish();
-                    }
-                }
-            }
-
-            tauri::async_runtime::spawn(
-                HttpServer::new(move || {
-                    App::new()
-                        .wrap(
-                            Cors::default()
-                                .allow_any_origin()
-                                .allow_any_method()
-                                .allow_any_header(),
-                        )
-                        .route("/rpc", web::post().to(rpc_request))
-                })
-                .bind(("127.0.0.1", 9680))
-                .expect("Failed to bind address")
-                .run(),
-            );
 
             Ok(())
         })

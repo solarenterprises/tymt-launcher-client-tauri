@@ -119,17 +119,6 @@
     "core:window:allow-set-focus",
     "updater:allow-check",
     "updater:default",
-    "http:allow-fetch",
-    "http:default",
-    {
-      "identifier": "http:default",
-      "allow": [
-        {
-          "url": "*"
-        }
-      ],
-      "deny": []
-    },
     "notification:default",
     "shell:default",
     "dialog:allow-ask",

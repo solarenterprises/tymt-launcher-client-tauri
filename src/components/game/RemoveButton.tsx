@@ -25,6 +25,7 @@ const RemoveButton = ({ game }: IPropsRemoveButton) => {
       setIsRemoving(true);
       await deleteGameDirectory(game);
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.REMOVE_SUCCESS });
+      setInstalled(false);
     } catch (err) {
       console.error("Failed to handleRemoveClick: ", err);
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.REMOVE_FAIL, text: err.toString() });
@@ -37,10 +38,8 @@ const RemoveButton = ({ game }: IPropsRemoveButton) => {
     const checkInstalled = async (game: IGame) => {
       setInstalled(await isInstalled(game));
     };
-    const intervalId = setInterval(() => checkInstalled(game), 1 * 1e3);
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
+
+    checkInstalled(game);
   }, [game]);
 
   return (

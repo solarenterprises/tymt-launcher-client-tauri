@@ -145,11 +145,6 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
     };
 
     checkInstalled(game);
-    const intervalId = setInterval(() => checkInstalled(game), 1 * 1e3);
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
   }, [game]);
 
   return (
