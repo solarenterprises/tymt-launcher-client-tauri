@@ -211,9 +211,8 @@ const InputText = ({
                   <Box className="fs-16-regular white">{t("cca-4_your-password-must")}</Box>
                   <Stack>
                     <Box className="fs-14-regular light">• {t("cca-5_at-least-8")}</Box>
-                    <Box className="fs-14-regular light">• {t("cca-6_one-uppercase-letter")}</Box>
-                    <Box className="fs-14-regular light">• {t("cca-7_one-lowercase-letter")}</Box>
-                    <Box className="fs-14-regular light">• {t("cca-8_one-number-character")}</Box>
+                    <Box className="fs-14-regular light">• {t("cca-9_max-64")}</Box>
+                    <Box className="fs-14-regular light">• {t("cca-10_disallow-common-passwords")}</Box>
                   </Stack>
                 </Stack>
               )

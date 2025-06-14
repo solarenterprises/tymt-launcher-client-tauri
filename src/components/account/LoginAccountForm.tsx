@@ -66,6 +66,7 @@ const LoginAccountForm = () => {
           refreshToken: res.refreshToken,
         })
       );
+      console.log(res.refreshToken);
       const newAccount: IAccount = {
         uid: res.user?._id,
         avatar: res.user?.avatar,

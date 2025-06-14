@@ -9071,6 +9071,11 @@ next-tick@^1.1.0:
   resolved "https://registry.npmjs.org/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
   integrity sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ==
 
+nist-password-validator@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.npmjs.org/nist-password-validator/-/nist-password-validator-3.0.2.tgz#4336f0cf0a6fdfd147734b64fa9d9f447139358d"
+  integrity sha512-Dfzqba+QPJjixgID3U0wsSfBIiau7FbhD4VpY8UwqPnA08V86+9W3wv/68g6eN9bHr3dws5rGwTg2AKEvhQ9vA==
+
 node-addon-api@^2.0.0:
   version "2.0.2"
   resolved "https://registry.npmjs.org/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
