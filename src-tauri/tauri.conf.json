@@ -67,13 +67,13 @@
     "security": {
       "csp": {
         "default-src": "'self'",
-        "script-src": "'self' 'unsafe-eval'",
+        "script-src": "'self' 'unsafe-eval' https://www.youtube.com https://s.ytimg.com https://*.gstatic.com",
         "style-src": "'self' 'unsafe-inline'",
         "img-src": "'self' data: https:",
         "font-src": "'self' data:",
         "connect-src": "'self' ipc: http://ipc.localhost https://*.tymt.com https://*.solar.org https://*.valist.io https://*.veloren.net https://*.github.com https://*.epicgames.com https://*.aka.ms",
-        "media-src": "'self' https://*.tymt.com https://*.railway.app https://*.youtube.com https://youtube.com https://www.youtube.com blob:https://www.youtube.com",
-        "frame-src": "'self' https://www.youtube.com https://www.youtube-nocookie.com https://youtube.com blob:https://www.youtube.com",
+        "media-src": "'self' https://*.tymt.com https://*.railway.app",
+        "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com",
         "object-src": "'none'",
         "base-uri": "'self'"
       },
