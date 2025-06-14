@@ -94,6 +94,7 @@
     "mui-one-time-password-input": "^2.0.2",
     "multichain-crypto-wallet": "^0.2.8",
     "multicoin-address-validator": "^0.5.16",
+    "nist-password-validator": "^3.0.2",
     "numeral": "^2.0.6",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
