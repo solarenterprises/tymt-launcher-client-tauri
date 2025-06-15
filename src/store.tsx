@@ -39,6 +39,7 @@ import developerGameListReducer from "./store/DeveloperGameListSlice";
 
 import tymtLogoReducer from "./store/tymtLogoSlice";
 import renderTimeReducer from "./store/RenderTimeSlice";
+import betaModalReducer from "./store/BetaModalSlice";
 
 // const blacklistActionTypes = ["intercomsupport/setChatMounted", "intercomsupport/setMountedTrue", "intercomsupport/setMountedFalse"];
 const blacklistActionTypes: string[] = [];
@@ -89,6 +90,8 @@ const store = configureStore({
     renderTime: renderTimeReducer,
 
     address: addressReducer,
+
+    betaModal: betaModalReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(stateSyncMiddleware),
 });

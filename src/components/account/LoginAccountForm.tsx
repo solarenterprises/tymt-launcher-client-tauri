@@ -20,6 +20,7 @@ import { addAccountList } from "../../store/AccountListSlice";
 import { setWallet } from "../../store/WalletSlice";
 import { setMnemonic } from "../../store/MnemonicSlice";
 import { getLoginAttempts, setLoginAttempts } from "../../store/LoginAttemptsSlice";
+import { resetBetaModalState } from "../../store/BetaModalSlice";
 
 import { AuthAPI } from "../../lib/api/AuthAPI";
 import { decrypt, encrypt, getKeccak256Hash } from "../../lib/helper/EncryptHelper";
@@ -83,6 +84,7 @@ const LoginAccountForm = () => {
       dispatch(addAccountList(newAccount));
       dispatch(setWallet(walletAddresses));
       dispatch(setMnemonic(passphrase));
+      dispatch(resetBetaModalState());
       navigate("/home");
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_SUCCESS });
     } catch (err) {
