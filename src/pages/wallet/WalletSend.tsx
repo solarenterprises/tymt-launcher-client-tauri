@@ -52,6 +52,7 @@ const WalletSend = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [lowBalanceError, setLowBalanceError] = useState<boolean>(false);
+  const [addrErr, setAddrErr] = useState<string>("");
 
   const {
     sxpFee,
@@ -171,10 +172,24 @@ const WalletSend = () => {
     [amount, setAmount]
   );
 
+  const handleAddressChange = (value: string) => {
+    setAddress(value);
+    if (!value) {
+      setAddrErr("");
+    } else if (value.length !== 34) {
+      setAddrErr("Solar addresses must be 34 characters");
+    } else if (!tymtCore.Blockchains.solar.wallet.validateAddress(value)) {
+      setAddrErr("Invalid Solar address");
+    } else {
+      setAddrErr("");
+    }
+  };
+
   const resetAllFields = () => {
     setDraft([]);
     setAmount("");
     setAddress("");
+    setAddrErr("");
     setPassword("");
   };
 
@@ -304,13 +319,19 @@ const WalletSend = () => {
                   id="recipient-address"
                   type="address"
                   value={address}
-                  setValue={setAddress}
+                  setValue={handleAddressChange}
                   label={t("wal-12_recipient-address")}
+                  error={addrErr !== ""}
                   onIconButtonClick={() => {
                     navigator.clipboard.writeText(address);
                   }}
                   onAddressButtonClick={() => setAddressBookView(true)}
                 />
+                {addrErr !== "" && (
+                  <Box mt={"8px"} className="fs-14-light red">
+                    {addrErr}
+                  </Box>
+                )}
                 {Number(amount) > 0 && address !== "" && (Number(sxpFee) > 0 || currentSupportChain?.native?.symbol !== "SXP") && (
                   <Button
                     fullWidth
