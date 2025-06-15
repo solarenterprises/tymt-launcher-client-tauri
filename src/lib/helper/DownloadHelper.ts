@@ -1,6 +1,6 @@
 import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
-import { type, arch } from "@tauri-apps/plugin-os";
+import { platform, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
 import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 import GameAPI from "../api/GameAPI";
@@ -14,12 +14,19 @@ export async function runUrlArgs(url: string, args: string[]) {
   });
 }
 
-export async function isInstalled(game: IGame) {
+const installCache: Record<string, boolean> = {};
+
+export async function isInstalled(game: IGame): Promise<boolean> {
+  if (installCache[game.project_name] !== undefined) {
+    return installCache[game.project_name];
+  }
+
   try {
     await readDir(`${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game.project_name}`);
+    installCache[game.project_name] = true;
     return true;
-  } catch (err) {
-    // console.log("Failed to isInstalled: ", err);
+  } catch {
+    installCache[game.project_name] = false;
     return false;
   }
 }
@@ -28,13 +35,13 @@ export const runNewGame = async (game: IGame) => {
   try {
     const fullExecutablePath = await getFullExecutablePathNewGame(game);
     const gameExtension = (await getExecutableFileExtension(game)).toLowerCase();
-    const platform = await type();
+    const currentPlatform = platform();
 
     const drmToken = game?.drmProtected ? await AuthAPI.getDrmToken(game?._id) : null;
 
     const runArgs = (args: string[] = []) => (drmToken ? [...args, `--tymt`, drmToken] : args);
 
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         if (gameExtension === "appimage") {
           await runUrlArgs(fullExecutablePath, runArgs([`--appimage-extract-and-run`]));
@@ -82,10 +89,10 @@ export const runNewGame = async (game: IGame) => {
 //       return false;
 //     }
 
-//     const platform = await type();
+//     const currentPlatform = platform();
 //     let args: string[] = [];
 
-//     switch (platform) {
+//     switch (currentPlatform) {
 //       case "linux":
 //         args = [`--appimage-extract-and-run`, `--launcher_url`, launcherUrl, `--token`, token];
 //         break;
@@ -98,7 +105,7 @@ export const runNewGame = async (game: IGame) => {
 //     }
 //     if (autoMode) args.push(`--address`, d53_server, `--port`, d53_port, `--go`);
 
-//     switch (platform) {
+//     switch (currentPlatform) {
 //       case "linux":
 //         await runUrlArgs(fullExePath, args);
 //         break;
@@ -168,9 +175,9 @@ export const installGame = async (game: IGame) => {
 
     const fullExecutablePath = await getFullExecutablePathNewGame(game);
     const sourceExtension = (await getDownloadFileExtension(game))?.toLocaleLowerCase();
-    const platform = await type();
+    const currentPlatform = platform();
 
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         switch (sourceExtension) {
           case "zip":
@@ -220,18 +227,24 @@ export const installGame = async (game: IGame) => {
       case "macos":
         switch (sourceExtension) {
           case "zip":
+            console.log("zip")
             await invoke("unzip_macos", {
               fileLocation: fileLocation,
               installDir: installDir,
             });
             break;
           case "bz2":
+            console.log("bz2")
             await invoke("untarbz2_macos", {
               fileLocation: fileLocation,
               installDir: installDir,
             });
             break;
         }
+        // console.log("permission")
+        // await invoke('my_custom_command')
+        // .then(() => console.log('Command invoked!'))
+        // .catch(console.error);      
         await invoke("set_permission", {
           executablePath: fullExecutablePath,
         });
@@ -262,9 +275,9 @@ export const getDownloadLinkNewGame = async (game: IGame) => {
     if (game.projectMeta.type === "browser") {
       return res;
     }
-    const platform = await type();
+    const currentPlatform = platform();
     const cpu = await arch();
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         switch (cpu) {
           case "arm":
@@ -325,9 +338,9 @@ export const getExecutablePathNewGame = async (game: IGame) => {
     if (game.projectMeta.type === "browser") {
       return res;
     }
-    const platform = await type();
+    const currentPlatform = platform();
     const cpu = await arch();
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         switch (cpu) {
           case "arm":
@@ -372,9 +385,9 @@ export const getDownloadFileNameNewGame = async (game: IGame) => {
     if (game.projectMeta.type === "browser") {
       return res;
     }
-    const platform = await type();
+    const currentPlatform = platform();
     const cpu = await arch();
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         switch (cpu) {
           case "arm":
@@ -441,9 +454,9 @@ export const getGameReleaseNative = async (game: IGame) => {
       return null;
     }
     let res: IGameReleaseNative;
-    const platform = await type();
+    const currentPlatform = platform();
     const cpu = await arch();
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         switch (cpu) {
           case "arm":
@@ -606,13 +619,13 @@ export const deleteGameDirectory = async (game: IGame) => {
 
 export const getOsCpu = async () => {
   try {
-    const platform = await type();
+    const currentPlatform = platform();
     const cpu = await arch();
 
     let resPlatform: string = "";
     let resCpu: string = "";
 
-    switch (platform) {
+    switch (currentPlatform) {
       case "linux":
         resPlatform = "linux";
         break;
