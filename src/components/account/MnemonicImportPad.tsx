@@ -1,40 +1,12 @@
-import CopyIconButton from "../home/CopyIconButton";
-import ExportIconButton from "../home/ExportIconButton";
 import MnemonicWord from "./MnemonicWord";
-import { save } from '@tauri-apps/plugin-dialog';
-import { writeTextFile } from '@tauri-apps/plugin-fs';
 
-export interface IPropsMnemonicRevealPad {
+export interface IPropsMnemonicImportPad {
   passphrase: string;
-  blur?: boolean;
-  setBlur?: (_: boolean) => void;
-  allowExport?: boolean;
+
 }
 
-const MnemonicRevealPad = ({ passphrase, blur, setBlur, allowExport = false }: IPropsMnemonicRevealPad) => {
+const MnemonicImportPad = ({ passphrase }: IPropsMnemonicImportPad) => {
   const mnemonic = passphrase?.split(" ");
-
-  const copyMnemonicToClipboard = () => {
-    navigator.clipboard.writeText(passphrase);
-  };
-
-  const saveFile = async () => {
-    try {
-      const filePath = await save({
-        filters: [{
-          name: 'Text',
-          extensions: ['txt']
-        }],
-        defaultPath: 'mnemonic-phrase.txt'
-      });
-      
-      if (filePath) {
-        await writeTextFile(filePath, passphrase);
-      }
-    } catch (error) {
-      console.error('Error saving file:', error);
-    }
-  };
 
   return (
     <div
@@ -50,26 +22,10 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur, allowExport = false }: I
           display: "flex",
           justifyContent: "flex-end",
           gap: "4px",
-          opacity: allowExport && passphrase ? 1 : 0.3,
-          pointerEvents: allowExport && passphrase ? 'auto' : 'none',
         }}
       >
-        <ExportIconButton onClick={saveFile} />
-        <CopyIconButton onClick={copyMnemonicToClipboard} />
       </div>
-      <div
-        style={{
-          filter: blur ? "blur(5px)" : "none",
-        }}
-        onClick={() => {
-          if (passphrase && blur) {
-            setBlur(false);
-            setTimeout(() => {
-              setBlur(true);
-            }, 10 * 1e3);
-          }
-        }}
-      >
+      <div>
         <div
           style={{
             width: "436px",
@@ -207,4 +163,4 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur, allowExport = false }: I
   );
 };
 
-export default MnemonicRevealPad;
+export default MnemonicImportPad;

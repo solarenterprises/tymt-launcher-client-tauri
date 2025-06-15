@@ -15,7 +15,7 @@ import AccountHeader from "../../../components/account/AccountHeader";
 import InputText from "../../../components/account/InputText";
 import AccountNextButton from "../../../components/account/AccountNextButton";
 import Stepper from "../../../components/account/Stepper";
-import MnemonicRevealPad from "../../../components/account/MnemonicRevealPad";
+import MnemonicImportPad from "../../../components/account/MnemonicImportPad";
 
 import { getAccountList } from "../../../store/AccountListSlice";
 
@@ -135,7 +135,7 @@ const NonCustodialLogIn2 = () => {
                         {formik.touched.mnemonic && formik.errors.mnemonic && <Box className={"fs-16-regular red"}>{formik.errors.mnemonic}</Box>}
                       </Grid>
                       <Grid item xs={12}>
-                        <MnemonicRevealPad passphrase={formik?.values?.mnemonic} />
+                        <MnemonicImportPad passphrase={formik?.values?.mnemonic} />
                       </Grid>
                       <Grid item xs={12} mt={"40px"}>
                         <AccountNextButton
