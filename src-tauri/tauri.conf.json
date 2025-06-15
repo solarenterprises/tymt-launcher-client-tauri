@@ -20,6 +20,9 @@
   "version": "2.1.4",
   "identifier": "tymtLauncher",
   "plugins": {
+    "os": {
+      "enabled": true
+    },  
     "updater": {
       "windows": {
         "installMode": "passive"
@@ -29,7 +32,7 @@
     }
   },
   "app": {
-    "withGlobalTauri": true,
+    "withGlobalTauri": false,
     "windows": [
       {
         "label": "tymtLauncher",

@@ -3,74 +3,71 @@
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
-mod minecraft;
-mod window;
-mod file;
-
-use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
-// use std::sync::Mutex;
 use std::sync::OnceLock;
 use tauri::{
     menu::{MenuBuilder, MenuItemBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
-use tauri::{Emitter, Listener, Manager};
+use tauri::{Emitter, Manager};
 
-#[cfg(target_family = "unix")]
-use std::os::unix::fs::PermissionsExt;
-#[cfg(target_family = "unix")]
-use std::path::Path;
-#[cfg(target_family = "unix")]
-use std::io::{self, Write};
+// #[cfg(target_family = "unix")]
+// use std::io::{self, Write};
+// #[cfg(target_family = "unix")]
+// use std::path::Path;
 
 static APPHANDLE: OnceLock<tauri::AppHandle> = OnceLock::new();
 
-#[cfg(target_family = "unix")]
-fn create_named_mutex(name: &str) -> std::io::Result<std::os::unix::net::UnixListener> {
-    let socket_path = Path::new(name);
-    if socket_path.exists() {
-        match std::os::unix::net::UnixStream::connect(socket_path) {
-            Ok(mut stream) => {
-                stream.write_all(b"ping")?;
-                return Err(io::Error::new(
-                    io::ErrorKind::AlreadyExists,
-                    "Socket already in use",
-                ));
-            }
-            Err(_) => {
-                // Previous instance did not clean up socket, remove it
-                std::fs::remove_file(socket_path)?;
-            }
-        }
-    }
-    std::os::unix::net::UnixListener::bind(socket_path)
-}
+// #[cfg(target_family = "unix")]
+// fn create_named_mutex(name: &str) -> std::io::Result<std::os::unix::net::UnixListener> {
+//     let socket_path = Path::new(name);
+//     if socket_path.exists() {
+//         match std::os::unix::net::UnixStream::connect(socket_path) {
+//             Ok(mut stream) => {
+//                 stream.write_all(b"ping")?;
+//                 return Err(io::Error::new(
+//                     io::ErrorKind::AlreadyExists,
+//                     "Socket already in use",
+//                 ));
+//             }
+//             Err(_) => {
+//                 // Previous instance did not clean up socket, remove it
+//                 std::fs::remove_file(socket_path)?;
+//             }
+//         }
+//     }
+//     std::os::unix::net::UnixListener::bind(socket_path)
+// }
 
-#[cfg(target_family = "windows")]
-fn create_named_mutex(name: &str) -> std::io::Result<()> {
-    use winapi::shared::winerror::ERROR_ALREADY_EXISTS;
-    use winapi::um::errhandlingapi::GetLastError;
-    use winapi::um::synchapi::CreateMutexA;
+// #[cfg(target_family = "windows")]
+// fn create_named_mutex(name: &str) -> std::io::Result<()> {
+//     use winapi::shared::winerror::ERROR_ALREADY_EXISTS;
+//     use winapi::um::errhandlingapi::GetLastError;
+//     use winapi::um::synchapi::CreateMutexA;
 
-    let mutex_name = std::ffi::CString::new(name).expect("CString::new failed");
-    let handle: *mut std::ffi::c_void =
-        unsafe { CreateMutexA(std::ptr::null_mut(), 0, mutex_name.as_ptr()) };
+//     let mutex_name = std::ffi::CString::new(name).expect("CString::new failed");
+//     let handle: *mut std::ffi::c_void =
+//         unsafe { CreateMutexA(std::ptr::null_mut(), 0, mutex_name.as_ptr()) };
 
-    if handle.is_null() {
-        return Err(std::io::Error::last_os_error());
-    }
-    if (unsafe { GetLastError() }) == ERROR_ALREADY_EXISTS {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::AlreadyExists,
-            "Mutex already exists",
-        ));
-    }
-    Ok(())
-}
+//     if handle.is_null() {
+//         return Err(std::io::Error::last_os_error());
+//     }
+//     if (unsafe { GetLastError() }) == ERROR_ALREADY_EXISTS {
+//         return Err(std::io::Error::new(
+//             std::io::ErrorKind::AlreadyExists,
+//             "Mutex already exists",
+//         ));
+//     }
+//     Ok(())
+// }
 
 #[derive(Default)]
 struct AppData {
     welcome_message: &'static str,
+}
+
+#[tauri::command]
+fn get_welcome_message(data: tauri::State<AppData>) -> String {
+    data.welcome_message.to_string()
 }
 
 pub fn main() -> std::io::Result<()> {
@@ -92,60 +89,35 @@ pub fn main() -> std::io::Result<()> {
     //     }
     // }
 
-    let mut builder = tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_fs::init());
-    #[cfg(desktop)]
-    {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
-            // Get the main window of the app
-            if let Some(window) = app.get_window("tymtLauncher") {
-                // Show the window if it is hidden
-                if !window.is_visible().unwrap_or(false) {
-                    window.show().unwrap();
-                }
-                // Focus the window
-                window.set_focus().unwrap();
-            }
-        }));
-    }
+    // let mut builder = tauri::Builder::default()
+    //     .plugin(tauri_plugin_shell::init())
+    //     .plugin(tauri_plugin_notification::init())
+    //     .plugin(tauri_plugin_fs::init());
+    // #[cfg(desktop)]
+    // {
+    //     builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+    //         // Get the main window of the app
+    //         if let Some(window) = app.get_window("tymtLauncher") {
+    //             // Show the window if it is hidden
+    //             if !window.is_visible().unwrap_or(false) {
+    //                 window.show().unwrap();
+    //             }
+    //             // Focus the window
+    //             window.set_focus().unwrap();
+    //         }
+    //     }));
+    // }
 
-    builder
+    tauri::Builder::default()
         //.manage(Mutex::new(AppState::default()))
         .manage(AppData {
             welcome_message: "Welcome to Tauri!",
         })
+        .invoke_handler(tauri::generate_handler![get_welcome_message])
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![
-            get_machine_id,
-            file::download_to_app_dir,
-            file::unzip_windows,
-            file::move_exe_windows,
-            file::unzip_macos,
-            file::untarbz2_macos,
-            file::unzip_linux,
-            file::move_appimage_linux,
-            file::install_deb_linux,
-            file::get_deb_package_name,
-            file::run_deb_linux,
-            file::delete_file,
-            file::delete_directory,
-            file::write_file,
-            file::run_url_args,
-            file::open_directory,
-#[cfg(target_family = "unix")]
-            file::set_permission,
-            minecraft::get_system_info,
-            window::create_child_window,
-            window::destroy_child_window,
-            window::is_window_visible,
-            window::show_transaction_window,
-            window::hide_transaction_window
-        ])
         .setup(|app| {
             app.manage(AppData {
                 welcome_message: "Welcome to Tauri!",
@@ -266,7 +238,6 @@ pub fn main() -> std::io::Result<()> {
                 })
                 .build(app)?;
 
-
             Ok(())
         })
         .on_window_event(|window, event| match event {
@@ -277,24 +248,7 @@ pub fn main() -> std::io::Result<()> {
             _ => {}
         })
         .run(tauri::generate_context!())
-        .unwrap(); //.expect("error while running tymtLauncher");
+        .expect("error while running tauri application");
 
     Ok(())
 }
-
-
-
-#[tauri::command]
-fn get_machine_id() -> Result<String, String> {
-    let mut builder = IdBuilder::new(Encryption::SHA256);
-    builder.add_component(HWIDComponent::SystemID);
-    let hwid = builder
-        .build("tymtLauncher")
-        .map_err(|err| err.to_string())?;
-
-    Ok(hwid)
-}
-
-
-
-

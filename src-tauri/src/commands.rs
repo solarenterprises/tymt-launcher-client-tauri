@@ -1,19 +1,26 @@
-use std::path::{Path, PathBuf};
-use std::fs::File;
-use tauri::Emitter;
-use zip::read::ZipArchive; // For Unix-specific permissions
+use debpkg::DebPkg;
+use futures_util::stream::StreamExt;
+use reqwest::header::ACCEPT;
+use reqwest::Client;
+use std::cmp::min;
 use std::fs;
+use std::fs::File;
+use std::io::Write;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{Duration, Instant};
-use reqwest::Client;
-use reqwest::header::ACCEPT;
-use futures_util::stream::StreamExt;
-use std::cmp::min;
-use std::io::Write;
-use debpkg::DebPkg;
+use tauri::Emitter;
+use zip::read::ZipArchive; // For Unix-specific permissions
+
+use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
 
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
+
+#[tauri::command]
+pub async fn my_custom_command() {
+    println!("I was invoked from JavaScript!");
+}
 
 #[tauri::command]
 pub async fn unzip_linux(
@@ -116,11 +123,18 @@ pub async fn get_deb_package_name(
         .map_err(|e| format!("Failed to open deb file '{}': {}", executable_path, e))?;
     let mut pkg = DebPkg::parse(file)
         .map_err(|e| format!("Failed to parse deb package '{}': {}", executable_path, e))?;
-    let control_tar = pkg
-        .control()
-        .map_err(|e| format!("Failed to extract control.tar from '{}': {}", executable_path, e))?;
-    let control = debpkg::Control::extract(control_tar)
-        .map_err(|e| format!("Failed to extract control information from '{}': {}", executable_path, e))?;
+    let control_tar = pkg.control().map_err(|e| {
+        format!(
+            "Failed to extract control.tar from '{}': {}",
+            executable_path, e
+        )
+    })?;
+    let control = debpkg::Control::extract(control_tar).map_err(|e| {
+        format!(
+            "Failed to extract control information from '{}': {}",
+            executable_path, e
+        )
+    })?;
     Ok(control.name().to_string())
 }
 
@@ -147,16 +161,15 @@ pub async fn run_deb_linux(
 
 #[cfg(target_family = "unix")]
 #[tauri::command]
-pub async fn set_permission(
-    app_handle: tauri::AppHandle,
-    executable_path: String,
-) -> Result<(), String> {
+pub async fn set_permission(executable_path: String) -> Result<(), String> {
     let path = PathBuf::from(&executable_path);
 
     // Check if the file exists
     if !path.exists() {
         return Err(format!("File does not exist: {}", executable_path));
     }
+
+    println!("Trying to set permissions on: {:?}", path);
 
     // Set the executable permission
     let mut permissions = fs::metadata(&path)
@@ -399,7 +412,10 @@ pub fn write_file(content: String, filepath: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn delete_file(_app_handle: tauri::AppHandle, file_location: String) -> Result<(), String> {
+pub async fn delete_file(
+    _app_handle: tauri::AppHandle,
+    file_location: String,
+) -> Result<(), String> {
     let path = PathBuf::from(file_location);
 
     fs::remove_file(&path).map_err(|e| format!("Failed to delete file: {}", e))?;

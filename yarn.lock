@@ -3505,7 +3505,7 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@tauri-apps/api@^2.0.0":
+"@tauri-apps/api@^2.0.0", "@tauri-apps/api@^2.5.0":
   version "2.5.0"
   resolved "https://registry.npmjs.org/@tauri-apps/api/-/api-2.5.0.tgz#f1c67b5505ba689621b549f9d0165389337586dc"
   integrity sha512-Ldux4ip+HGAcPUmuLT8EIkk6yafl5vK0P0c0byzAKzxJh7vxelVtdPONjfgTm96PbN24yjZNESY8CKo8qniluA==
@@ -3624,7 +3624,14 @@
   dependencies:
     "@tauri-apps/api" "^2.0.0"
 
-"@tauri-apps/plugin-os@^2.0.0-rc":
+"@tauri-apps/plugin-opener@~2":
+  version "2.2.7"
+  resolved "https://registry.npmjs.org/@tauri-apps/plugin-opener/-/plugin-opener-2.2.7.tgz#2fccf081e8bd32b61cfc31640845d81a0bf8ed06"
+  integrity sha512-uduEyvOdjpPOEeDRrhwlCspG/f9EQalHumWBtLBnp3fRp++fKGLqDOyUhSIn7PzX45b/rKep//ZQSAQoIxobLA==
+  dependencies:
+    "@tauri-apps/api" "^2.0.0"
+
+"@tauri-apps/plugin-os@~2":
   version "2.2.1"
   resolved "https://registry.npmjs.org/@tauri-apps/plugin-os/-/plugin-os-2.2.1.tgz#64550ece964e73c710ec2017b88aa6694512ba5f"
   integrity sha512-cNYpNri2CCc6BaNeB6G/mOtLvg8dFyFQyCUdf2y0K8PIAKGEWdEcu8DECkydU2B+oj4OJihDPD2de5K6cbVl9A==
