@@ -93,6 +93,7 @@
     "i18next": "^23.10.0",
     "keccak": "^3.0.4",
     "lodash": "^4.17.21",
+    "mongodb": "^6.17.0",
     "mui-one-time-password-input": "^2.0.2",
     "multichain-crypto-wallet": "^0.2.8",
     "multicoin-address-validator": "^0.5.16",
@@ -135,7 +136,8 @@
     "vite-plugin-node-polyfills": "^0.21.0",
     "vm-browserify": "^1.1.2",
     "wif": "^4.0.0",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "zip": "^1.2.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.5.0",

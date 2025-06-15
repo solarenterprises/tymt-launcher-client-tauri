@@ -2,7 +2,6 @@ import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { platform, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
-import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
 import { AuthAPI } from "../api/AuthAPI";
@@ -21,8 +20,12 @@ export async function isInstalled(game: IGame): Promise<boolean> {
     return installCache[game.project_name];
   }
 
+  const originalDir = await appDataDir();
+  const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/TymtApps/');
+  const gameDir = `${baseDir}games/${game.project_name}`;
+
   try {
-    await readDir(`${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game.project_name}`);
+    await readDir(gameDir);
     installCache[game.project_name] = true;
     return true;
   } catch {
@@ -30,6 +33,7 @@ export async function isInstalled(game: IGame): Promise<boolean> {
     return false;
   }
 }
+
 
 export const runNewGame = async (game: IGame) => {
   try {
@@ -125,8 +129,11 @@ export const runNewGame = async (game: IGame) => {
 // };
 
 export async function openDir() {
+  const originalDir = await appDataDir();
+  const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/');
+
   return invoke("open_directory", {
-    path: await appDataDir(),
+    path: await baseDir,
   });
 }
 
@@ -143,16 +150,48 @@ export const checkOnline = async (): Promise<boolean> => {
 
 export const downloadFileToAppDir = async (game: IGame) => {
   try {
-    const url: string = await getDownloadLinkNewGame(game);
+    // const url: string = await getDownloadLinkNewGame(game);
     const downloadPath: string = await getDownloadFileFullPath(game);
-    if (!url || !downloadPath) return false;
+    const currentPlatform = platform();
+
+    let archeOsType;
+
+    switch (currentPlatform) {
+      case "windows":
+        archeOsType = "windows_amd64";
+        break;
+      case "macos":
+        archeOsType = "darwin_amd64";
+        break;
+      case "linux":
+        archeOsType = "linux_amd64";
+        break;
+      default:
+        console.log("OS is not supported!");
+        break;
+    }
+
+    const downloadUrl = game?.releaseMeta.platforms?.[archeOsType].external_url;
+    const appId = game?.appId;
+    const imageUrl = game?.projectMeta.image;
+    const gameTitle = game?.title;
+
+    if (!downloadPath || !archeOsType || !downloadUrl || !appId || !imageUrl || !gameTitle) {
+      if (!downloadPath) console.error("Missing: downloadPath");
+      if (!archeOsType) console.error("Missing: archeOsType");
+      if (!downloadUrl) console.error("Missing: downloadUrl");
+      if (!appId) console.error("Missing: appId");
+      if (!imageUrl) console.error("Missing: imageUrl");
+      if (!gameTitle) console.error("Missing: gameTitle");
+      return false;
+    }    
+
+    const formattedTitle = gameTitle.toLowerCase().replace(/\s+/g, "");
 
     await invoke("download_to_app_dir", {
-      url: url,
       fileLocation: downloadPath,
-      gameId: game?._id,
-      gameImageUrl: game?.imageUrl,
-      gameTitle: game?.title,
+      downloadUrl: downloadUrl,
+      gameTitle: formattedTitle,
     });
 
     return true;
@@ -162,107 +201,10 @@ export const downloadFileToAppDir = async (game: IGame) => {
   }
 };
 
-export const installGame = async (game: IGame) => {
-  try {
-    // console.log("installGame");
-
-    const fileLocation: string = await getDownloadFileFullPath(game);
-    const installDir: string = await getInstallDir(game);
-    if (!fileLocation || !installDir) return false;
-
-    // console.log("fileLocation", fileLocation);
-    // console.log("installDir", installDir);
-
-    const fullExecutablePath = await getFullExecutablePathNewGame(game);
-    const sourceExtension = (await getDownloadFileExtension(game))?.toLocaleLowerCase();
-    const currentPlatform = platform();
-
-    switch (currentPlatform) {
-      case "linux":
-        switch (sourceExtension) {
-          case "zip":
-            await invoke("unzip_linux", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            await invoke("set_permission", {
-              executablePath: fullExecutablePath,
-            });
-            break;
-          case "appimage":
-            await invoke("move_appimage_linux", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            await invoke("set_permission", {
-              executablePath: fullExecutablePath,
-            });
-            break;
-          case "deb":
-            await invoke("move_appimage_linux", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            await invoke("install_deb_linux", {
-              executablePath: fullExecutablePath,
-            });
-        }
-        break;
-      case "windows":
-        switch (sourceExtension) {
-          case "zip":
-            await invoke("unzip_windows", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            break;
-          case "exe":
-            await invoke("move_exe_windows", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            break;
-        }
-        break;
-      case "macos":
-        switch (sourceExtension) {
-          case "zip":
-            console.log("zip")
-            await invoke("unzip_macos", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            break;
-          case "bz2":
-            console.log("bz2")
-            await invoke("untarbz2_macos", {
-              fileLocation: fileLocation,
-              installDir: installDir,
-            });
-            break;
-        }
-        // console.log("permission")
-        // await invoke('my_custom_command')
-        // .then(() => console.log('Command invoked!'))
-        // .catch(console.error);      
-        await invoke("set_permission", {
-          executablePath: fullExecutablePath,
-        });
-        break;
-    }
-
-    return true;
-  } catch (err) {
-    throw new Error(err.toString());
-  }
-};
-
 export const downloadAndInstallNewGame = async (game: IGame) => {
   try {
     await GameAPI.increaseDownloadCount(game?._id);
     await downloadFileToAppDir(game);
-    await installGame(game);
-    await deleteDownloadFile(game);
   } catch (err) {
     throw new Error(err.toString());
   }
@@ -321,11 +263,12 @@ export const getDownloadLinkNewGame = async (game: IGame) => {
 
 export const getFullExecutablePathNewGame = async (game: IGame) => {
   try {
-    const prefix: string = await appDataDir();
-    const exePath: string = await getExecutablePathNewGame(game);
-    const fullPath = prefix + `/v${CONFIG_TYMT_VERSION}/games/${game.project_name}/` + exePath;
+    const originalDir = await appDataDir();
+    const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/TymtApps/');
+    const fullPathGameDir = `${baseDir}games/${game.project_name}`;
+
     // console.log("getFullExecutablePathNewGame", fullPath);
-    return fullPath;
+    return fullPathGameDir;
   } catch (err) {
     // console.log("Failed to getFullExecutablePathNewGame: ", err);
     return "";
@@ -547,9 +490,11 @@ export const getSupportOSList = (game: IGame) => {
 export const getDownloadFileFullPath = async (game: IGame) => {
   try {
     const fileName = await getDownloadFileNameNewGame(game);
-    const res = `${await appDataDir()}/${fileName}`;
-    // console.log("getDownloadFileFullPath", res);
-    return res;
+    const originalDir = await appDataDir();
+    const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/TymtApps/');
+    const fullPathGameDir = `${baseDir}games/${fileName}`;
+    
+    return fullPathGameDir;
   } catch (err) {
     // console.log("Failed to getDownloadFileFullPath: ", err);
     return "";
@@ -558,9 +503,11 @@ export const getDownloadFileFullPath = async (game: IGame) => {
 
 export const getInstallDir = async (game: IGame) => {
   try {
-    const res = `${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game?.project_name}`;
-    // console.log("getInstallDir", res);
-    return res;
+    const originalDir = await appDataDir();
+    const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/TymtApps/');
+    const fullPathGameDir = `${baseDir}games/${game?.project_name}`;
+
+    return fullPathGameDir;
   } catch (err) {
     // console.log("Failed to getInstallDir: ", err);
     return "";

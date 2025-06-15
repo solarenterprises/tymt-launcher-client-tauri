@@ -15,7 +15,7 @@ import { IGame } from "../../../types/GameTypes";
 
 export const CONST_GAME_DISTRICT53: IGame = {
   _id: "district53",
-  addId: "",
+  appId: "",
   epic_game_url: "",
   imageUrl: d53Thumbnail,
   launch_epic: false,

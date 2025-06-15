@@ -4,7 +4,7 @@ const tavlaThumbnail = "https://tavla.xyz/images/bg-1920.jpg";
 
 export const CONST_GAME_TAVLA: IGame = {
   _id: "tavla",
-  addId: "",
+  appId: "",
   epic_game_url: "",
   imageUrl: tavlaThumbnail,
   launch_epic: false,

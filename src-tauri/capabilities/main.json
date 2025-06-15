@@ -101,10 +101,10 @@
         "/home/*/.cache/tymtLauncherDebug/*/*/*/*/*/*",
         "/home/*/.cache/tymtLauncherDebug/*/*/*/*/*/*/*",
         "/home/*/.cache/tymtLauncherDebug/*/*/*/*/*/*/*/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*/*/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*/*/*/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*/*/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*/*/*/*",
         "/Users/*/Library/Application Support/tymtLauncherDebug/*/games/*",
         "/Users/*/Library/Application Support/tymtLauncherDebug/*/games/*/*",
         "/Users/*/Library/Application Support/tymtLauncherDebug/*/games/*/*/*",
@@ -126,7 +126,6 @@
     "dialog:default",
     "dialog:default",
     "os:default",
-    "os:default",
-    "opener:default"
+    "os:default"
   ]
 }

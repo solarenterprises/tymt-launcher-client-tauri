@@ -1,18 +1,12 @@
 use debpkg::DebPkg;
-use futures_util::stream::StreamExt;
-use reqwest::header::ACCEPT;
-use reqwest::Client;
-use std::cmp::min;
+use mongodb::bson::doc;
 use std::fs;
 use std::fs::File;
+use std::io;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::time::{Duration, Instant};
-use tauri::Emitter;
-use zip::read::ZipArchive; // For Unix-specific permissions
-
-use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
+use zip::read::ZipArchive;
 
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
@@ -184,6 +178,31 @@ pub async fn set_permission(executable_path: String) -> Result<(), String> {
     Ok(())
 }
 
+#[cfg(target_family = "unix")]
+#[tauri::command]
+pub async fn set_permission_str(executable_path: &str) -> Result<(), String> {
+    let path = PathBuf::from(&executable_path);
+
+    // Check if the file exists
+    if !path.exists() {
+        return Err(format!("File does not exist: {}", executable_path));
+    }
+
+    println!("Trying to set permissions on: {:?}", path);
+
+    // Set the executable permission
+    let mut permissions = fs::metadata(&path)
+        .map_err(|e| format!("Failed to get metadata: {}", e))?
+        .permissions();
+
+    permissions.set_mode(0o755); // Set permissions to rwxr-xr-x
+
+    fs::set_permissions(&path, permissions)
+        .map_err(|e| format!("Failed to set permissions: {}", e))?;
+
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn unzip_windows(
     _app_handle: tauri::AppHandle,
@@ -321,89 +340,159 @@ pub struct DownloadProgress {
 
 #[tauri::command]
 pub async fn download_to_app_dir(
-    app_handle: tauri::AppHandle,
-    url: String,
+    _app_handle: tauri::AppHandle,
     file_location: String,
-    game_id: String,
-    game_image_url: String,
+    download_url: String,
     game_title: String,
-) -> Result<(), String> {
-    let path = Path::new(&file_location);
+) -> i32 {
+    // Get ZIP file and write file
+    let resp = reqwest::get(&download_url).await.expect("request failed");
+    let bytes = resp.bytes().await.expect("Failed to read response bytes");
+    let path: String = format!("{}{}", file_location, game_title);
+    println!("{}", path);
+    let mut created_file: File = File::create(&path).expect("Failed to create file");
+    created_file
+        .write_all(&bytes)
+        .expect("Failed to write file");
 
-    if let Some(parent) = path.parent() {
-        if !parent.exists() {
-            match fs::create_dir_all(&parent) {
-                Err(why) => panic!("couldn't create directory: {}", why),
-                Ok(_) => println!("Successfully created the directory"),
+    if path.ends_with(".zip") {
+        let fname = std::path::Path::new(&*path);
+        let reader = fs::File::open(fname).unwrap();
+        let mut archive = zip::ZipArchive::new(reader).unwrap();
+
+        for i in 0..archive.len() {
+            let mut file = archive.by_index(i).unwrap();
+            let outpath = match file.enclosed_name() {
+                Some(path) => path,
+                None => continue,
+            };
+
+            {
+                let comment = file.comment();
+                if !comment.is_empty() {
+                    println!("File {i} comment: {comment}");
+                }
+            }
+
+            if file.is_dir() {
+                println!("File {} extracted to \"{}\"", i, outpath.display());
+                fs::create_dir_all(&outpath).unwrap();
+            } else {
+                println!(
+                    "File {} extracted to \"{}\" ({} bytes)",
+                    i,
+                    outpath.display(),
+                    file.size()
+                );
+                if let Some(p) = outpath.parent() {
+                    if !p.exists() {
+                        fs::create_dir_all(p).unwrap();
+                    }
+                }
+                let mut outfile = fs::File::create(&outpath).unwrap();
+                io::copy(&mut file, &mut outfile).unwrap();
+            }
+
+            if let Err(err) = set_permission_str(&path).await {
+                println!("Failed to set permission: {}", err);
             }
         }
-    }
+        return 0;
+    } else {
 
-    // fs::create_dir_all("./download/").expect("Error at create_dir_all");
-    let start_time = Instant::now();
-    let client = Client::new();
-    let res = client
-        .get(&url)
-        .header(ACCEPT, "application/octet-stream")
-        .header(reqwest::header::USER_AGENT, "tymtLauncher/1.0")
-        .send()
-        .await
-        .map_err(|e| format!("Failed to GET from '{}': {}", &url, e))?;
-    let total = res
-        .content_length()
-        .ok_or(format!("Failed to get content length from '{}'", &url))?;
-
-    let mut file =
-        File::create(&path).or(Err(format!("Failed to create file '{}'", file_location)))?;
-    let mut downloaded: u64 = 0;
-    let mut stream = res.bytes_stream();
-
-    let mut last_emit_time = Instant::now();
-
-    while let Some(item) = stream.next().await {
-        let chunk = item.or(Err(format!("Error while downloading file")))?;
-        file.write_all(&chunk)
-            .or(Err(format!("Error while writing to file")))?;
-        downloaded = min(downloaded + (chunk.len() as u64), total);
-        let duration = start_time.elapsed().as_secs_f64();
-        let speed = if duration > 0.0 {
-            Some((downloaded as f64) / duration / 1024.0 / 1024.0)
-        } else {
-            None
-        };
-
-        if last_emit_time.elapsed() >= Duration::new(1, 0) {
-            let expectation = if let Some(s) = speed {
-                (total - downloaded) as f64 / (s * 1024.0 * 1024.0)
-            } else {
-                0.0
-            };
-
-            let progress = DownloadProgress {
-                downloaded,
-                speed,
-                total,
-                duration,
-                expectation,
-                game_id: game_id.clone(),
-                game_image_url: game_image_url.clone(),
-                game_title: game_title.clone(),
-            };
-
-            app_handle
-                .emit("game-download-progress", &progress)
-                .map_err(|e| format!("Failed to emit progress event: {}", e))?;
-
-            last_emit_time = Instant::now();
+        if let Err(err) = set_permission(path).await {
+            println!("Failed to set permission: {}", err);
         }
 
-        // println!("downloaded => {}", downloaded);
-        // println!("total_size => {}", total_size);
-        // println!("speed => {:?}", speed);
+        return 0;
     }
-
-    return Ok(());
 }
+// #[tauri::command]
+// pub async fn download_to_app_dir(
+//     app_handle: tauri::AppHandle,
+//     url: String,
+//     file_location: String,
+//     game_id: String,
+//     game_image_url: String,
+//     game_title: String,
+// ) -> Result<(), String> {
+//     println!("URL: {url}");
+//     let path = Path::new(&file_location);
+
+//     if let Some(parent) = path.parent() {
+//         if !parent.exists() {
+//             match fs::create_dir_all(&parent) {
+//                 Err(why) => panic!("couldn't create directory: {}", why),
+//                 Ok(_) => println!("Successfully created the directory"),
+//             }
+//         }
+//     }
+
+//     // fs::create_dir_all("./download/").expect("Error at create_dir_all");
+//     let start_time = Instant::now();
+//     let client = Client::new();
+//     let res = client
+//         .get(&url)
+//         .header(ACCEPT, "application/octet-stream")
+//         .header(reqwest::header::USER_AGENT, "tymtLauncher/1.0")
+//         .send()
+//         .await
+//         .map_err(|e| format!("Failed to GET from '{}': {}", &url, e))?;
+//     let total = res
+//         .content_length()
+//         .ok_or(format!("Failed to get content length from '{}'", &url))?;
+
+//     let mut file =
+//         File::create(&path).or(Err(format!("Failed to create file '{}'", file_location)))?;
+//     let mut downloaded: u64 = 0;
+//     let mut stream = res.bytes_stream();
+
+//     let mut last_emit_time = Instant::now();
+
+//     while let Some(item) = stream.next().await {
+//         let chunk = item.or(Err(format!("Error while downloading file")))?;
+//         file.write_all(&chunk)
+//             .or(Err(format!("Error while writing to file")))?;
+//         downloaded = min(downloaded + (chunk.len() as u64), total);
+//         let duration = start_time.elapsed().as_secs_f64();
+//         let speed = if duration > 0.0 {
+//             Some((downloaded as f64) / duration / 1024.0 / 1024.0)
+//         } else {
+//             None
+//         };
+
+//         if last_emit_time.elapsed() >= Duration::new(1, 0) {
+//             let expectation = if let Some(s) = speed {
+//                 (total - downloaded) as f64 / (s * 1024.0 * 1024.0)
+//             } else {
+//                 0.0
+//             };
+
+//             let progress = DownloadProgress {
+//                 downloaded,
+//                 speed,
+//                 total,
+//                 duration,
+//                 expectation,
+//                 game_id: game_id.clone(),
+//                 game_image_url: game_image_url.clone(),
+//                 game_title: game_title.clone(),
+//             };
+
+//             app_handle
+//                 .emit("game-download-progress", &progress)
+//                 .map_err(|e| format!("Failed to emit progress event: {}", e))?;
+
+//             last_emit_time = Instant::now();
+//         }
+
+//         // println!("downloaded => {}", downloaded);
+//         // println!("total_size => {}", total_size);
+//         // println!("speed => {:?}", speed);
+//     }
+
+//     return Ok(());
+// }
 
 #[tauri::command]
 pub fn write_file(content: String, filepath: String) -> Result<(), String> {

@@ -12,7 +12,7 @@ import { IGame } from "../../../types/GameTypes";
 
 export const CONST_GAME_REDECLIPSE: IGame = {
   _id: "redeclipse",
-  addId: "",
+  appId: "",
   epic_game_url: "",
   imageUrl: redeclipseThumbnail,
   launch_epic: false,

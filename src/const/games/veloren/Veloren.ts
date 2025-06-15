@@ -12,7 +12,7 @@ import { IGame } from "../../../types/GameTypes";
 
 export const CONST_GAME_VELOREN: IGame = {
   _id: "veloren",
-  addId: "",
+  appId: "",
   epic_game_url: "",
   imageUrl: velorenThumbnail,
   launch_epic: false,
