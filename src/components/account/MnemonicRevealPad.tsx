@@ -1,14 +1,17 @@
 import CopyIconButton from "../home/CopyIconButton";
 import ExportIconButton from "../home/ExportIconButton";
 import MnemonicWord from "./MnemonicWord";
+import { save } from '@tauri-apps/plugin-dialog';
+import { writeTextFile } from '@tauri-apps/plugin-fs';
 
 export interface IPropsMnemonicRevealPad {
   passphrase: string;
   blur?: boolean;
   setBlur?: (_: boolean) => void;
+  allowExport?: boolean;
 }
 
-const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPad) => {
+const MnemonicRevealPad = ({ passphrase, blur, setBlur, allowExport = false }: IPropsMnemonicRevealPad) => {
   const mnemonic = passphrase?.split(" ");
 
   const copyMnemonicToClipboard = () => {
@@ -17,15 +20,17 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPa
 
   const saveFile = async () => {
     try {
-      const blob = new Blob([passphrase], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'mnemonic-phrase.txt';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const filePath = await save({
+        filters: [{
+          name: 'Text',
+          extensions: ['txt']
+        }],
+        defaultPath: 'mnemonic-phrase.txt'
+      });
+      
+      if (filePath) {
+        await writeTextFile(filePath, passphrase);
+      }
     } catch (error) {
       console.error('Error saving file:', error);
     }
@@ -45,6 +50,8 @@ const MnemonicRevealPad = ({ passphrase, blur, setBlur }: IPropsMnemonicRevealPa
           display: "flex",
           justifyContent: "flex-end",
           gap: "4px",
+          opacity: allowExport && passphrase ? 1 : 0.3,
+          pointerEvents: allowExport && passphrase ? 'auto' : 'none',
         }}
       >
         <ExportIconButton onClick={saveFile} />
