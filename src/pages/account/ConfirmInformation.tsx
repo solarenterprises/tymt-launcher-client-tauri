@@ -140,7 +140,6 @@ const ConfirmInformation = () => {
       };
       dispatch(setAccount(updatedAccount));
       dispatch(addAccountList(updatedAccount));
-      dispatch(resetBetaModalState());
     }
     setLoading(false);
   };
