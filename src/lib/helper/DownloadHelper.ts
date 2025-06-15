@@ -2,7 +2,6 @@ import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
-import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
@@ -644,12 +643,27 @@ export const getOsCpu = async () => {
 export const fetchMetaUri = async (game) => {
   try {
     const metaUri = game?.releaseMeta?.meta_uri;
-    const res1: any = await tauriFetch(metaUri, {
-      method: "GET",
-      connectTimeout: 30,
-    });
-    const res = await res1.json();
-    return res;
+    if (!metaUri) return null;
+
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+    try {
+      const res1 = await fetch(metaUri, {
+        method: "GET",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const res = await res1.json();
+      return res;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        console.error('Fetch timed out');
+      }
+      throw err;
+    }
   } catch (err) {
     // console.log("Failed to fetchMetaUri: ", err);
   }

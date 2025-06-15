@@ -1,7 +1,7 @@
 import * as bip39 from "bip39";
 
 import { CONST_CHAIN_NAMES, CONST_CHAIN_SYMBOLS, CONST_SUPPORT_CHAINS } from "../../const/ChainConsts";
-import { convertFromRaw, add } from "./balanceUtils";
+import { add } from "./balanceUtils";
 import {
   CONFIG_NETWORK_NAME,
   CONFIG_SOLAR_SCAN,
@@ -171,8 +171,7 @@ export const getNativeDecimalsBySymbol = (symbol: string): number | null => {
 export const getTokenBalanceBySymbol = (balanceListStore: IBalanceList, symbol: string): string => {
   try {
     const balance = balanceListStore?.list?.find((one) => one?.symbol === symbol)?.balance || '0';
-    const decimal = getNativeDecimalsBySymbol(symbol) || 18;
-    return convertFromRaw(balance, decimal);
+    return balance;
   } catch (err) {
     console.error("Failed to getTokenBalanceBySymbol: ", err);
     return '0';

@@ -4,7 +4,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [package]
 name = "tymtLauncher"
-version = "2.2.2"
+version = "2.1.4"
 description = "tymtLauncher"
 authors = ["solar"]
 edition = "2021"
@@ -31,15 +31,12 @@ machineid-rs = "1.2.4"
 tokio = { version = "1.44.2", features = ["full"] }
 tokio-tungstenite = "0.26"
 futures-util = "0.3.31"
-actix-web = "4.10.2"
-actix-cors = "0.7.1"
 dotenv = "0.15"
 winapi = "0.3.9"
 tauri-plugin-fs = "2.2.1"
 tauri-plugin-cli = "2.2.0"
 tauri-plugin-clipboard-manager = "2.2.2"
 tauri-plugin-dialog = "2"
-tauri-plugin-http = "2.4.3"
 tauri-plugin-updater = "2.7.1"
 tauri-plugin-os = "2.2.1"
 tauri-plugin-single-instance = "2.2.3"

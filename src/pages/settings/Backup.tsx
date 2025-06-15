@@ -125,7 +125,7 @@ const Backup = ({ view, setView }: IPropsBackup) => {
                 )}
               </Stack>
               <Box>
-                <MnemonicRevealPad passphrase={passphrase} blur={blur} setBlur={setBlur} />
+                <MnemonicRevealPad passphrase={passphrase} blur={blur} setBlur={setBlur} allowExport={!!passphrase} />
               </Box>
               <Box
                 className={"fs-16-regular white"}

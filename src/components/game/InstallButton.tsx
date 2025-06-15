@@ -68,7 +68,8 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
         }
 
         const webview = new WebviewWindow(label, {
-          url: externalUrl
+          url: externalUrl,
+          title: game?.title || 'tymt™'
         });
 
         webviewCache.set(label, webview);
@@ -145,11 +146,6 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
     };
 
     checkInstalled(game);
-    const intervalId = setInterval(() => checkInstalled(game), 1 * 1e3);
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
   }, [game]);
 
   return (
