@@ -11,7 +11,6 @@ pub fn main() {
     builder
         .invoke_handler(tauri::generate_handler![
             commands::my_custom_command,
-            commands::get_machine_id,
             commands::download_to_app_dir,
             commands::unzip_windows,
             commands::move_exe_windows,

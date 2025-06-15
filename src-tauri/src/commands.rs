@@ -18,17 +18,6 @@ use machineid_rs::{Encryption, HWIDComponent, IdBuilder};
 use std::os::unix::fs::PermissionsExt;
 
 #[tauri::command]
-pub fn get_machine_id() -> Result<String, String> {
-    let mut builder = IdBuilder::new(Encryption::SHA256);
-    builder.add_component(HWIDComponent::SystemID);
-    let hwid = builder
-        .build("tymtLauncher")
-        .map_err(|err| err.to_string())?;
-
-    Ok(hwid)
-}
-
-#[tauri::command]
 pub async fn my_custom_command() {
     println!("I was invoked from JavaScript!");
 }
