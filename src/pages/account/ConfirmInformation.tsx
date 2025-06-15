@@ -17,6 +17,7 @@ import { addAccountList, getAccountList } from "../../store/AccountListSlice";
 import { setWallet } from "../../store/WalletSlice";
 import { setMnemonic } from "../../store/MnemonicSlice";
 import { setAuth } from "../../store/AuthSlice";
+import { resetBetaModalState } from "../../store/BetaModalSlice";
 import { useAppDispatch, useAppSelector } from "../../store";
 
 import { getKeccak256Hash, encrypt } from "../../lib/helper/EncryptHelper";
@@ -116,6 +117,7 @@ const ConfirmInformation = () => {
       dispatch(addAccountList(newAccount));
       dispatch(setWallet(walletAddresses));
       dispatch(setMnemonic(passphrase));
+      dispatch(resetBetaModalState());
       navigate("/home");
       showNotification({ content: CONST_NOTIFICATION_CONTENTS.LOGIN_SUCCESS });
     } catch (err) {
