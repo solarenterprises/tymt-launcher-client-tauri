@@ -68,7 +68,8 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
         }
 
         const webview = new WebviewWindow(label, {
-          url: externalUrl
+          url: externalUrl,
+          title: game?.title || 'tymt™'
         });
 
         webviewCache.set(label, webview);
