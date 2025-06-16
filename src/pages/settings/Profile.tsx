@@ -3,7 +3,8 @@ import { FC, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 
-import { Box, Button, CircularProgress, Divider, Stack, Tooltip } from "@mui/material";
+import { Box, Button, CircularProgress, Divider, Stack } from "@mui/material";
+// import { Box, Button, CircularProgress, Divider, Stack, Tooltip } from "@mui/material";
 
 import Avatar from "../../components/home/Avatar";
 import InputText from "../../components/account/InputText";
@@ -69,12 +70,12 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
     }
   }, [nickname, accountStore]);
 
-  const launchUploader = () => {
-    const fileInput = document.getElementById("file-input");
-    if (fileInput) {
-      fileInput.click();
-    }
-  };
+  // const launchUploader = () => {
+  //   const fileInput = document.getElementById("file-input");
+  //   if (fileInput) {
+  //     fileInput.click();
+  //   }
+  // };
 
   const uploadImage = useCallback(async () => {
     try {
@@ -113,7 +114,7 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
           </Stack>
           <Divider variant="middle" sx={{ backgroundColor: "#FFFFFF1A" }} />
           <Stack direction={"column"}>
-            <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"30px"}>
+            {/* <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"30px"}>
               <Stack direction={"row"} justifyContent={"center"} textAlign={"right"} alignItems={"center"} gap={"10px"}>
                 <Box className="center-align">
                   <Avatar onlineStatus={true} url={accountStore?.avatar} size={92} status="active" />
@@ -142,6 +143,24 @@ const Profile: FC<IPropsProfile> = ({ view, setView }) => {
               <Box textAlign={"left"} className="fs-14-light gray p-t-10">
                 {t("set-70_nickname-detail")}
               </Box>
+            </Stack> */}
+            <Stack direction={"row"} justifyContent={"space-between"} textAlign={"center"} padding={"30px"}>
+              <Stack width={"100%"} display={"flex"}  direction={"row"} textAlign={"right"} alignItems={"center"}>
+                <Box className="center-align">
+                  <Avatar onlineStatus={true} url={accountStore?.avatar} size={72} status="active" />
+                </Box>
+                <Stack direction={"column"} justifyContent={"flex-start"} textAlign={"center"} padding={"20px"} flexGrow={"1"}>
+                  <InputText id="change-nickname" label={t("set-69_change-nickname")} type="text" value={nickname} setValue={setNickname} />
+                    {error && (
+                      <Stack mt={"8px"} padding={"0px 6px"} width={"100%"}>
+                        <Box className={"fs-16-regular red"}>{error}</Box>
+                      </Stack>
+                    )}
+                </Stack>
+                <Box sx={{ display: "flex", position:"absolute", right:"55px" }} className="common-btn">
+                      <img src={editIcon}/>
+                </Box>
+              </Stack>
             </Stack>
             <Box padding={"20px"} width={"90%"} sx={{ position: "absolute", bottom: "30px" }}>
               <Button fullWidth className={"red-border-button"} onClick={updateAccount} disabled={loading}>
