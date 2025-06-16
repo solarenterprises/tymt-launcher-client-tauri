@@ -1,6 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod commands;
+mod minecraft;
+mod window;
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 
 use std::sync::OnceLock;
@@ -107,13 +110,38 @@ pub fn main() -> std::io::Result<()> {
     //         }
     //     }));
     // }
-
     tauri::Builder::default()
         //.manage(Mutex::new(AppState::default()))
         .manage(AppData {
             welcome_message: "Welcome to Tauri!",
         })
-        .invoke_handler(tauri::generate_handler![get_welcome_message])
+        .invoke_handler(tauri::generate_handler![
+            get_welcome_message,
+            commands::my_custom_command,
+            commands::download_to_app_dir,
+            commands::unzip_windows,
+            commands::move_exe_windows,
+            commands::unzip_macos,
+            commands::untarbz2_macos,
+            commands::unzip_linux,
+            commands::move_appimage_linux,
+            commands::install_deb_linux,
+            commands::get_deb_package_name,
+            commands::run_deb_linux,
+            commands::delete_file,
+            commands::delete_directory,
+            commands::write_file,
+            commands::run_url_args,
+            commands::open_directory,
+            #[cfg(target_family = "unix")]
+            commands::set_permission,
+            minecraft::get_system_info,
+            window::create_child_window,
+            window::destroy_child_window,
+            window::is_window_visible,
+            window::show_transaction_window,
+            window::hide_transaction_window])
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_os::init())
