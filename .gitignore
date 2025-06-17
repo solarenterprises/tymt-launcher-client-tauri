@@ -34,3 +34,7 @@ configs/*
 *.njsproj
 *.sln
 *.sw?
+
+# Tauri build artifacts
+src-tauri/target/
+src-tauri/gen/
