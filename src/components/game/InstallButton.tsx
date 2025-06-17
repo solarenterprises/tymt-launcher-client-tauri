@@ -85,15 +85,18 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
           console.log(`Webview "${label}" created.`);
         });
 
-        const unlisten = await webview.listen('state-change', async () => {
-          console.log("Listening to webview changes")
+        // Listen for window close event and cleanup
+        const unlistenClose = await webview.listen('tauri://close-requested', async () => {
+          console.log(`Webview "${label}" closing.`);
+          webviewCache.delete(label);
+          await webview.destroy();
         });
 
-
-        if (webviewCache.size === 0) {
-          console.log("The map is empty. Unlistening.");
-          await unlisten();
-        }
+        // Clean up listeners when window is destroyed
+        webview.once('tauri://destroyed', () => {
+          console.log(`Webview "${label}" destroyed.`);
+          unlistenClose();
+        });
 
         return;
       }
