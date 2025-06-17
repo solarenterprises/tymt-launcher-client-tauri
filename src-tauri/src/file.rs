@@ -442,6 +442,15 @@ pub async fn delete_file(_app_handle: tauri::AppHandle, file_location: String) -
 }
 
 #[tauri::command]
+pub async fn dir_exists(
+    _app_handle: tauri::AppHandle,
+    path: String,
+) -> Result<bool, String> {
+    let path_buf = PathBuf::from(path);
+    Ok(path_buf.exists())
+}
+
+#[tauri::command]
 pub async fn delete_directory(
     _app_handle: tauri::AppHandle,
     dir_location: String,

@@ -1,4 +1,3 @@
-import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
@@ -16,10 +15,13 @@ export async function runUrlArgs(url: string, args: string[]) {
 
 export async function isInstalled(game: IGame) {
   try {
-    await readDir(`${await appDataDir()}/games/${game.project_name}`);
-    return true;
+    console.time(`isInstalled check for ${game.project_name}`);
+    const path = `${await appDataDir()}/games/${game.project_name}`;
+    const exists = await invoke<boolean>('dir_exists', { path });
+    console.timeEnd(`isInstalled check for ${game.project_name}`);
+    return exists;
   } catch (err) {
-    // console.log("Failed to isInstalled: ", err);
+    console.error("Failed to check if installed: ", err);
     return false;
   }
 }

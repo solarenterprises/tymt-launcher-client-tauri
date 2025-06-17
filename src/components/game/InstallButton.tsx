@@ -143,19 +143,24 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
 
   useEffect(() => {
     const checkSupport = async () => {
+      console.time(`checkSupport for ${game.project_name}`);
       if (game?.projectMeta?.type === "browser") {
         setIsSupporting(true);
+        console.timeEnd(`checkSupport for ${game.project_name}`);
         return;
       }
       const release = await getGameReleaseNative(game);
       setIsSupporting(!!release);
+      console.timeEnd(`checkSupport for ${game.project_name}`);
     };
     checkSupport();
   }, [game._id]);
 
   useEffect(() => {
     const checkInstalled = async (game: IGame) => {
+      console.time(`checkInstalled useEffect for ${game.project_name}`);
       setInstalled(await isInstalled(game));
+      console.timeEnd(`checkInstalled useEffect for ${game.project_name}`);
     };
 
     checkInstalled(game);
