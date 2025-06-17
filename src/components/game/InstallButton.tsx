@@ -12,7 +12,13 @@ import { useNotification } from "../../providers/NotificationProvider";
 
 import { getDownloadStatus, resetDownloadStatus } from "../../store/DownloadStatusSlice";
 
-import { /*checkOnline,*/ downloadAndInstallNewGame, getFullExecutablePathNewGame, getGameReleaseBrowser, isInstalled } from "../../lib/helper/DownloadHelper";
+import {
+  /*checkOnline,*/
+  downloadAndInstallNewGame,
+  getGameReleaseBrowser,
+  getGameReleaseNative,
+  isInstalled
+} from "../../lib/helper/DownloadHelper";
 
 import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 
@@ -133,9 +139,12 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
 
   useEffect(() => {
     const checkSupport = async () => {
-      const fullPath = await getFullExecutablePathNewGame(game);
-      if (!fullPath) setIsSupporting(false);
-      else setIsSupporting(true);
+      if (game?.projectMeta?.type === "browser") {
+        setIsSupporting(true);
+        return;
+      }
+      const release = await getGameReleaseNative(game);
+      setIsSupporting(!!release);
     };
     checkSupport();
   }, [game]);
