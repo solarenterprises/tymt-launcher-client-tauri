@@ -134,6 +134,7 @@ pub fn main() -> std::io::Result<()> {
             file::run_deb_linux,
             file::delete_file,
             file::delete_directory,
+            file::dir_exists,
             file::write_file,
             file::run_url_args,
             file::open_directory,

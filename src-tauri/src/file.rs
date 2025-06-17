@@ -15,6 +15,7 @@ use debpkg::DebPkg;
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
 
+// TODO: This function is identical to unzip_windows - they should be consolidated
 #[tauri::command]
 pub async fn unzip_linux(
     _app_handle: tauri::AppHandle,
@@ -34,7 +35,24 @@ pub async fn unzip_linux(
         let mut file = archive
             .by_index(i)
             .map_err(|e| format!("Failed to access file in zip: {}", e))?;
+
+        // Check for path traversal attempts
+        let file_path = Path::new(file.name());
+        for component in file_path.components() {
+            match component {
+                std::path::Component::ParentDir | std::path::Component::RootDir => {
+                    return Err(format!("Invalid path in archive: {}", file.name()));
+                }
+                _ => {}
+            }
+        }
+
         let out_path = extract_path.join(file.name());
+
+        // Final safety check: ensure the path stays within extract directory
+        if !out_path.starts_with(&extract_path) {
+            return Err(format!("Path traversal attempt: {}", file.name()));
+        }
 
         if file.is_dir() {
             // Create directories
@@ -171,6 +189,7 @@ pub async fn set_permission(
     Ok(())
 }
 
+// TODO: This function is identical to unzip_linux - they should be consolidated
 #[tauri::command]
 pub async fn unzip_windows(
     _app_handle: tauri::AppHandle,
@@ -190,7 +209,24 @@ pub async fn unzip_windows(
         let mut file = archive
             .by_index(i)
             .map_err(|e| format!("Failed to access file in zip: {}", e))?;
+
+        // Check for path traversal attempts
+        let file_path = Path::new(file.name());
+        for component in file_path.components() {
+            match component {
+                std::path::Component::ParentDir | std::path::Component::RootDir => {
+                    return Err(format!("Invalid path in archive: {}", file.name()));
+                }
+                _ => {}
+            }
+        }
+
         let out_path = extract_path.join(file.name());
+
+        // Final safety check: ensure the path stays within extract directory
+        if !out_path.starts_with(&extract_path) {
+            return Err(format!("Path traversal attempt: {}", file.name()));
+        }
 
         if file.is_dir() {
             // Create directories
@@ -319,10 +355,8 @@ pub async fn download_to_app_dir(
 
     if let Some(parent) = path.parent() {
         if !parent.exists() {
-            match fs::create_dir_all(&parent) {
-                Err(why) => panic!("couldn't create directory: {}", why),
-                Ok(_) => println!("Successfully created the directory"),
-            }
+            fs::create_dir_all(&parent)
+                .map_err(|e| format!("Failed to create directory: {}", e))?;
         }
     }
 
@@ -405,6 +439,15 @@ pub async fn delete_file(_app_handle: tauri::AppHandle, file_location: String) -
     fs::remove_file(&path).map_err(|e| format!("Failed to delete file: {}", e))?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn dir_exists(
+    _app_handle: tauri::AppHandle,
+    path: String,
+) -> Result<bool, String> {
+    let path_buf = PathBuf::from(path);
+    Ok(path_buf.exists())
 }
 
 #[tauri::command]

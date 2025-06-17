@@ -12,7 +12,13 @@ import { useNotification } from "../../providers/NotificationProvider";
 
 import { getDownloadStatus, resetDownloadStatus } from "../../store/DownloadStatusSlice";
 
-import { /*checkOnline,*/ downloadAndInstallNewGame, getFullExecutablePathNewGame, getGameReleaseBrowser, isInstalled } from "../../lib/helper/DownloadHelper";
+import {
+  /*checkOnline,*/
+  downloadAndInstallNewGame,
+  getGameReleaseBrowser,
+  getGameReleaseNative,
+  isInstalled
+} from "../../lib/helper/DownloadHelper";
 
 import { CONST_GAME_DISTRICT53 } from "../../const/games/district53/District53";
 
@@ -102,8 +108,12 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
         else setModalView(true);
         return;
       }
+      setInstalling(true);
       const id = game?.project_name;
-      if (!id) return;
+      if (!id) {
+        setInstalling(false);
+        return;
+      }
       // const online = await checkOnline();
       // if (!online) {
       //   showNotification({ content: CONST_NOTIFICATION_CONTENTS.INTERNET_ERROR });
@@ -133,27 +143,55 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
 
   useEffect(() => {
     const checkSupport = async () => {
-      const fullPath = await getFullExecutablePathNewGame(game);
-      if (!fullPath) setIsSupporting(false);
-      else setIsSupporting(true);
+      console.time(`checkSupport for ${game.project_name}`);
+      if (game?.projectMeta?.type === "browser") {
+        setIsSupporting(true);
+        console.timeEnd(`checkSupport for ${game.project_name}`);
+        return;
+      }
+      const release = await getGameReleaseNative(game);
+      setIsSupporting(!!release);
+      console.timeEnd(`checkSupport for ${game.project_name}`);
     };
     checkSupport();
-  }, [game]);
+  }, [game._id]);
 
   useEffect(() => {
     const checkInstalled = async (game: IGame) => {
+      console.time(`checkInstalled useEffect for ${game.project_name}`);
       setInstalled(await isInstalled(game));
+      console.timeEnd(`checkInstalled useEffect for ${game.project_name}`);
     };
 
     checkInstalled(game);
-  }, [game]);
+  }, [game._id]);
+
+  useEffect(() => {
+    const unlisten = listen('game-installation-changed', (event: any) => {
+      if (event.payload.gameId === game._id) {
+        setInstalled(event.payload.installed);
+      }
+    });
+
+    return () => {
+      unlisten.then(f => f());
+    };
+  }, [game._id]);
+
+  const isDownloading = !!downloadStatusStore?.game_id;
+  const isNativeGame = game?.projectMeta?.type === "native";
 
   return (
     <>
       <Button
         fullWidth
         onClick={handleClick}
-        disabled={!isSupporting || !!downloadStatusStore?.game_id || purchaseLoading || installing}
+        disabled={
+          !isSupporting ||
+          (isNativeGame && isDownloading) ||
+          purchaseLoading ||
+          installing
+        }
         sx={{
           height: "46px",
           width: "226px",

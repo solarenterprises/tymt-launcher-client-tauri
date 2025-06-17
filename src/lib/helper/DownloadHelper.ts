@@ -1,8 +1,7 @@
-import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
-import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
+import { emit } from "@tauri-apps/api/event";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
 import { AuthAPI } from "../api/AuthAPI";
@@ -16,10 +15,13 @@ export async function runUrlArgs(url: string, args: string[]) {
 
 export async function isInstalled(game: IGame) {
   try {
-    await readDir(`${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game.project_name}`);
-    return true;
+    console.time(`isInstalled check for ${game.project_name}`);
+    const path = `${await appDataDir()}/games/${game.project_name}`;
+    const exists = await invoke<boolean>('dir_exists', { path });
+    console.timeEnd(`isInstalled check for ${game.project_name}`);
+    return exists;
   } catch (err) {
-    // console.log("Failed to isInstalled: ", err);
+    console.error("Failed to check if installed: ", err);
     return false;
   }
 }
@@ -250,6 +252,8 @@ export const downloadAndInstallNewGame = async (game: IGame) => {
     await downloadFileToAppDir(game);
     await installGame(game);
     await deleteDownloadFile(game);
+    // Emit event after successful installation
+    await emit('game-installation-changed', { gameId: game._id, installed: true });
   } catch (err) {
     throw new Error(err.toString());
   }
@@ -310,7 +314,7 @@ export const getFullExecutablePathNewGame = async (game: IGame) => {
   try {
     const prefix: string = await appDataDir();
     const exePath: string = await getExecutablePathNewGame(game);
-    const fullPath = prefix + `/v${CONFIG_TYMT_VERSION}/games/${game.project_name}/` + exePath;
+    const fullPath = prefix + `/games/${game.project_name}/` + exePath;
     // console.log("getFullExecutablePathNewGame", fullPath);
     return fullPath;
   } catch (err) {
@@ -545,7 +549,7 @@ export const getDownloadFileFullPath = async (game: IGame) => {
 
 export const getInstallDir = async (game: IGame) => {
   try {
-    const res = `${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game?.project_name}`;
+    const res = `${await appDataDir()}/games/${game?.project_name}`;
     // console.log("getInstallDir", res);
     return res;
   } catch (err) {
@@ -598,6 +602,8 @@ export const deleteGameDirectory = async (game: IGame) => {
     await invoke("delete_directory", {
       dirLocation: directoryLocation,
     });
+    // Emit event after successful deletion
+    await emit('game-installation-changed', { gameId: game._id, installed: false });
   } catch (err) {
     console.error("Failed to deleteGameDirectory: ", err);
     throw new Error(err.toString());
