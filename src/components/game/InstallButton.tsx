@@ -108,8 +108,12 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
         else setModalView(true);
         return;
       }
+      setInstalling(true);
       const id = game?.project_name;
-      if (!id) return;
+      if (!id) {
+        setInstalling(false);
+        return;
+      }
       // const online = await checkOnline();
       // if (!online) {
       //   showNotification({ content: CONST_NOTIFICATION_CONTENTS.INTERNET_ERROR });
