@@ -319,10 +319,8 @@ pub async fn download_to_app_dir(
 
     if let Some(parent) = path.parent() {
         if !parent.exists() {
-            match fs::create_dir_all(&parent) {
-                Err(why) => panic!("couldn't create directory: {}", why),
-                Ok(_) => println!("Successfully created the directory"),
-            }
+            fs::create_dir_all(&parent)
+                .map_err(|e| format!("Failed to create directory: {}", e))?;
         }
     }
 
