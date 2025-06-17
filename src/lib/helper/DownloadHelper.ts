@@ -2,7 +2,6 @@ import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
-import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
 import { AuthAPI } from "../api/AuthAPI";
@@ -16,7 +15,7 @@ export async function runUrlArgs(url: string, args: string[]) {
 
 export async function isInstalled(game: IGame) {
   try {
-    await readDir(`${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game.project_name}`);
+    await readDir(`${await appDataDir()}/games/${game.project_name}`);
     return true;
   } catch (err) {
     // console.log("Failed to isInstalled: ", err);
@@ -310,7 +309,7 @@ export const getFullExecutablePathNewGame = async (game: IGame) => {
   try {
     const prefix: string = await appDataDir();
     const exePath: string = await getExecutablePathNewGame(game);
-    const fullPath = prefix + `/v${CONFIG_TYMT_VERSION}/games/${game.project_name}/` + exePath;
+    const fullPath = prefix + `/games/${game.project_name}/` + exePath;
     // console.log("getFullExecutablePathNewGame", fullPath);
     return fullPath;
   } catch (err) {
@@ -545,7 +544,7 @@ export const getDownloadFileFullPath = async (game: IGame) => {
 
 export const getInstallDir = async (game: IGame) => {
   try {
-    const res = `${await appDataDir()}/v${CONFIG_TYMT_VERSION}/games/${game?.project_name}`;
+    const res = `${await appDataDir()}/games/${game?.project_name}`;
     // console.log("getInstallDir", res);
     return res;
   } catch (err) {
