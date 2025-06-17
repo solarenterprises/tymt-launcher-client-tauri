@@ -1,11 +1,142 @@
-import { readDir } from "@tauri-apps/plugin-fs";
+import { readDir, exists } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
-import { type, arch } from "@tauri-apps/plugin-os";
-import { invoke } from "@tauri-apps/api/core";
+import { type, arch, platform } from "@tauri-apps/plugin-os";
+import { invoke, Channel } from "@tauri-apps/api/core";
 import { CONFIG_TYMT_VERSION } from "../../config/MainConfig";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
 import { AuthAPI } from "../api/AuthAPI";
+import { DownloadEventPayload } from "../../components/game/InstallButton"
+
+export const openGame = async (game: IGame) => {
+  const formattedTitle = game.title.toLowerCase().replace(/\s+/g, "");
+
+  const originalDir = await appDataDir();
+  const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/TymtApps/');
+  const gamePath = `${baseDir}games/${formattedTitle}`;
+
+  try {
+
+    const currentPlatform = platform();
+
+    let exePath;
+
+    switch (currentPlatform) {
+      case "windows":
+        exePath = `${gamePath}.exe`;
+        break;
+      case "macos":
+        exePath = `${gamePath}.app`;
+        break;
+      case "linux":
+        exePath = `${gamePath}.deb`;
+        break;
+      default:
+        console.log("OS is not supported!");
+        break;
+    }
+
+    await invoke('launch_game', { path: exePath });
+  } catch (error) {
+    console.error('Failed to open game:', error);
+  }
+};
+
+const gamePaths = new Map<string, string>();
+
+export const getGamePath = (game: IGame): string | undefined => {
+  return gamePaths.get(game.title.toLowerCase().replace(/\s+/g, ''));
+};
+
+export const setGamePath = (game: IGame, path: string): void => {
+  const key = game.title.toLowerCase().replace(/\s+/g, '');
+  gamePaths.set(key, path);
+};
+
+export const isGameInstalled = async (game: IGame): Promise<boolean> => {
+  const key = game.title.toLowerCase().replace(/\s+/g, '');
+  let path = gamePaths.get(key);
+
+  if (!path) {
+    try {
+      const originalDir = await appDataDir();
+      const baseDir = originalDir.replace(/tymtLauncher\/?$/, 'Tymt/TymtApps/');
+      path = `${baseDir}games/${key}`;
+      gamePaths.set(key, path);
+    } catch {
+      return false;
+    }
+  }
+
+  try {
+    const gameExists = await exists(path);
+    return gameExists;
+  } catch {
+    return false;
+  }
+};
+
+export const downloadFileToAppDir = async (game: IGame, onProgress: (event: DownloadEventPayload) => void) => {
+  await GameAPI.increaseDownloadCount(game?._id);
+  try {
+    // const url: string = await getDownloadLinkNewGame(game);
+    const downloadPath: string = await getDownloadFileFullPath(game);
+    const currentPlatform = platform();
+
+    let archeOsType;
+
+    switch (currentPlatform) {
+      case "windows":
+        archeOsType = "windows_amd64";
+        break;
+      case "macos":
+        archeOsType = "darwin_amd64";
+        break;
+      case "linux":
+        archeOsType = "linux_amd64";
+        break;
+      default:
+        console.log("OS is not supported!");
+        break;
+    }
+
+    const downloadUrl = game?.releaseMeta.platforms?.[archeOsType].external_url;
+    const appId = game?.appId;
+    const imageUrl = game?.projectMeta.image;
+    const gameTitle = game?.title;
+
+    console.log(game);
+
+    if (!downloadPath || !archeOsType || !downloadUrl || !appId || !imageUrl || !gameTitle) {
+      if (!downloadPath) console.error("Missing: downloadPath");
+      if (!archeOsType) console.error("Missing: archeOsType");
+      if (!downloadUrl) console.error("Missing: downloadUrl");
+      if (!appId) console.error("Missing: addId");
+      if (!imageUrl) console.error("Missing: imageUrl");
+      if (!gameTitle) console.error("Missing: gameTitle");
+      return false;
+    }    
+
+    const formattedTitle = gameTitle.toLowerCase().replace(/\s+/g, "");
+
+    const chan = await new Channel<DownloadEventPayload>((event) => {
+      console.log("Download event received:", event);
+      onProgress(event);
+    });       
+
+    await invoke("download_to_app_dir", {
+      fileLocation: downloadPath,
+      downloadUrl: downloadUrl,
+      gameTitle: formattedTitle,
+      onEvent: chan, // must match what you emit in Rust
+    });
+
+    return true;
+  } catch (err) {
+    console.error("Failed to downloadFileToAppDir: ", err);
+    return false;
+  }
+};
 
 export async function runUrlArgs(url: string, args: string[]) {
   return invoke("run_url_args", {
@@ -134,27 +265,6 @@ export const checkOnline = async (): Promise<boolean> => {
   }
 };
 
-export const downloadFileToAppDir = async (game: IGame) => {
-  try {
-    const url: string = await getDownloadLinkNewGame(game);
-    const downloadPath: string = await getDownloadFileFullPath(game);
-    if (!url || !downloadPath) return false;
-
-    await invoke("download_to_app_dir", {
-      url: url,
-      fileLocation: downloadPath,
-      gameId: game?._id,
-      gameImageUrl: game?.imageUrl,
-      gameTitle: game?.title,
-    });
-
-    return true;
-  } catch (err) {
-    console.error("Failed to downloadFileToAppDir: ", err);
-    return false;
-  }
-};
-
 export const installGame = async (game: IGame) => {
   try {
     // console.log("installGame");
@@ -247,7 +357,7 @@ export const installGame = async (game: IGame) => {
 export const downloadAndInstallNewGame = async (game: IGame) => {
   try {
     await GameAPI.increaseDownloadCount(game?._id);
-    await downloadFileToAppDir(game);
+    // await downloadFileToAppDir(game);
     await installGame(game);
     await deleteDownloadFile(game);
   } catch (err) {

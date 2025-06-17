@@ -16,7 +16,7 @@ export const platformIconMap: Map<number, string> = new Map([
 
 export interface IGame {
   _id: string;
-  addId: string;
+  appId: string;
   epic_game_url: string;
   imageUrl: string;
   launch_epic: boolean;

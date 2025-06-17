@@ -9,6 +9,22 @@
     "tymt"
   ],
   "permissions": [
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "exec-sh",
+          "cmd": "sh",
+          "args": [
+            "-c",
+            {
+              "validator": "\\S+"
+            }
+          ],
+          "sidecar": false
+        }
+      ]
+    },
     "core:window:allow-close",
     "core:window:allow-destroy",
     "core:default",
@@ -101,10 +117,10 @@
         "/home/*/.cache/tymtLauncherDebug/*/*/*/*/*/*",
         "/home/*/.cache/tymtLauncherDebug/*/*/*/*/*/*/*",
         "/home/*/.cache/tymtLauncherDebug/*/*/*/*/*/*/*/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*/*/*",
-        "/Users/*/Library/Application Support/tymtLauncher/*/games/*/*/*/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*/*/*",
+        "/Users/*/Library/Application Support/Tymt/TymtApps/*/*/*/*",
         "/Users/*/Library/Application Support/tymtLauncherDebug/*/games/*",
         "/Users/*/Library/Application Support/tymtLauncherDebug/*/games/*/*",
         "/Users/*/Library/Application Support/tymtLauncherDebug/*/games/*/*/*",

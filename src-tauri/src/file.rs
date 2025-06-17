@@ -1,19 +1,192 @@
 use std::path::{Path, PathBuf};
 use std::fs::File;
-use tauri::Emitter;
 use zip::read::ZipArchive; // For Unix-specific permissions
 use std::fs;
 use std::process::Command;
-use std::time::{Duration, Instant};
-use reqwest::Client;
-use reqwest::header::ACCEPT;
-use futures_util::stream::StreamExt;
-use std::cmp::min;
 use std::io::Write;
 use debpkg::DebPkg;
+use std::io;
 
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
+
+#[derive(Clone, serde::Serialize)]
+#[serde(tag = "event", content = "data")]
+pub enum DownloadEvent {
+    Started {
+        game_title: String,
+    },
+    Progress {
+        game_title: String,
+        file_index: usize,
+        percent: u8,
+    },
+    Finished {
+        game_title: String,
+    },
+}
+
+#[tauri::command]
+pub async fn download_to_app_dir(
+    _app_handle: tauri::AppHandle,
+    file_location: String,
+    download_url: String,
+    game_title: String,
+    on_event: tauri::ipc::Channel<DownloadEvent>,
+) -> Result<i32, String> {
+    on_event
+        .send(DownloadEvent::Started {
+            game_title: game_title.clone(),
+        })
+        .unwrap();
+
+    let zip_temp_dir = PathBuf::from(&file_location).join("zip_temp");
+    let zip_path = zip_temp_dir.join(format!("{}.zip", game_title));
+    let extract_dir = PathBuf::from(&file_location);
+
+    if !zip_temp_dir.exists() {
+        fs::create_dir_all(&zip_temp_dir).map_err(|e| e.to_string())?;
+    }
+    if !extract_dir.exists() {
+        fs::create_dir_all(&extract_dir).map_err(|e| e.to_string())?;
+    }
+
+    println!("Downloading zip to: {}", zip_path.display());
+
+    let mut resp = reqwest::get(&download_url)
+        .await
+        .map_err(|e| e.to_string())?;
+    let mut zip_file = fs::File::create(&zip_path).map_err(|e| e.to_string())?;
+
+    let total_size = resp.content_length().unwrap_or(0); // fallback to 0 if unknown
+    let mut downloaded = 0;
+
+    let mut last_percent = 0;
+
+    while let Some(chunk) = resp.chunk().await.map_err(|e| e.to_string())? {
+        downloaded += chunk.len() as u64;
+        zip_file.write_all(&chunk).map_err(|e| e.to_string())?;
+
+        if total_size > 0 {
+            let percent = ((downloaded as f64 / total_size as f64) * 50.0) as u8;
+            if percent > last_percent {
+                last_percent = percent;
+                on_event
+                    .send(DownloadEvent::Progress {
+                        game_title: game_title.clone(),
+                        file_index: 0,
+                        percent,
+                    })
+                    .unwrap();
+            }
+        }
+    }
+
+    let reader = fs::File::open(&zip_path).map_err(|e| e.to_string())?;
+    let mut archive = ZipArchive::new(reader).map_err(|e| e.to_string())?;
+    let archive_len = archive.len();
+
+    let mut last_extract_percent = 50;
+
+    for i in 0..archive_len {
+        let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
+        let outpath = match file.enclosed_name() {
+            Some(path) => extract_dir.join(path),
+            None => continue,
+        };
+
+        println!("Extracting: {}", outpath.display());
+
+        if file.is_dir() {
+            fs::create_dir_all(&outpath).map_err(|e| e.to_string())?;
+        } else {
+            if let Some(parent) = outpath.parent() {
+                if !parent.exists() {
+                    fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+                }
+            }
+            let mut outfile = fs::File::create(&outpath).map_err(|e| e.to_string())?;
+            io::copy(&mut file, &mut outfile).map_err(|e| e.to_string())?;
+
+            #[cfg(unix)]
+            {
+                if let Some(mode) = file.unix_mode() {
+                    fs::set_permissions(&outpath, fs::Permissions::from_mode(mode))
+                        .map_err(|e| e.to_string())?;
+                } else {
+                    fs::set_permissions(&outpath, fs::Permissions::from_mode(0o644))
+                        .map_err(|e| e.to_string())?;
+                }
+            }
+        }
+
+        let extract_percent = 50.0 + ((i + 1) as f32 / archive_len as f32 * 50.0);
+        let extract_percent_u8 = extract_percent as u8;
+
+        if extract_percent_u8 > last_extract_percent {
+            last_extract_percent = extract_percent_u8;
+            on_event
+                .send(DownloadEvent::Progress {
+                    game_title: game_title.clone(),
+                    file_index: i,
+                    percent: extract_percent_u8,
+                })
+                .unwrap();
+        }
+    }
+
+    let launcher_app = extract_dir.join("Launcher.app");
+    let renamed_app = extract_dir.join(format!("{}.app", game_title));
+    if launcher_app.exists() {
+        if renamed_app.exists() {
+            fs::remove_dir_all(&renamed_app).map_err(|e| e.to_string())?;
+        }
+        fs::rename(&launcher_app, &renamed_app).map_err(|e| e.to_string())?;
+    }
+
+    fs::remove_dir_all(&zip_temp_dir).map_err(|e| e.to_string())?;
+
+    on_event
+        .send(DownloadEvent::Finished {
+            game_title: game_title,
+        })
+        .unwrap();
+    Ok(0)
+}
+
+#[tauri::command]
+pub fn launch_game(path: String) -> Result<(), String> {
+    if !std::path::Path::new(&path).exists() {
+        return Err(format!("Path does not exist: {}", path));
+    }
+
+    // Match OS-specific launch methods
+    #[cfg(target_os = "windows")]
+    {
+        Command::new("cmd")
+            .args(["/C", &path])
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("open")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        Command::new("xdg-open")
+            .arg(&path)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+    }
+
+    Ok(())
+}
 
 #[tauri::command]
 pub async fn unzip_linux(
@@ -304,92 +477,6 @@ pub struct DownloadProgress {
     game_id: String,
     game_image_url: String,
     game_title: String,
-}
-
-#[tauri::command]
-pub async fn download_to_app_dir(
-    app_handle: tauri::AppHandle,
-    url: String,
-    file_location: String,
-    game_id: String,
-    game_image_url: String,
-    game_title: String,
-) -> Result<(), String> {
-    let path = Path::new(&file_location);
-
-    if let Some(parent) = path.parent() {
-        if !parent.exists() {
-            match fs::create_dir_all(&parent) {
-                Err(why) => panic!("couldn't create directory: {}", why),
-                Ok(_) => println!("Successfully created the directory"),
-            }
-        }
-    }
-
-    // fs::create_dir_all("./download/").expect("Error at create_dir_all");
-    let start_time = Instant::now();
-    let client = Client::new();
-    let res = client
-        .get(&url)
-        .header(ACCEPT, "application/octet-stream")
-        .header(reqwest::header::USER_AGENT, "tymtLauncher/1.0")
-        .send()
-        .await
-        .map_err(|e| format!("Failed to GET from '{}': {}", &url, e))?;
-    let total = res
-        .content_length()
-        .ok_or(format!("Failed to get content length from '{}'", &url))?;
-
-    let mut file =
-        File::create(&path).or(Err(format!("Failed to create file '{}'", file_location)))?;
-    let mut downloaded: u64 = 0;
-    let mut stream = res.bytes_stream();
-
-    let mut last_emit_time = Instant::now();
-
-    while let Some(item) = stream.next().await {
-        let chunk = item.or(Err(format!("Error while downloading file")))?;
-        file.write_all(&chunk)
-            .or(Err(format!("Error while writing to file")))?;
-        downloaded = min(downloaded + (chunk.len() as u64), total);
-        let duration = start_time.elapsed().as_secs_f64();
-        let speed = if duration > 0.0 {
-            Some((downloaded as f64) / duration / 1024.0 / 1024.0)
-        } else {
-            None
-        };
-
-        if last_emit_time.elapsed() >= Duration::new(1, 0) {
-            let expectation = if let Some(s) = speed {
-                (total - downloaded) as f64 / (s * 1024.0 * 1024.0)
-            } else {
-                0.0
-            };
-
-            let progress = DownloadProgress {
-                downloaded,
-                speed,
-                total,
-                duration,
-                expectation,
-                game_id: game_id.clone(),
-                game_image_url: game_image_url.clone(),
-                game_title: game_title.clone(),
-            };
-
-            app_handle
-                .emit("game-download-progress", &progress)
-                .map_err(|e| format!("Failed to emit progress event: {}", e))?;
-
-            last_emit_time = Instant::now();
-        }
-
-        // println!("downloaded => {}", downloaded);
-        // println!("total_size => {}", total_size);
-        // println!("speed => {:?}", speed);
-    }
-
-    return Ok(());
 }
 
 #[tauri::command]
