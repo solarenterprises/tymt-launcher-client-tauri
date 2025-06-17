@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 import { Button } from "@mui/material";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import { listen } from "@tauri-apps/api/event";
 
 import { useNotification } from "../../providers/NotificationProvider";
 
@@ -40,6 +41,18 @@ const RemoveButton = ({ game }: IPropsRemoveButton) => {
     };
 
     checkInstalled(game);
+  }, [game._id]);
+
+  useEffect(() => {
+    const unlisten = listen('game-installation-changed', (event: any) => {
+      if (event.payload.gameId === game._id) {
+        setInstalled(event.payload.installed);
+      }
+    });
+
+    return () => {
+      unlisten.then(f => f());
+    };
   }, [game._id]);
 
   return (

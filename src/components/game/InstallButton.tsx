@@ -157,6 +157,18 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
     checkInstalled(game);
   }, [game._id]);
 
+  useEffect(() => {
+    const unlisten = listen('game-installation-changed', (event: any) => {
+      if (event.payload.gameId === game._id) {
+        setInstalled(event.payload.installed);
+      }
+    });
+
+    return () => {
+      unlisten.then(f => f());
+    };
+  }, [game._id]);
+
   const isDownloading = !!downloadStatusStore?.game_id;
   const isNativeGame = game?.projectMeta?.type === "native";
 

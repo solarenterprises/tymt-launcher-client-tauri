@@ -2,6 +2,7 @@ import { readDir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import { type, arch } from "@tauri-apps/plugin-os";
 import { invoke } from "@tauri-apps/api/core";
+import { emit } from "@tauri-apps/api/event";
 import GameAPI from "../api/GameAPI";
 import { IGame, IGameReleaseNative } from "../../types/GameTypes";
 import { AuthAPI } from "../api/AuthAPI";
@@ -249,6 +250,8 @@ export const downloadAndInstallNewGame = async (game: IGame) => {
     await downloadFileToAppDir(game);
     await installGame(game);
     await deleteDownloadFile(game);
+    // Emit event after successful installation
+    await emit('game-installation-changed', { gameId: game._id, installed: true });
   } catch (err) {
     throw new Error(err.toString());
   }
@@ -597,6 +600,8 @@ export const deleteGameDirectory = async (game: IGame) => {
     await invoke("delete_directory", {
       dirLocation: directoryLocation,
     });
+    // Emit event after successful deletion
+    await emit('game-installation-changed', { gameId: game._id, installed: false });
   } catch (err) {
     console.error("Failed to deleteGameDirectory: ", err);
     throw new Error(err.toString());
