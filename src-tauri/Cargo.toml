@@ -4,7 +4,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [package]
 name = "tymtLauncher"
-version = "2.1.4"
+version = "2.2.2"
 description = "tymtLauncher"
 authors = ["solar"]
 edition = "2021"
