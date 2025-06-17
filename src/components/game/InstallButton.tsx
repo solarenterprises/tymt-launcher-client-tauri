@@ -157,12 +157,20 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
     checkInstalled(game);
   }, [game]);
 
+  const isDownloading = !!downloadStatusStore?.game_id;
+  const isNativeGame = game?.projectMeta?.type === "native";
+
   return (
     <>
       <Button
         fullWidth
         onClick={handleClick}
-        disabled={!isSupporting || !!downloadStatusStore?.game_id || purchaseLoading || installing}
+        disabled={
+          !isSupporting ||
+          (isNativeGame && isDownloading) ||
+          purchaseLoading ||
+          installing
+        }
         sx={{
           height: "46px",
           width: "226px",
