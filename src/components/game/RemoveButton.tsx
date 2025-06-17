@@ -40,7 +40,7 @@ const RemoveButton = ({ game }: IPropsRemoveButton) => {
     };
 
     checkInstalled(game);
-  }, [game]);
+  }, [game._id]);
 
   return (
     <>

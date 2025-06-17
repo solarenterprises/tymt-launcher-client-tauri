@@ -147,7 +147,7 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
       setIsSupporting(!!release);
     };
     checkSupport();
-  }, [game]);
+  }, [game._id]);
 
   useEffect(() => {
     const checkInstalled = async (game: IGame) => {
@@ -155,7 +155,7 @@ const InstallButton = ({ game, purchased, setOpenBuyGameModal, purchaseLoading }
     };
 
     checkInstalled(game);
-  }, [game]);
+  }, [game._id]);
 
   const isDownloading = !!downloadStatusStore?.game_id;
   const isNativeGame = game?.projectMeta?.type === "native";
