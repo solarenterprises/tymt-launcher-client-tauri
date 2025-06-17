@@ -14,6 +14,7 @@ export const GameAPI = {
     }
   },
 
+  // @ts-ignore - TODO: Use query parameter instead of hardcoded values
   fetchGameListAll: async (query: IGameListQuery = { page: 1, limit: 1000 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
 
