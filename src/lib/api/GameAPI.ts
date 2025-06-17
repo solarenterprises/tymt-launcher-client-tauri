@@ -16,15 +16,15 @@ export const GameAPI = {
 
   fetchGameListAll: async (query: IGameListQuery = { page: 1, limit: 1000 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
-      console.log("FETCH ALL!!!!!!!!!!!!!!!!!!!")
+
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: { page: 1, limit: 10000 } });
-      console.log("res---->", res);
+
       return res.data;
     } catch (err) {
       throw new Error(err.response?.data?.error ?? "Failed to fetchGameList");
     }
   },
-  
+
   fetchGameList: async (query: IGameListQuery = { page: 1, limit: 20 }): Promise<{ data: IGame[]; meta: IMetaPagination }> => {
     try {
       const res = await axiosAuth.get<{ data: IGame[]; meta: IMetaPagination }>(`/game/list`, { params: query });

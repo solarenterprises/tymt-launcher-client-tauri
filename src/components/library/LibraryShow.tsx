@@ -51,9 +51,7 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
       setLoading(true);
       try {
         const result = await config.fetchGames({ page });
-        console.log("status==>", status);
-        console.log("page==>", page);
-        console.log("result==>", result);
+
         if (status === 0) {
           const downloaded = await Promise.all(
             result.data.map(async (game) => {
@@ -63,8 +61,7 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
             })
           );
           const filteredGames = downloaded.filter((game): game is IGame => game !== null);
-          console.log("downloaded=>>", downloaded);
-          console.log("filteredGames================>", filteredGames)
+
           setGamePagination({
             data: filteredGames,
             meta: {
