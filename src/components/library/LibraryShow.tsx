@@ -13,6 +13,7 @@ import NoGamePng from "../../assets/main/NoGames.png";
 
 import { IGame } from "../../types/GameTypes";
 import { IMetaPagination } from "../../types/APITypes/BasicAPITypes";
+import { isInstalled } from "../../lib/helper/DownloadHelper";
 
 export interface IPropsLibraryShow {
   status: number;
@@ -28,7 +29,7 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
   // Map status to API calls and titles
   const statusConfig = {
     0: {
-      fetchGames: GameAPI.fetchPurchasedGameList,
+      fetchGames: GameAPI.fetchGameListAll,
       title: t("lib-1_your-games"),
     },
     2: {
@@ -42,20 +43,47 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
   };
 
   const fetchGames = useCallback(
-    (page: number) => {
+    async (page: number) => {
       const config = statusConfig[status];
+      console.log("config==>", config);
       if (!config) return;
 
       setLoading(true);
-      config
-        .fetchGames({ page })
-        .then(setGamePagination)
-        .catch((err) => {
-          console.error("Error fetching game list:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      try {
+        const result = await config.fetchGames({ page });
+        console.log("status==>", status);
+        console.log("page==>", page);
+        console.log("result==>", result);
+        if (status === 0) {
+          const downloaded = await Promise.all(
+            result.data.map(async (game) => {
+              const installed = await isInstalled(game);
+              // console.log("installed?==>", game);
+              return installed ? game : null;
+            })
+          );
+          const filteredGames = downloaded.filter((game): game is IGame => game !== null);
+          console.log("downloaded=>>", downloaded);
+          console.log("filteredGames================>", filteredGames)
+          setGamePagination({
+            data: filteredGames,
+            meta: {
+              "pagination": {
+                "page": 1,
+                "pageSize": filteredGames.length,
+                "pageCount": 1,
+                "total": filteredGames.length
+              }
+            }
+          });
+        } else {
+          setGamePagination(result);
+        }
+      } catch (err) {
+        console.error("Error fetching game list:", err);
+      } finally {
+        setLoading(false);
+      }
     },
     [status]
   );
@@ -115,8 +143,8 @@ const LibraryShow = ({ status }: IPropsLibraryShow) => {
         {loading
           ? renderSkeletons()
           : !gamePagination?.data?.length
-          ? renderNoGames()
-          : gamePagination?.data
+            ? renderNoGames()
+            : gamePagination?.data
               ?.filter((game) => game)
               .map((game, index) => (
                 <Grid item key={index}>
