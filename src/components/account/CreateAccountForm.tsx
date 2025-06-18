@@ -11,7 +11,7 @@ import InputText from "./InputText";
 import IAgreeTerms from "./IAgreeTerms";
 import { validatePassword } from "nist-password-validator";
 
-async function checkCustomPassword(password) {
+async function checkCustomPassword(password: string) {
   const result = await validatePassword(password, {
     minLength: 8, // Custom minimum length (default: 15)
     maxLength: 64, // Custom maximum length (default: 100K)
@@ -229,8 +229,27 @@ async function checkCustomPassword(password) {
   }
 }
 
+export interface ICreateAccountFormProps {
+  mode?: 'create' | 'import';
+  showTerms?: boolean;
+  buttonText?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  title?: string;
+  onSubmit?: (values: { password: string; passwordMatch?: string }) => void;
+  customNavigate?: (password: string) => void;
+}
 
-const CreateAccountForm = () => {
+const CreateAccountForm = ({ 
+  mode = 'create', 
+  showTerms = true, 
+  buttonText,
+  disabled = false,
+  loading = false,
+  title,
+  onSubmit,
+  customNavigate
+}: ICreateAccountFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -256,27 +275,44 @@ const CreateAccountForm = () => {
         .required(t("cca-63_required"))
         .oneOf([Yup.ref("password")], t("cca-64_password-must-match")),
     }),
-    onSubmit: () => {
-      try {
-        const newPassword = formik.values.password;
-        navigate("/non-custodial-signup-2", {
-          state: { password: newPassword },
-        });
-      } catch (err) {
-        // console.log("Failed at CreateAccountForm: ", err);
+    onSubmit: (values) => {
+      if (onSubmit) {
+        onSubmit(values);
+      } else if (customNavigate) {
+        customNavigate(values.password);
+      } else if (mode === 'create') {
+        // Default create account behavior
+        try {
+          const newPassword = values.password;
+          navigate("/non-custodial-signup-2", {
+            state: { password: newPassword },
+          });
+        } catch (err) {
+          // console.log("Failed at CreateAccountForm: ", err);
+        }
       }
     },
   });
+
+  const isFormValid = () => {
+    const hasPasswordError = formik.touched.password && formik.errors.password;
+    const hasPasswordMatchError = formik.touched.passwordMatch && formik.errors.passwordMatch;
+    const termsValid = showTerms ? checked : true;
+    
+    return !hasPasswordError && !hasPasswordMatchError && termsValid && !disabled;
+  };
 
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
         <Stack gap={"24px"}>
-          <Box className="fs-24-regular white">{t("ncca-1_create-account")}</Box>
+          <Box className="fs-24-regular white">
+            {title || (mode === 'create' ? t("ncca-1_create-account") : t("ncca-3_password"))}
+          </Box>
           <Stack>
             <InputText
               id="password"
-              label={t("ncca-3_password")}
+              label={mode === 'import' ? "Create password" : t("ncca-3_password")}
               type="password"
               name="password"
               value={formik.values.password}
@@ -299,11 +335,12 @@ const CreateAccountForm = () => {
             />
             {formik.touched.passwordMatch && formik.errors.passwordMatch && <Box className={"fs-16-regular red"}>{formik.errors.passwordMatch}</Box>}
           </Stack>
-          <IAgreeTerms checked={checked} setChecked={setChecked} />
+          {showTerms && <IAgreeTerms checked={checked} setChecked={setChecked} />}
           <AccountNextButton
             isSubmit={true}
-            text={t("ncca-7_next")}
-            disabled={(formik.errors.password ? true : false || formik.errors.passwordMatch ? true : false) || !checked}
+            text={buttonText || t("ncca-7_next")}
+            disabled={!isFormValid()}
+            loading={loading}
           />
         </Stack>
       </form>

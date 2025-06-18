@@ -94,7 +94,11 @@ const Welcome = () => {
                       <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
                     </Grid>
                     <Grid item xs={12} mt={"32px"}>
-                      <CreateAccountForm />
+                      <CreateAccountForm
+                        mode="create"
+                        showTerms={true}
+                        buttonText={t("ncca-7_next")}
+                      />
                     </Grid>
                     <Grid item xs={12} mt={"32px"}>
                       <OrLine />
