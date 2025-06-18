@@ -38,12 +38,6 @@ const NonCustodialImport1 = () => {
     accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
   }, [accountListStore]);
 
-  const handlePasswordSubmit = (password: string) => {
-    navigate(`/non-custodial-signup-4/${mode === "guest" ? "guest" : "signup"}`, { 
-      state: { passphrase: passphrase, password: password } 
-    });
-  };
-
   return (
     <>
       <Grid container className="basic-container">
@@ -76,11 +70,17 @@ const NonCustodialImport1 = () => {
                       <AccountHeader title={t("ncca-65_hello-again")} text={t("ncl-12_type-your-mnemonic")} />
                     </Grid>
                     <Grid item xs={12} mt={"48px"}>
-                      <CreateAccountForm 
-                        mode="import"
-                        showTerms={false}
+                      <CreateAccountForm
+                        title={t("ncca-3_password")}
+                        passwordLabel="Create password"
+                        confirmPasswordLabel={t("ncca-5_repeat-password")}
                         buttonText={t("ncl-6_next")}
-                        customNavigate={handlePasswordSubmit}
+                        showTerms={false}
+                        onSubmit={(values) => {
+                          navigate(`/non-custodial-signup-4/${mode === "guest" ? "guest" : "signup"}`, {
+                            state: { passphrase: passphrase, password: values.password }
+                          });
+                        }}
                       />
                     </Grid>
                   </Grid>

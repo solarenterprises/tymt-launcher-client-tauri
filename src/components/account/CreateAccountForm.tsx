@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -230,35 +229,44 @@ async function checkCustomPassword(password: string) {
 }
 
 export interface ICreateAccountFormProps {
-  mode?: 'create' | 'import';
+  // Display options
   showTerms?: boolean;
-  buttonText?: string;
-  disabled?: boolean;
-  loading?: boolean;
   title?: string;
-  onSubmit?: (values: { password: string; passwordMatch?: string }) => void;
-  customNavigate?: (password: string) => void;
+  subtitle?: string;
+  
+  // Field labels
+  passwordLabel?: string;
+  confirmPasswordLabel?: string;
+  
+  // Button
+  buttonText?: string;
+  loading?: boolean;
+  
+  // Form behavior
+  requirePasswordMatch?: boolean;
+  
+  // Callback
+  onSubmit: (values: { password: string; passwordMatch?: string }) => void;
 }
 
 const CreateAccountForm = ({ 
-  mode = 'create', 
   showTerms = true, 
-  buttonText,
-  disabled = false,
-  loading = false,
   title,
-  onSubmit,
-  customNavigate
+  subtitle,
+  passwordLabel = "Password",
+  confirmPasswordLabel = "Confirm Password",
+  buttonText = "Next",
+  loading = false,
+  requirePasswordMatch = true,
+  onSubmit
 }: ICreateAccountFormProps) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
   const [checked, setChecked] = useState<boolean>(false);
 
   const formik = useFormik({
     initialValues: {
       password: "",
-      passwordMatch: "",
+      passwordMatch: requirePasswordMatch ? "" : undefined,
     },
     validationSchema: Yup.object({
       password: Yup.string()
@@ -271,61 +279,61 @@ const CreateAccountForm = ({
           return result;
         })
         .required(t("cca-63_required")),
-      passwordMatch: Yup.string()
-        .required(t("cca-63_required"))
-        .oneOf([Yup.ref("password")], t("cca-64_password-must-match")),
+      ...(requirePasswordMatch && {
+        passwordMatch: Yup.string()
+          .required(t("cca-63_required"))
+          .oneOf([Yup.ref("password")], t("cca-64_password-must-match")),
+      }),
     }),
     onSubmit: (values) => {
-      if (onSubmit) {
-        onSubmit(values);
-      } else if (customNavigate) {
-        customNavigate(values.password);
-      } else if (mode === 'create') {
-        // Default create account behavior
-        try {
-          const newPassword = values.password;
-          navigate("/non-custodial-signup-2", {
-            state: { password: newPassword },
-          });
-        } catch (err) {
-          // console.log("Failed at CreateAccountForm: ", err);
-        }
-      }
+      onSubmit(values);
     },
   });
 
   const isFormValid = () => {
     const hasPasswordError = formik.touched.password && formik.errors.password;
-    const hasPasswordMatchError = formik.touched.passwordMatch && formik.errors.passwordMatch;
+    const hasPasswordMatchError = requirePasswordMatch && formik.touched.passwordMatch && formik.errors.passwordMatch;
     const termsValid = showTerms ? checked : true;
     
-    return !hasPasswordError && !hasPasswordMatchError && termsValid && !disabled;
+    return !hasPasswordError && !hasPasswordMatchError && termsValid && !loading;
   };
 
   return (
-    <>
-      <form onSubmit={formik.handleSubmit}>
-        <Stack gap={"24px"}>
+    <form onSubmit={formik.handleSubmit}>
+      <Stack gap={"24px"}>
+        {title && (
           <Box className="fs-24-regular white">
-            {title || (mode === 'create' ? t("ncca-1_create-account") : t("ncca-3_password"))}
+            {title}
           </Box>
-          <Stack>
-            <InputText
-              id="password"
-              label={mode === 'import' ? "Create password" : t("ncca-3_password")}
-              type="password"
-              name="password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.password && formik.errors.password ? true : false}
-            />
-            {formik.touched.password && formik.errors.password && <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>}
-          </Stack>
+        )}
+        
+        {subtitle && (
+          <Box className="fs-16-regular white opacity-70">
+            {subtitle}
+          </Box>
+        )}
+        
+        <Stack>
+          <InputText
+            id="password"
+            label={passwordLabel}
+            type="password"
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.password && formik.errors.password ? true : false}
+          />
+          {formik.touched.password && formik.errors.password && (
+            <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>
+          )}
+        </Stack>
+        
+        {requirePasswordMatch && (
           <Stack>
             <InputText
               id="repeat-password"
-              label={t("ncca-5_repeat-password")}
+              label={confirmPasswordLabel}
               type="password"
               name="passwordMatch"
               value={formik.values.passwordMatch}
@@ -333,18 +341,22 @@ const CreateAccountForm = ({
               onBlur={formik.handleBlur}
               error={formik.touched.passwordMatch && formik.errors.passwordMatch ? true : false}
             />
-            {formik.touched.passwordMatch && formik.errors.passwordMatch && <Box className={"fs-16-regular red"}>{formik.errors.passwordMatch}</Box>}
+            {formik.touched.passwordMatch && formik.errors.passwordMatch && (
+              <Box className={"fs-16-regular red"}>{formik.errors.passwordMatch}</Box>
+            )}
           </Stack>
-          {showTerms && <IAgreeTerms checked={checked} setChecked={setChecked} />}
-          <AccountNextButton
-            isSubmit={true}
-            text={buttonText || t("ncca-7_next")}
-            disabled={!isFormValid()}
-            loading={loading}
-          />
-        </Stack>
-      </form>
-    </>
+        )}
+        
+        {showTerms && <IAgreeTerms checked={checked} setChecked={setChecked} />}
+        
+        <AccountNextButton
+          isSubmit={true}
+          text={buttonText}
+          disabled={!isFormValid()}
+          loading={loading}
+        />
+      </Stack>
+    </form>
   );
 };
 
