@@ -8,6 +8,7 @@ import { Box, Stack } from "@mui/material";
 import AccountNextButton from "./AccountNextButton";
 import InputText from "./InputText";
 import IAgreeTerms from "./IAgreeTerms";
+import SecurityLevel from "./SecurityLevel";
 import { validatePassword } from "nist-password-validator";
 
 async function checkCustomPassword(password: string) {
@@ -244,7 +245,8 @@ export interface ICreateAccountFormProps {
   
   // Form behavior
   requirePasswordMatch?: boolean;
-  
+  showSecurityLevel?: boolean;
+
   // Callback
   onSubmit: (values: { password: string; passwordMatch?: string }) => void;
 }
@@ -258,6 +260,7 @@ const CreateAccountForm = ({
   buttonText = "Next",
   loading = false,
   requirePasswordMatch = true,
+  showSecurityLevel = false,
   onSubmit
 }: ICreateAccountFormProps) => {
   const { t } = useTranslation();
@@ -328,6 +331,12 @@ const CreateAccountForm = ({
             <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>
           )}
         </Stack>
+
+        {showSecurityLevel && (
+          <Box>
+            <SecurityLevel password={formik.values.password} />
+          </Box>
+        )}
         
         {requirePasswordMatch && (
           <Stack>
