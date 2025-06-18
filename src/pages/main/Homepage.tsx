@@ -9,21 +9,22 @@ import TymtIntro from "../../components/home/TymtIntro";
 import GameSwiperComponent from "../../components/home/GameSwiperComponent";
 import BetaModal from "../../components/modal/BetaModal";
 
-import { useAppDispatch, useAppSelector } from "../../store";
-import { getBetaModalState, setBetaModalSeen } from "../../store/BetaModalSlice";
+import { useAppDispatch } from "../../store";
+import { setBetaModalSeen } from "../../store/BetaModalSlice";
 
 const Homepage = () => {
   const { constTymtLinks } = useConstVar();
   const [updateModal, setUpdateModal] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-const { hasSeenBetaModal } = useAppSelector(getBetaModalState);
-const [betaModal, setBetaModal] = useState<boolean>(!hasSeenBetaModal);
+  // const { hasSeenBetaModal } = useAppSelector(getBetaModalState);
+  // const [betaModal, setBetaModal] = useState<boolean>(!hasSeenBetaModal);
+  const [betaModal, setBetaModal] = useState<boolean>(false);
 
-const handleBetaModalClose = () => {
-  setBetaModal(false);
-  dispatch(setBetaModalSeen());
-};
+  const handleBetaModalClose = () => {
+    setBetaModal(false);
+    dispatch(setBetaModalSeen());
+  };
 
   return (
     <>
