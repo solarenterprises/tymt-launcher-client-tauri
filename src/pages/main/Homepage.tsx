@@ -17,13 +17,14 @@ const Homepage = () => {
   const [updateModal, setUpdateModal] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
-const { hasSeenBetaModal } = useAppSelector(getBetaModalState);
-const [betaModal, setBetaModal] = useState<boolean>(!hasSeenBetaModal);
+  const { hasSeenBetaModal } = useAppSelector(getBetaModalState);
+  // const [betaModal, setBetaModal] = useState<boolean>(!hasSeenBetaModal);
+  const [betaModal, setBetaModal] = useState<boolean>(false);
 
-const handleBetaModalClose = () => {
-  setBetaModal(false);
-  dispatch(setBetaModalSeen());
-};
+  const handleBetaModalClose = () => {
+    setBetaModal(false);
+    dispatch(setBetaModalSeen());
+  };
 
   return (
     <>
