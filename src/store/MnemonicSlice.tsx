@@ -1,5 +1,5 @@
-// Mnemonic is not saved in local stroage due to the security issue.
-// It is cleaned when the app is closed.
+// Mnemonic is stored in memory only - not persisted to any storage
+// It is cleared when the app is closed or refreshed
 
 import { createSlice } from "@reduxjs/toolkit";
 import { IMnemonic } from "../types/AccountTypes";
@@ -8,13 +8,8 @@ const init: IMnemonic = {
   mnemonic: "",
 };
 
-const loadMnemonic: () => IMnemonic = () => {
-  const mnemonicData = sessionStorage.getItem("mnemonic");
-  return mnemonicData ? JSON.parse(mnemonicData) : init;
-};
-
 const initialState = {
-  data: loadMnemonic(),
+  data: init,
   status: "mnemonic",
   msg: "",
 };
@@ -25,7 +20,7 @@ export const mnemonicSlice = createSlice({
   reducers: {
     setMnemonic: (state, action) => {
       state.data.mnemonic = action.payload;
-      sessionStorage.setItem("mnemonic", JSON.stringify(state.data));
+      // No storage - memory only
     },
   },
 });

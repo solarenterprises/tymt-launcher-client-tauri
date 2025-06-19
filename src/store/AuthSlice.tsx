@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import tymtStorage from "../lib/storage/tymtStorage";
+import { authStorage } from "../lib/storage/authStorage";
 import { compareJSONStructure } from "../lib/helper/JSONHelper";
 
 import { IAuth } from "../types/AccountTypes";
@@ -12,12 +12,11 @@ const init: IAuth = {
 };
 
 const loadAuth: () => IAuth = () => {
-  const data = tymtStorage.get(`auth`);
-  if (!data || !compareJSONStructure(JSON.parse(data), init)) {
-    tymtStorage.set(`auth`, JSON.stringify(init));
+  const data = authStorage.get();
+  if (!data || !compareJSONStructure(data, init)) {
     return init;
   }
-  return JSON.parse(data);
+  return data;
 };
 
 const initialState = {
@@ -32,7 +31,7 @@ export const authSlice = createSlice({
   reducers: {
     setAuth: (state, action) => {
       state.data = action.payload;
-      tymtStorage.set(`auth`, JSON.stringify(state.data));
+      authStorage.set(state.data);
     },
   },
 });

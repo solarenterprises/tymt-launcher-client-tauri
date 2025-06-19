@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { CONFIG_TYMT_BACKEND_URL } from "../../config/MainConfig";
-import tymtStorage from "../storage/tymtStorage";
+import { authStorage } from "../storage/authStorage";
 
 const axiosAuth = axios.create({
   baseURL: `${CONFIG_TYMT_BACKEND_URL}/api`,
@@ -13,10 +13,9 @@ const axiosAuth = axios.create({
 // Add a request interceptor to attach the Bearer token
 axiosAuth.interceptors.request.use(
   (config) => {
-    const auth = tymtStorage.get("auth");
-    if (auth) {
-      const { accessToken } = JSON.parse(auth);
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const auth = authStorage.get();
+    if (auth && auth.accessToken) {
+      config.headers.Authorization = `Bearer ${auth.accessToken}`;
     }
     return config;
   },
@@ -37,18 +36,17 @@ axiosAuth.interceptors.response.use(
 
       try {
         // Refresh the access token using the refresh token
-        const auth = tymtStorage.get("auth");
-        if (!auth) {
+        const auth = authStorage.get();
+        if (!auth || !auth.refreshToken) {
           throw new Error("No refresh token found");
         }
-        const { refreshToken } = JSON.parse(auth);
 
-        const response = await axios.post(`${CONFIG_TYMT_BACKEND_URL}/api/auth/refresh-token`, { refreshToken });
+        const response = await axios.post(`${CONFIG_TYMT_BACKEND_URL}/api/auth/refresh-token`, { refreshToken: auth.refreshToken });
 
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data?.data;
 
         // Update the access token in local storage and headers
-        tymtStorage.set("auth", JSON.stringify({ ...JSON.parse(auth), accessToken: newAccessToken, refreshToken: newRefreshToken }));
+        authStorage.set({ ...auth, accessToken: newAccessToken, refreshToken: newRefreshToken });
 
         // Retry the original request with the new access token
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -56,7 +54,7 @@ axiosAuth.interceptors.response.use(
       } catch (refreshError) {
         // Handle refresh token failure (e.g., logout the user)
         console.error("Failed to refresh token:", refreshError);
-        tymtStorage.remove("auth");
+        authStorage.remove();
         window.location.href = "/"; // Redirect to splash page
         return Promise.reject(refreshError);
       }
