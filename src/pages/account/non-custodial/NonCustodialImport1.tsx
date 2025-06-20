@@ -3,8 +3,6 @@ import { useSelector } from "react-redux";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 
 // import "../../../global.css";
 
@@ -12,9 +10,8 @@ import { Grid, Box, Stack } from "@mui/material";
 
 import Back from "../../../components/account/Back";
 import AccountHeader from "../../../components/account/AccountHeader";
-import InputText from "../../../components/account/InputText";
-import AccountNextButton from "../../../components/account/AccountNextButton";
 import Stepper from "../../../components/account/Stepper";
+import CreateAccountForm from "../../../components/account/CreateAccountForm";
 
 import { getAccountList } from "../../../store/AccountListSlice";
 
@@ -26,6 +23,7 @@ export interface ILocationStateNonCustodialImport1 {
   passphrase: string;
 }
 
+
 const NonCustodialImport1 = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -35,46 +33,6 @@ const NonCustodialImport1 = () => {
   const { passphrase } = (location.state as ILocationStateNonCustodialImport1) || {};
 
   const accountListStore: IAccountList = useSelector(getAccountList);
-
-  const formik = useFormik({
-    initialValues: {
-      password: "",
-      passwordMatch: "",
-    },
-    validationSchema: Yup.object({
-      password: Yup.string()
-        .test(
-          "password-requirements",
-          "Password must meet at least four out of the five requirements: Include a lowercase letter, an uppercase letter, a number, a special character, and be at least 8 characters long.",
-          (value) => {
-            if (!value) {
-              return false;
-            }
-            const checks = [
-              /[a-z]/.test(value), // Check for lowercase letter
-              /[A-Z]/.test(value), // Check for uppercase letter
-              /\d/.test(value), // Check for digit
-              /^[^\s'";\\]+$/.test(value), // Exclude spaces, single quotes, double quotes, semicolons, and backslashes
-              value.length >= 8, // Check for minimum length
-            ];
-            const passedConditions = checks.filter(Boolean).length;
-            return passedConditions >= 4;
-          }
-        )
-        .required(t("cca-63_required")),
-      passwordMatch: Yup.string()
-        .required(t("cca-63_required"))
-        .oneOf([Yup.ref("password")], t("cca-64_password-must-match")),
-    }),
-    onSubmit: async () => {
-      try {
-        const newPassword = formik.values.password;
-        navigate(`/non-custodial-signup-4/${mode === "guest" ? "guest" : "signup"}`, { state: { passphrase: passphrase, password: newPassword } });
-      } catch (err) {
-        console.error("Failed to onSubmit at NonCustodialImport1: ", err);
-      }
-    },
-  });
 
   const handleBackClick = useCallback(() => {
     accountListStore?.list?.length ? navigate("/non-custodial-login-1") : navigate("/welcome");
@@ -111,64 +69,20 @@ const NonCustodialImport1 = () => {
                     <Grid item xs={12} mt={"80px"}>
                       <AccountHeader title={t("ncca-65_hello-again")} text={t("ncl-12_type-your-mnemonic")} />
                     </Grid>
-                    <form onSubmit={formik.handleSubmit} style={{ width: "100%" }}>
-                      <Grid item xs={12} mt={"48px"}>
-                        <InputText
-                          id="non-custodial-new-password"
-                          name="password"
-                          label={"Create password"}
-                          type="password"
-                          value={formik.values.password}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          error={formik.touched.password && formik.errors.password ? true : false}
-                        />
-                      </Grid>
-                      {/* <Grid item xs={12} mt={"16px"}>
-                        <SecurityLevel password={formik.values.password} />
-                      </Grid> */}
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          height: "20px",
-                          padding: "0px 6px",
+                    <Grid item xs={12} mt={"48px"}>
+                      <CreateAccountForm
+                        title={t("ncca-3_password")}
+                        passwordLabel="Create password"
+                        confirmPasswordLabel={t("ncca-5_repeat-password")}
+                        buttonText={t("ncl-6_next")}
+                        showTerms={false}
+                        onSubmit={(values) => {
+                          navigate(`/non-custodial-signup-4/${mode === "guest" ? "guest" : "signup"}`, {
+                            state: { passphrase: passphrase, password: values.password }
+                          });
                         }}
-                      >
-                        {formik.touched.password && formik.errors.password && <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>}
-                      </Grid>
-                      <Grid item xs={12} mt={"48px"}>
-                        <InputText
-                          id="non-custodial-repeat-password"
-                          name="passwordMatch"
-                          label={t("ncca-5_repeat-password")}
-                          type="password"
-                          value={formik.values.passwordMatch}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          error={formik.touched.passwordMatch && formik.errors.passwordMatch ? true : false}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sx={{
-                          height: "20px",
-                          padding: "0px 6px",
-                        }}
-                      >
-                        {formik.touched.passwordMatch && formik.errors.passwordMatch && (
-                          <Box className={"fs-16-regular red"}>{formik.errors.passwordMatch}</Box>
-                        )}
-                      </Grid>
-                      <Grid item xs={12} mt={"24px"}>
-                        <AccountNextButton
-                          isSubmit={true}
-                          text={t("ncl-6_next")}
-                          disabled={formik.errors.password || formik.errors.passwordMatch ? true : false}
-                        />
-                      </Grid>
-                    </form>
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
               </Stack>

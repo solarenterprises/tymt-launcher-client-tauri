@@ -94,7 +94,18 @@ const Welcome = () => {
                       <Divider variant="fullWidth" sx={{ backgroundColor: "#FFFFFF1A" }} />
                     </Grid>
                     <Grid item xs={12} mt={"32px"}>
-                      <CreateAccountForm />
+                      <CreateAccountForm
+                        title={t("ncca-1_create-account")}
+                        passwordLabel={t("ncca-3_password")}
+                        confirmPasswordLabel={t("ncca-5_repeat-password")}
+                        buttonText={t("ncca-7_next")}
+                        showTerms={true}
+                        onSubmit={(values) => {
+                          navigate("/non-custodial-signup-2", {
+                            state: { password: values.password },
+                          });
+                        }}
+                      />
                     </Grid>
                     <Grid item xs={12} mt={"32px"}>
                       <OrLine />

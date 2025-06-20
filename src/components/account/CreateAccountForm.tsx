@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -9,9 +8,10 @@ import { Box, Stack } from "@mui/material";
 import AccountNextButton from "./AccountNextButton";
 import InputText from "./InputText";
 import IAgreeTerms from "./IAgreeTerms";
+import SecurityLevel from "./SecurityLevel";
 import { validatePassword } from "nist-password-validator";
 
-async function checkCustomPassword(password) {
+async function checkCustomPassword(password: string) {
   const result = await validatePassword(password, {
     minLength: 8, // Custom minimum length (default: 15)
     maxLength: 64, // Custom maximum length (default: 100K)
@@ -229,17 +229,47 @@ async function checkCustomPassword(password) {
   }
 }
 
+export interface ICreateAccountFormProps {
+  // Display options
+  showTerms?: boolean;
+  title?: string;
+  subtitle?: string;
+  
+  // Field labels
+  passwordLabel?: string;
+  confirmPasswordLabel?: string;
+  
+  // Button
+  buttonText?: string;
+  loading?: boolean;
+  
+  // Form behavior
+  requirePasswordMatch?: boolean;
+  showSecurityLevel?: boolean;
 
-const CreateAccountForm = () => {
+  // Callback
+  onSubmit: (values: { password: string; passwordMatch?: string }) => void;
+}
+
+const CreateAccountForm = ({ 
+  showTerms = true, 
+  title,
+  subtitle,
+  passwordLabel = "Password",
+  confirmPasswordLabel = "Confirm Password",
+  buttonText = "Next",
+  loading = false,
+  requirePasswordMatch = true,
+  showSecurityLevel = false,
+  onSubmit
+}: ICreateAccountFormProps) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
   const [checked, setChecked] = useState<boolean>(false);
 
   const formik = useFormik({
     initialValues: {
       password: "",
-      passwordMatch: "",
+      passwordMatch: requirePasswordMatch ? "" : undefined,
     },
     validationSchema: Yup.object({
       password: Yup.string()
@@ -252,44 +282,67 @@ const CreateAccountForm = () => {
           return result;
         })
         .required(t("cca-63_required")),
-      passwordMatch: Yup.string()
-        .required(t("cca-63_required"))
-        .oneOf([Yup.ref("password")], t("cca-64_password-must-match")),
+      ...(requirePasswordMatch && {
+        passwordMatch: Yup.string()
+          .required(t("cca-63_required"))
+          .oneOf([Yup.ref("password")], t("cca-64_password-must-match")),
+      }),
     }),
-    onSubmit: () => {
-      try {
-        const newPassword = formik.values.password;
-        navigate("/non-custodial-signup-2", {
-          state: { password: newPassword },
-        });
-      } catch (err) {
-        // console.log("Failed at CreateAccountForm: ", err);
-      }
+    onSubmit: (values) => {
+      onSubmit(values);
     },
   });
 
+  const isFormValid = () => {
+    const hasPasswordError = formik.touched.password && formik.errors.password;
+    const hasPasswordMatchError = requirePasswordMatch && formik.touched.passwordMatch && formik.errors.passwordMatch;
+    const termsValid = showTerms ? checked : true;
+    
+    return !hasPasswordError && !hasPasswordMatchError && termsValid && !loading;
+  };
+
   return (
-    <>
-      <form onSubmit={formik.handleSubmit}>
-        <Stack gap={"24px"}>
-          <Box className="fs-24-regular white">{t("ncca-1_create-account")}</Box>
-          <Stack>
-            <InputText
-              id="password"
-              label={t("ncca-3_password")}
-              type="password"
-              name="password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.password && formik.errors.password ? true : false}
-            />
-            {formik.touched.password && formik.errors.password && <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>}
-          </Stack>
+    <form onSubmit={formik.handleSubmit}>
+      <Stack gap={"24px"}>
+        {title && (
+          <Box className="fs-24-regular white">
+            {title}
+          </Box>
+        )}
+        
+        {subtitle && (
+          <Box className="fs-16-regular white opacity-70">
+            {subtitle}
+          </Box>
+        )}
+        
+        <Stack>
+          <InputText
+            id="password"
+            label={passwordLabel}
+            type="password"
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.password && formik.errors.password ? true : false}
+          />
+          {formik.touched.password && formik.errors.password && (
+            <Box className={"fs-16-regular red"}>{formik.errors.password}</Box>
+          )}
+        </Stack>
+
+        {showSecurityLevel && (
+          <Box>
+            <SecurityLevel password={formik.values.password} />
+          </Box>
+        )}
+        
+        {requirePasswordMatch && (
           <Stack>
             <InputText
               id="repeat-password"
-              label={t("ncca-5_repeat-password")}
+              label={confirmPasswordLabel}
               type="password"
               name="passwordMatch"
               value={formik.values.passwordMatch}
@@ -297,17 +350,22 @@ const CreateAccountForm = () => {
               onBlur={formik.handleBlur}
               error={formik.touched.passwordMatch && formik.errors.passwordMatch ? true : false}
             />
-            {formik.touched.passwordMatch && formik.errors.passwordMatch && <Box className={"fs-16-regular red"}>{formik.errors.passwordMatch}</Box>}
+            {formik.touched.passwordMatch && formik.errors.passwordMatch && (
+              <Box className={"fs-16-regular red"}>{formik.errors.passwordMatch}</Box>
+            )}
           </Stack>
-          <IAgreeTerms checked={checked} setChecked={setChecked} />
-          <AccountNextButton
-            isSubmit={true}
-            text={t("ncca-7_next")}
-            disabled={(formik.errors.password ? true : false || formik.errors.passwordMatch ? true : false) || !checked}
-          />
-        </Stack>
-      </form>
-    </>
+        )}
+        
+        {showTerms && <IAgreeTerms checked={checked} setChecked={setChecked} />}
+        
+        <AccountNextButton
+          isSubmit={true}
+          text={buttonText}
+          disabled={!isFormValid()}
+          loading={loading}
+        />
+      </Stack>
+    </form>
   );
 };
 
