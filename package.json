@@ -163,5 +163,9 @@
     "vite-plugin-top-level-await": "^1.4.1",
     "vite-plugin-wasm": "^3.3.0",
     "vitest": "^3.2.1"
-  }
+  },
+  "engines": {
+    "yarn": ">=1.0.0 <2.0.0"
+  },
+  "packageManager": "yarn@1.22.22"
 }
