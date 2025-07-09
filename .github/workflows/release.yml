@@ -88,34 +88,34 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=8192"
 
           # Tauri Signing Keys
-          TAURI_SIGNING_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
+          TAURI_SIGNING_PUBLIC_KEY: ${{ vars.TAURI_SIGNING_PUBLIC_KEY }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
           # Environment-specific variables
-          VITE_APP_PRODUCTION_VERSION: ${{ secrets.VITE_APP_PRODUCTION_VERSION }}
-          VITE_APP_NETWORK_NAME: ${{ secrets.VITE_APP_NETWORK_NAME }}
-          VITE_APP_TYMT_RELEASE_DATE: ${{ secrets.VITE_APP_TYMT_RELEASE_DATE }}
-          VITE_APP_TYMT_VERSION: ${{ secrets.VITE_APP_TYMT_VERSION }}
-          VITE_APP_NOTIFICATION_DURATION: ${{ secrets.VITE_APP_NOTIFICATION_DURATION }}
-          VITE_APP_LOCAL_SERVER_PORT: ${{ secrets.VITE_APP_LOCAL_SERVER_PORT }}
-          VITE_APP_WIF: ${{ secrets.VITE_APP_WIF }}
+          VITE_APP_PRODUCTION_VERSION: ${{ vars.VITE_APP_PRODUCTION_VERSION }}
+          VITE_APP_NETWORK_NAME: ${{ vars.VITE_APP_NETWORK_NAME }}
+          VITE_APP_TYMT_RELEASE_DATE: ${{ vars.VITE_APP_TYMT_RELEASE_DATE }}
+          VITE_APP_TYMT_VERSION: ${{ vars.VITE_APP_TYMT_VERSION }}
+          VITE_APP_NOTIFICATION_DURATION: ${{ vars.VITE_APP_NOTIFICATION_DURATION }}
+          VITE_APP_LOCAL_SERVER_PORT: ${{ vars.VITE_APP_LOCAL_SERVER_PORT }}
+          VITE_APP_WIF: ${{ vars.VITE_APP_WIF }}
 
           # Backend URLs
-          CONFIG_TYMT_BACKEND_URL: ${{ secrets.CONFIG_TYMT_BACKEND_URL }}
-          VITE_APP_TYMT_BACKEND_URL: ${{ secrets.VITE_APP_TYMT_BACKEND_URL }}
-          VITE_APP_TYMT_BACKEND_DEV_URL: ${{ secrets.VITE_APP_TYMT_BACKEND_DEV_URL }}
-          VITE_APP_TYMT_AVATAR_URL: ${{ secrets.VITE_APP_TYMT_AVATAR_URL }}
-          VITE_APP_SOCKET_BACKEND_URL: ${{ secrets.VITE_APP_SOCKET_BACKEND_URL }}
-          VITE_APP_SOCKET_BACKEND_DEV_URL: ${{ secrets.VITE_APP_SOCKET_BACKEND_DEV_URL }}
+          CONFIG_TYMT_BACKEND_URL: ${{ vars.CONFIG_TYMT_BACKEND_URL }}
+          VITE_APP_TYMT_BACKEND_URL: ${{ vars.VITE_APP_TYMT_BACKEND_URL }}
+          VITE_APP_TYMT_BACKEND_DEV_URL: ${{ vars.VITE_APP_TYMT_BACKEND_DEV_URL }}
+          VITE_APP_TYMT_AVATAR_URL: ${{ vars.VITE_APP_TYMT_AVATAR_URL }}
+          VITE_APP_SOCKET_BACKEND_URL: ${{ vars.VITE_APP_SOCKET_BACKEND_URL }}
+          VITE_APP_SOCKET_BACKEND_DEV_URL: ${{ vars.VITE_APP_SOCKET_BACKEND_DEV_URL }}
 
           # Solar Network URLs
-          VITE_APP_MAINNET_SOLAR_SCAN: ${{ secrets.VITE_APP_MAINNET_SOLAR_SCAN }}
-          VITE_APP_MAINNET_SOLAR_API_URL: ${{ secrets.VITE_APP_MAINNET_SOLAR_API_URL }}
-          VITE_APP_MAINNET_SOLAR_WSS_URL: ${{ secrets.VITE_APP_MAINNET_SOLAR_WSS_URL }}
-          VITE_APP_TESTNET_SOLAR_SCAN: ${{ secrets.VITE_APP_TESTNET_SOLAR_SCAN }}
-          VITE_APP_TESTNET_SOLAR_API_URL: ${{ secrets.VITE_APP_TESTNET_SOLAR_API_URL }}
-          VITE_APP_TESTNET_SOLAR_WSS_URL: ${{ secrets.VITE_APP_TESTNET_SOLAR_WSS_URL }}
+          VITE_APP_MAINNET_SOLAR_SCAN: ${{ vars.VITE_APP_MAINNET_SOLAR_SCAN }}
+          VITE_APP_MAINNET_SOLAR_API_URL: ${{ vars.VITE_APP_MAINNET_SOLAR_API_URL }}
+          VITE_APP_MAINNET_SOLAR_WSS_URL: ${{ vars.VITE_APP_MAINNET_SOLAR_WSS_URL }}
+          VITE_APP_TESTNET_SOLAR_SCAN: ${{ vars.VITE_APP_TESTNET_SOLAR_SCAN }}
+          VITE_APP_TESTNET_SOLAR_API_URL: ${{ vars.VITE_APP_TESTNET_SOLAR_API_URL }}
+          VITE_APP_TESTNET_SOLAR_WSS_URL: ${{ vars.VITE_APP_TESTNET_SOLAR_WSS_URL }}
 
          # Arbitrum
           VITE_APP_ARB_API_KEY: ${{ secrets.VITE_APP_ARB_API_KEY }}
@@ -185,9 +185,12 @@ jobs:
  
           # Misc. API Keys
           VITE_APP_ALCHEMY_KEY: ${{ secrets.VITE_APP_ALCHEMY_KEY }}
+
+          # Tag and release naming
+          VERSION_SUFFIX: ${{ github.ref_name == 'staging' && '-testnet' || '' }}
         with:
-          tagName: v__VERSION__
-          releaseName: "tymt™ v__VERSION__"
+          tagName: "v__VERSION__${{ env.VERSION_SUFFIX }}"
+          releaseName: "tymt™ v__VERSION__${{ env.VERSION_SUFFIX }}"
           releaseBody: "See assets below to download and install this version."
           releaseDraft: true
           prerelease: false

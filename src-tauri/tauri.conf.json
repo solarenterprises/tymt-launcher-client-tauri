@@ -71,7 +71,7 @@
         "style-src": "'self' 'unsafe-inline'",
         "img-src": "'self' data: https:",
         "font-src": "'self' data:",
-        "connect-src": "'self' ipc: http://ipc.localhost https://*.tymt.com https://*.solar.org https://*.valist.io https://*.veloren.net https://*.github.com https://*.epicgames.com https://*.aka.ms",
+        "connect-src": "'self' ipc: http://ipc.localhost https://*.railway.app https://*.tymt.com https://*.solar.org https://*.valist.io https://*.veloren.net https://*.github.com https://*.epicgames.com https://*.aka.ms",
         "media-src": "'self' https://*.tymt.com https://*.railway.app",
         "frame-src": "https://www.youtube.com https://www.youtube-nocookie.com",
         "object-src": "'none'",
